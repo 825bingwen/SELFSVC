@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SCORESEL">
+	<!-- 开户模板对象 -->
+	<typeAlias alias="scorePojo"
+		type="com.customize.hub.selfsvc.scorexecoup.model.ScorePojo" />
+ <!-- add begin by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+ <typeAlias alias="activePojo"
+		type="com.customize.hub.selfsvc.scorexecoup.model.RewardAction" />
+ <!-- add end by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+	<!-- 选号共享单位查询 -->
+	<select id="qryScoreType" resultClass="scorePojo"
+		parameterClass="java.lang.String">
+		SELECT T.TYPE,T.SCORE,T.DESCRIPTION,T.STATUS,T.OPERID FROM
+		SH_SCOREEXCHANGE_CONF T WHERE T.CHANGETYPE=#value# AND T.STATUS='1'
+	</select>
+	<!-- add begin by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+			<select id="qryAllRewardLevel" resultClass="activePojo"
+		parameterClass="activePojo">
+		<![CDATA[
+		select distinct d.dictid actid,max(d.dictname) activename,min(r.costdata) costdata from  sh_dict_item d,SH_EXTRACTPRIZE_RULE r where d.groupid='AWARDLEVEL' and d.status=1 and r.rectype='ScoreAward' and r.status=1 
+and r.costdata<=#step# and d.dictid=r.awardlevel and (r.region=999 or r.region=#region#)  group by d.dictid 
+	]]></select>
+	
+ <select id="qryActiveListByLevel" resultClass="activePojo"
+		parameterClass="activePojo">
+		<![CDATA[select  r.actid,r.activename,r.costdata,r.note from  sh_dict_item d,SH_EXTRACTPRIZE_RULE r where d.groupid='AWARDLEVEL' and d.status=1 and r.rectype='ScoreAward' and r.status=1 
+and d.dictid=#actid#  and r.costdata<=#step# and  d.dictid=r.awardlevel and (r.region=999 or r.region=#region#) order by r.actid 
+
+	]]></select>
+ <!-- add end by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+</sqlMap>

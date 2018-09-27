@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="spService">
+
+	<!-- 结果对象 -->
+	<typeAlias alias="spAvailPO" type="com.gmcc.boss.selfsvc.baseService.spService.model.SpAvailPO" />
+	
+	<!-- 查询可用全网梦网业务 -->
+	<select id="qryAvailSp" resultClass="spAvailPO">
+		SELECT * FROM SH_PC_DSMP_SPBIZINFO M WHERE M.STATUS = 1
+	</select>
+	
+	<!-- add begin by sWX219697 2014-6-30 OR_HUB_201406_1115_湖北跨运营商携号转网 -->
+	<!-- 根据企业编码和业务编码查找符合条件的白名单 -->
+	<select id="findWhiteList" parameterClass="spAvailPO" resultClass="java.lang.Integer">
+		SELECT COUNT(A.SPID) 
+		FROM SH_SP_WHITELIST_HUB A 
+		WHERE A.SPID = #spcode# AND A.SPBUSID = #operatorCode# AND A.SPTYPE = #servType# AND A.STATUS = '1'
+	</select>
+	<!-- add end sWX219697 2014-6-30 OR_HUB_201406_1115_湖北跨运营商携号转网 -->
+	
+</sqlMap>
+

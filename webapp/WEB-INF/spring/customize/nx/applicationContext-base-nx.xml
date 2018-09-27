@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<bean id="selfSvcCallNX"
+		class="com.customize.nx.selfsvc.call.impl.SelfSvcCallNXImpl">
+		<property name="intMsgUtil" ref="intMsgUtil"></property>
+	</bean>
+
+	<bean id="baseBeanNX"
+		class="com.customize.nx.selfsvc.bean.impl.BaseBeanNXImpl">
+		<property name="selfSvcCallNX" ref="selfSvcCallNX"></property>
+	</bean>
+	
+	<!-- modify begin wWX217192 2015-04-22 实现service层包含主要逻辑 -->
+	<bean id="baseServiceNX" parent="baseService"
+		class="com.customize.nx.selfsvc.common.service.BaseServiceNXImpl">
+		<property name="selfSvcCallNX" ref="selfSvcCallNX"></property>
+	</bean>
+	<!-- modify end wWX217192 2015-04-22 实现service层包含主要逻辑 -->
+	
+</beans>

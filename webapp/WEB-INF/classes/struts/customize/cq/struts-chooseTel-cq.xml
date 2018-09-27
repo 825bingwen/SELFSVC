@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="chooseTel" extends="struts-common" namespace="/chooseTel">		
+
+		<!-- 选择规则页面 -->
+		<action name="selectRule" class="chooseTelAction" method="selectRule">
+		    <result name="selectRule">/jsp/customize/cq/chooseTel/selectRule.jsp</result>
+		</action>
+		
+		<!-- 根据规则输入号码页面 -->
+		<action name="inputTelNumByRule" class="chooseTelAction" method="inputTelNumByRule">
+		    <result name="inputTelNumByRule">/jsp/customize/cq/chooseTel/inputTelNumByRule.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="telNumResult" class="chooseTelAction" method="telNumResult">
+		    <result name="telNumResult">/jsp/customize/cq/chooseTel/telNumResult.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="inputCertid" class="chooseTelAction" method="inputCertid">
+		    <result name="inputCertid">/jsp/customize/cq/chooseTel/inputCertid.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="makeSureTel" class="chooseTelAction" method="makeSureTel">
+		    <result name="makeSureTel">/jsp/customize/cq/chooseTel/makeSureTel.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+	</package>	
+</struts>

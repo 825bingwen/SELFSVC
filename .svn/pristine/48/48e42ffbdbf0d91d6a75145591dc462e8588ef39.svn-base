@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="chooseTel">
+	<!-- 号码预约_湖北 -->
+	
+	<typeAlias alias="chooseTelNumPO" type="com.customize.hub.selfsvc.chooseTel.model.ChooseTelNumPO" />
+	<typeAlias alias="blacklistPO" type="com.customize.hub.selfsvc.chooseTel.model.BlacklistPO" />
+	<typeAlias alias="luckyNumRulePO" type="com.gmcc.boss.selfsvc.resdata.model.DictItemPO" />
+	<typeAlias alias="loverNumPO" type="com.customize.hub.selfsvc.chooseTel.model.LoverNumPO" />
+	<typeAlias alias="servNumPO" type="com.customize.hub.selfsvc.chooseTel.model.ServerNumPO" />
+	
+	<!-- 取选号次数 -->
+	<select id="getChooseTelNum" resultClass="chooseTelNumPO" parameterClass="chooseTelNumPO">
+		SELECT IDCARD,CHOOSETELTIME,CHOOSETELDATE 
+		FROM SH_CHOOSETEL_NUM 
+		WHERE IDCARD = #idCard# AND TO_CHAR(CHOOSETELDATE,'YYYY-MM-DD') = #chooseTelDate#
+	</select>
+	
+	<!-- 更新选号次数 -->
+	<update id="updateChooseTelNum" parameterClass="chooseTelNumPO">
+		UPDATE SH_CHOOSETEL_NUM
+     	SET CHOOSETELTIME = #chooseTelTime#
+     	WHERE IDCARD = #idCard# AND TO_CHAR(CHOOSETELDATE,'YYYY-MM-DD') = #chooseTelDate#
+	</update>
+	
+	<!-- 插入选号次数 -->
+	<insert id="insertChooseTelNum" parameterClass="chooseTelNumPO">
+		INSERT INTO SH_CHOOSETEL_NUM 
+		(IDCARD,CHOOSETELTIME,CHOOSETELDATE)
+        VALUES
+        (#idCard#,#chooseTelTime#,SYSDATE)
+	</insert>
+	
+	<!-- 取黑名单 -->
+	<select id="getBlacklist" resultClass="blacklistPO" parameterClass="blacklistPO">
+		SELECT BLACKIDCARD
+		FROM SH_CHOOSETEL_BLACKLIST 
+		WHERE BLACKIDCARD = #blackIdCard# 
+	</select>
+	
+	<select id="luckyNumRules" resultClass="luckyNumRulePO">
+		SELECT DICTID, DICTNAME, GROUPID
+	      FROM SH_DICT_ITEM
+         WHERE STATUS = 1 AND GROUPID='LuckyNumRules' 
+	</select>
+	
+	<select id="loverNums" resultClass="loverNumPO" parameterClass="loverNumPO">
+		SELECT MAINNUM, SUBSNUM, CITYID, COST, SIMCOST, NUMTYPE, LIMITCOST, ORGID, REMARK
+		  FROM SH_TEL_LOVER
+		 WHERE NUMSTATUS = 1 AND CITYID = #cityID#
+	</select>
+	
+	<select id="luckyNumInfo" resultClass="servNumPO">
+		SELECT TELNUM, PREPAY_FEE SELTEL_PREPAYFEE
+	      FROM SH_TEL_LUCKY
+	</select>
+
+	<update id="updateLoverNumInfo" parameterClass="loverNumPO">
+	    UPDATE SH_TEL_LOVER
+           SET NUMSTATUS = 2, EXPIREDDATE = TO_DATE(#expiredDate#, 'yyyymmddhh24miss')
+         WHERE MAINNUM = #mainNum#
+	</update>
+</sqlMap>

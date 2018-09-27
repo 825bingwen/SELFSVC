@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="mpaycharge" extends="struts-common" namespace="/mpaycharge">		
+
+		<!-- 手机支付主账户充值输入号码页面 -->
+		<action name="cmpay" class="cmpayAction" method="inputNumber">
+			<result name="inputNumber">/jsp/charge/cmpay/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 手机支付主账户信息查询 -->
+		<action name="qryCmpayAccount" class="cmpayAction" method="qryCmpayAccount">
+			<result name="success">/jsp/charge/cmpay/accountInfo.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币 -->
+		<action name="cashCharge" class="cmpayAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/charge/cmpay/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 充值 -->
+		<action name="commitCharge" class="cmpayAction" method="commitCharge">
+			<result name="success">/jsp/charge/cmpay/finish.jsp</result>
+			<result name="failed">/jsp/charge/cmpay/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="cmpayAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/charge/cmpay/cash/cashErrorPage.jsp</result>
+		</action>
+	</package>	
+</struts>

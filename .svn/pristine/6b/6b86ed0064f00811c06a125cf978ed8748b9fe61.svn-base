@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <bean id="prestoredRewardBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.PrestoredRewardBean"></bean>
+    <bean id="prestoredRewardDao" parent="baseDao" class="com.customize.sd.selfsvc.prestoredReward.dao.PrestoredRewardDaoImpl"></bean>
+    <bean id="preRewardServiceImpl" class="com.customize.sd.selfsvc.prestoredReward.service.PrestoredRewardServiceImpl">
+        <property name="prestoredRewardDao" ref="prestoredRewardDao"></property>
+    </bean>
+    
+    <bean id="prestoredRewardService" parent="baseTransactionProxy">
+        <property name="target" ref="preRewardServiceImpl"></property>
+    </bean>
+    
+    <!-- 预存有礼Action -->
+    <bean id="prestoredRewardAction" parent="baseAction" class="com.customize.sd.selfsvc.prestoredReward.action.PrestoredRewardAction" scope="prototype">
+        <property name="prestoredRewardService" ref="prestoredRewardService"></property>
+        <property name="prestoredRewardBean" ref="prestoredRewardBean"></property>
+    </bean>
+</beans>

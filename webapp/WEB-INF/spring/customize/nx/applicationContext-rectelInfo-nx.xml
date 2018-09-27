@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<bean id="rectelDaoImpl" parent="baseDao" class="com.customize.nx.selfsvc.rectelinfo.dao.RectelInfoDaoImpl">
+	</bean>
+	
+	<bean id="rectelInfoServiceImpl" class="com.customize.nx.selfsvc.rectelinfo.service.RectelInfoServiceImpl">
+		<property name="rectelDaoImpl">
+			<ref bean="rectelDaoImpl" />
+		</property>
+	</bean>
+	
+	<bean id="rectelInfoService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref bean="rectelInfoServiceImpl" />
+		</property>
+	</bean>
+	
+	<bean id="rectelInfoAction" parent="baseAction" class="com.customize.nx.selfsvc.rectelinfo.action.RectelInfoAction" scope="prototype">
+	    <property name="managerOperationService">
+	    	<ref bean="managerOperationService" />
+	    </property>
+	    
+	    <property name="rectelInfoService">
+	    	<ref bean="rectelInfoService" />
+	    </property>
+	</bean>
+</beans>

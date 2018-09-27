@@ -1,0 +1,402 @@
+<%@page contentType="text/html; charset=GBK"%>
+<%@page import="com.customize.hub.selfsvc.chooseTel.model.ServerNumPO" %>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib uri="/WEB-INF/paginator.tld" prefix="pg"%>
+<%
+	// 全部数据
+	List<ServerNumPO> serverNumList = (List<ServerNumPO>)request.getAttribute("serverNumList");
+	
+	// 查询号码列表结果
+	List<ServerNumPO> tmpList = (List<ServerNumPO>)request.getAttribute("tmpList");
+	
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>移动自助终端</title>
+<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<link href="${sessionScope.basePath }css/style.css" type="text/css" rel="stylesheet" />
+<link href="${sessionScope.basePath }css/reset.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="${sessionScope.basePath }js/public.js"></script>
+<script	type="text/javascript" src="${sessionScope.basePath }js/script.js"></script>
+<script type="text/javascript" src="${sessionScope.basePath }js/dialyzer.js"></script>
+<script type="text/javascript" src="${sessionScope.basePath}css/IE8.js"></script>
+<script type="text/javascript">
+var submitFlag = 0;
+
+document.onkeydown = keyDown;
+function keyDown(e) 
+{
+	var key = GetKeyCode(e);
+	
+	if (key == 77) 
+	{
+		preventEvent(e);
+	}
+	
+	if (!KeyIsNumber(key)) 
+	{
+		return false;//这句话最关键
+	}
+	
+}
+
+function KeyIsNumber(KeyCode) 
+{
+  	//如果输入的字符是在0-9之间，或者是backspace、DEL键
+	var tel = document.forms[0].finalNbr.value;
+	
+	if (KeyCode > 47 && KeyCode < 58)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+document.onkeyup = keyUp;
+function keyUp(e) 
+{
+	var key = GetKeyCode(e);
+
+	//确认
+	if (key == 13 || key == 89 || key == 221) 
+	{
+		search();
+		return;
+	}
+	//返回
+	else if (key == 82 || key == 220) 
+	{
+		document.actform.target="_self";
+		document.actform.action="${sessionScope.basePath }chooseTel/selectRegion.action?bz=1";
+		document.actform.submit();
+		return;
+	}
+	
+	var finalNbr = document.forms[0].finalNbr.value;
+	
+	if (key == 8 || key == 32 || key == 66 || key == 77) 
+	{
+		var etarget = getEventTarget(e);
+		if (etarget.type == "text" || etarget.type == "password") 
+		{
+			etarget.value = backString(etarget.value);
+		}
+	}			
+	
+	if (key == 77 && pangu_getStrLen(trim(finalNbr)) > 4) 
+	{
+		document.forms[0].finalNbr.focus();
+		return true;
+	}
+		
+	return true;
+}		
+
+// 选择号码
+function selectTelNum(telnum,payfee)
+{
+	if (telnum == '')
+	{
+		document.getElementById('chooseNum').style.visibility='hidden';
+		document.getElementById('telnum').value = '';
+		document.getElementById('payfee').value = '';
+		return;
+	}
+	var displayFee = (Number(payfee)/100).toFixed(2) ;
+	document.getElementById('chooseNum').style.visibility='hidden';
+	document.getElementById('telnum').value = telnum;
+	document.getElementById('payfee').value = payfee;
+	document.getElementById('chooseNum').innerHTML = '';
+	document.getElementById('chooseNum').style.visibility='visible';
+	document.getElementById('chooseNum').innerHTML = '<p class="fs16 tc">' + telnum + '</p><p class="fs14 tc">预存费：' + displayFee + ' 元</p>';
+	document.getElementById('winText').innerHTML = '<span class="yellow"></span><br />号码：' + telnum + '<span class="ml20">预存费：</span><span class="">' + displayFee + '</span>元';
+}
+
+// 下一页
+function nextPage(linkURL)
+{
+	// 执行查询
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		
+		document.actform.target="_self";
+		document.actform.action=linkURL;
+		document.actform.submit();
+	}		
+}
+
+// 按尾号搜索
+function search()
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		document.actform.target="_self";
+		document.actform.action="${sessionScope.basePath }chooseTel/phoneSearchByFinalNbr.action?bz=1";
+		document.actform.submit();
+	}		
+}
+
+// 转到按网号搜索页面
+function netNbrSearch()
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		document.actform.target="_self";
+		document.actform.action="${sessionScope.basePath }chooseTel/phoneSearchByNetNbr.action?bz=1";
+		document.actform.submit();
+	}		
+}
+
+// 转到按号段搜索页面
+function netValueSearch()
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		document.actform.target="_self";
+		document.actform.action="${sessionScope.basePath }chooseTel/phoneSearchByNetValue.action?bz=1";
+		document.actform.submit();
+	}		
+}
+
+function goback(curmenu) 
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		
+		document.getElementById("curMenuId").value = curmenu;
+
+		document.actform.target="_self";
+		document.actform.action="${sessionScope.basePath }chooseTel/selectRegion.action?bz=1";
+		document.actform.submit();		
+	}			
+}
+</script>
+</head>
+	<body scroll="no" onload="moveLast()">
+		<form name="actform" method="post">
+			<input type="hidden" name="telnum" id="telnum" value="">
+			<input type="hidden" name="payfee" id="payfee" value="">
+			<input type="hidden" name="pageCount" id="pageCount" value="<s:property value='pageCount' />">
+			<input type="hidden" name="pageflag" id="pageflag" value="<s:property value='pageflag' />">
+			
+			<%@ include file="/titleinc.jsp"%>
+			<div class="main" id="main">
+          		<%@ include file="/customer.jsp"%>
+          		<a title="按网号搜索" href="#" class="bt5 num_intro x_66" onmousedown="this.className='bt5on num_intro x_66'" onmouseup="this.className='bt5 num_intro x_66';netNbrSearch()">按网号搜索</a>
+          		<a title="按网段搜索" href="#" class="bt5 num_backtonum" onmousedown="this.className='bt5on num_backtonum'" onmouseup="this.className='bt5 num_backtonum';netValueSearch()">按网段搜索</a>
+	          	<div class="num_brand fs24 lh2 p20">
+	           		按尾号搜索
+	         	</div>
+       
+				<div class="box842W fl ml20 relative tab_966  tab_966_search " style="display:inline">
+                    <div class="bg2"></div>
+                    <div class="blank50"></div>
+                    <div class="  blank50"></div>
+                    <div class="num_l_dis" >
+                      	<p class="fs18">共<span class="yellow"><%=tmpList.size() %>个</span>搜索结果。点击号码即可放入选定号码区。</p>
+                      	<div class="blank10"></div>
+                      <%
+					  for (int i=0;i<serverNumList.size();i++)
+					  {
+					  	ServerNumPO po = serverNumList.get(i);
+					  	if ("".equals(po.getTelnum()))
+					  	{
+					  %>
+					  	  	<a title="" href="javascript:void(0)" onclick="selectTelNum('<%=po.getTelnum() %>','<%=po.getSeltel_prepayfee() %>')">
+						  	  	<span></span>
+						  	  	<p></p>
+			                  	<p></p>
+						  	</a>
+					  <%
+					  	}
+					  	else
+					  	{
+					  %>
+	                      	<a title="" href="javascript:void(0)" onclick="selectTelNum('<%=po.getTelnum() %>','<%=po.getSeltel_prepayfee() %>')">
+	                      	  	<span></span>
+	                      	 	<p><%=po.getTelnum() %></p>
+		                      	<p><script type="text/javascript">document.write((Number(<%=po.getSeltel_prepayfee() %>)/100).toFixed(2)+'元');</script></p>
+						  	</a>
+                      <%
+                      	}
+                      }
+                      %>
+                    </div>
+                    
+                    <!--小键盘-->
+                    <div class="num_r_input fr">
+                      	<div class="numboard numboard_big numboard_small m0a no_bg" id="numBoard"> 
+                      <p class="fs18 pt5">请输入0至4位号码：</p>
+                        	<input type="text" id="numBoardText" name="finalNbr" class="text3 fl " value="<s:property value='finalNbr' />"/>
+                          	<a title="搜索" href="javascript:search()" class="bt8 fl" name="functionkey" onmousedown="this.className='bt8on fl '" onmouseup="this.className='bt8 fl '">搜索</a>
+                          	<p class="  blank15 fs14"></p>
+                        
+                  			<div class=" numbox"> 
+	                        <a title="1" href="javascript:void(0)">1</a><a title="2" href="javascript:void(0)">2</a><a title="3" href="javascript:void(0)">3</a>
+	                        <a title="退格" href="javascript:void(0)" class="func1" name="functionkey" id="numBoardBack" onmousedown="this.className='func1on'" onmouseup="this.className='func1';var allNumBoardText=numBoardText.value;numBoardText.value=allNumBoardText.slice(0,-1);moveLast();"></a>
+	                        <div class="clear"></div>
+	                        <a title="4" href="javascript:void(0)">4</a><a title="5" href="javascript:void(0)">5</a><a title="6" href="javascript:void(0)">6</a>
+	                        <a title="清除" href="javascript:void(0)" class="func2" name="functionkey" id="numBoardClear" onmousedown="this.className='func2on'" onmouseup="this.className='func2';numBoardText.value='';moveLast();"></a>
+	                        <div class="clear"></div>
+	                        <div class="nleft">
+	                            <a title="7" href="javascript:void(0)">7</a><a title="8" href="javascript:void(0)">8</a><a title="9" href="javascript:void(0)">9</a>
+	                            <a title="x" href="javascript:void(0)" name="functionkey">x</a><a title="0" href="javascript:void(0)">0</a><a title="#" href="javascript:void(0)" name="functionkey">#</a>
+	                        </div>
+	                        <div class="nright">
+	                            <a title="确认" href="javascript:void(0)" class="func3" name="functionkey" id="numBoardEnter" onmousedown="this.className='func3on'" onmouseup="this.className='func3'">1</a>
+	                        </div>
+	                        <div class="blank10"></div>
+                     	</div>
+                  	</div>                
+
+              		<script type="text/javascript">
+	                var numBoardBtns=document.getElementById('numBoard').getElementsByTagName('div')[0].getElementsByTagName('a');
+					var numBoardText=document.getElementById('numBoardText');
+					for(i=0;i<numBoardBtns.length;i++){
+						if(!numBoardBtns[i].className)
+						{
+							numBoardBtns[i].className='';
+						}
+						
+					    if(numBoardBtns[i].name=='functionkey')
+					    {
+					    	continue ;
+					    }  
+						 
+						numBoardBtns[i].onmousedown=function(){
+						 	this.className+='on';
+						}
+						
+						numBoardBtns[i].onmouseup=function(){
+							var textValue=document.getElementById('numBoardText').value;
+							if(textValue.length<4)
+							document.getElementById('numBoardText').value+=this.innerHTML;
+							var numBoardText=document.getElementById('numBoardText');
+							var fullClass=this.className;
+							var fullValue=numBoardText.value;
+							this.className=fullClass.slice(0,fullClass.indexOf('on'));
+							moveLast();
+						}
+						
+					}
+					function moveLast()
+					{
+						var r = document.getElementById('numBoardText').createTextRange(); 
+						r.collapse(false); 
+						r.select(); 
+					}				
+              		</script>
+              		<!--小键盘-->
+              		
+                </div>
+                <div class="  blank10 clear"></div>
+                    
+                <div class="num_foot fs18 pt0 pl23"> 
+                    <s:if test="pageFlag == 'true'">
+    					<pg:paginator recordsCount="${recordCount }" pageSize="${pageviewnum }" page="${page }" linkUrl="chooseTel/phoneSearchByFinalNbr.action" alignType="left" />
+    				</s:if>
+    				<s:else>
+    					<div class='page-left'></div>
+    				</s:else>
+    					<div class="fright1"> 
+    						<span class="fl pt15">已选定号码：</span> 
+							<a title="" href="javascript:void(0)" class="bt_choosenum2 fl" style=" visibility:hidden" id="chooseNum">
+                         	<p class="fs16 tc" id="telnumText">13800000000</p>
+							<p class="fs14 tc" id="payfeeText">预存费：100.00 元</p>
+                        </a>
+        				<a title="预订" href="javascript:void(0)" class="bt2 fr relative fl"  onmousedown="this.className='bt2on fl relative'" onmouseup="this.className='bt2 fl relative';openWindow('openWin1')">预订</a> 
+                    </div>
+                </div>					
+			</div>                   
+                
+            <!--弹出窗-->                
+            <div class="openwin_tip" id="openWin1">
+            	<div class="bg"></div>
+                <div class=" blank60"></div> 
+                <div class=" blank30"></div>
+                    
+                    <div class="  blank10n"></div>
+                    <p class="fs28 yellow pt5 pl20 lh2 pl166">您选择预订：</p>
+                    <p class="fs24  pt5 pl20 tc" id="winText" name="winText">
+                    	号码：<span class="">13948603946</span>
+						<span class="ml20">预存费：</span><span class="">100.00</span>元
+					</p>
+                    <div class=" blank10"></div>
+                    <div class="tc">
+                    <div class=" blank60"></div>
+                    <a title="确认" href="javascript:void(0)" class=" bt4" onmousedown="this.className='bt4on'" onmouseup="this.className='bt4';wiWindow.close();openWindowloading('openWinLoading')">确认</a>
+                    <a title="" href="javascript:void(0)" class=" bt4 ml20" onmousedown="this.className='bt4on ml20'" onmouseup="this.className='bt4 ml20';wiWindow.close()">取消</a>
+                    </div>
+                </div>
+                
+                <div class="openwin_tip openwin_big div804w515h" id="openWinLoading">
+                    <div class="bg loading tc">
+                      <div class="blank60"></div><div class="blank60"></div>
+                      <img src="${sessionScope.basePath }images/loading.gif"  class="" alt="处理中..."/>
+                      <div class="blank30"></div>
+                      <p class="fs24   lh2">正在执行预定信息处理，请稍候...</p>
+                    </div>
+                    
+                    
+                </div>
+                <script type="text/javascript">
+				openWindow = function(id){
+					// 检查是否已选中
+					if (document.getElementById('telnum').value == '')
+					{
+						return;
+					}
+					wiWindow = new OpenWindow("openWin1",708,392);//打开弹出窗口例子
+					
+				}
+				openWindowMail = function(id){
+					wiWindow = new OpenWindow("openWin2",708,392);//打开弹出窗口例子
+					
+				}
+				
+				openWindowloading = function(id){
+					wiWindow = new OpenWindow("openWinLoading",804,515);//打开弹出窗口例子
+					 gotoPrintSuccess();
+					
+				}
+				
+				
+				function gotoPrintSuccess(){
+					setTimeout(
+						function(){
+							// 如果支持打印按走验证码预约流程,如果不支持走身份证预约流程
+							if (window.parent.isPrintFlag == 1)// 支持打印
+							{
+								document.actform.target="_self";
+								document.actform.action="${sessionScope.basePath }chooseTel/validateFinish.action";
+								document.actform.submit();
+							}
+							else
+							{
+								document.actform.target="_self";
+								document.actform.action="${sessionScope.basePath }chooseTel/inputIdCard.action";
+								document.actform.submit();
+							}
+							
+						},
+					500);
+				}
+				</script>
+                <!--弹出窗结束-->
+				
+			</div>
+			<%@ include file="/backinc.jsp"%>		
+		</form>
+	</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="scoreExchange" extends="struts-common" namespace="/scoreExchange">  
+       
+        <!-- 查询用户积分及可用电子券 -->
+        <action name="scoreExchange" class="scoreExchangeAction" method="scoreExchange">
+            <result name="success">/jsp/serviceinfo/scoreExchangeSD.jsp</result>
+        </action>
+        
+        <!-- 积分兑换电子券提交 -->
+        <action name="exchangeCommit" class="scoreExchangeAction" method="exchangeCommit">
+            <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+        </action>
+    </package>  
+</struts>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="quickpublish" extends="struts-common">	
+		
+		<!-- 产品列表展示 -->
+		<action name="getProdList" class="quickPubAction" method="initProdList">
+			<!-- 自定义图标 -->
+			<result name="resultList">/jsp/quickpublish/quickPubIndex.jsp</result>
+			<result name="failed">/commonError.jsp</result>	
+			<!-- 统一图片 -->
+			<result name="resultList_unify">/jsp/quickpublish/quickPubIndexUnify.jsp</result>	
+		</action>
+		
+		<!-- 产品详情展示 -->
+		<action name="prodDetail" class="quickPubAction" method="prodDetail">
+			<result name="prodDetail">/jsp/quickpublish/prodDetail.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 子产品展现页面 -->
+		<action name="subsProd" class="quickPubAction" method="subsProd">
+			<result name="subsProd">/jsp/quickpublish/subsProd.jsp</result>
+		</action>
+		
+		<!-- 子产品属性展现页面 -->
+		<action name="subProdAddAttr" class="quickPubAction" method="subProdAddAttr">
+			<result name="subProdAddAttr">/jsp/quickpublish/subProdAddAttr.jsp</result>
+		</action>
+		
+		<!-- 查询多个子产品属性 -->
+		<action name="getSubProdAttrsByAjax" class="quickPubAction" method="getSubProdAttrsByAjax">
+		</action>
+		
+		<!-- 校验子产品 -->
+		<action name="checkBySubProd" class="quickPubAction" method="checkBySubProd">
+		</action>
+		
+		<!-- 登录后转向产品详情 -->
+		<action name="authPassword" class="quickPubAction" method="authPassword">
+			<result name="prodDetail">/jsp/quickpublish/prodDetail.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 产品受理 -->
+		<action name="prodRec" class="quickPubAction" method="prodRec">
+			<result name="failed">/commonError.jsp</result>
+			<result name="success">/commonSuccess.jsp</result>	
+		</action>
+		
+		<!-- 产品包受理 -->
+		<action name="prodPackegRec" class="quickPubAction" method="prodPackegRec">
+			<result name="failed">/commonError.jsp</result>
+			<result name="success">/commonSuccess.jsp</result>	
+		</action>	
+		
+		<!-- 产品附加属性展示 -->
+		<action name="goProdAddAttr" class="quickPubAction" method="goProdAddAttr">
+			<result name="prodAddAttr">/jsp/quickpublish/prodAddAttr.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>	
+		
+		<!-- 产品详情展示 -->
+		<action name="goEffectType" class="quickPubAction" method="goEffectType">
+			<result name="goEffectType">/jsp/quickpublish/effectType.jsp</result>
+		</action>	
+
+	</package>	
+</struts>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 产品转换Action -->
+	<bean id="prodChangeAction" parent="baseAction" class="com.customize.cq.selfsvc.prodChange.action.ProdChangeCQAction" scope="prototype">
+	    <property name="prodChangeBean" ref="prodChangeBean"></property>
+	    <property name="prodChangeCQService" ref="prodChangeCQService"></property>
+	</bean>
+	
+	<!-- 产品转换service -->
+	<bean id="prodChangeCQService" parent="baseTransactionProxy">
+	    <property name="target" ref="prodChangeServiceCQImpl"></property>
+	</bean>
+	
+	<!-- 产品转换serviceImpl -->
+	<bean id="prodChangeServiceCQImpl" class="com.customize.cq.selfsvc.prodChange.service.ProdChangeServiceCQImpl">
+	    <property name="prodChangeDaoCQImpl" ref="prodChangeDaoCQImpl"></property>
+	</bean>
+	
+	<!-- 产品转换DaoImpl -->
+	<bean id="prodChangeDaoCQImpl" parent="baseDao" class="com.customize.cq.selfsvc.prodChange.dao.ProdChangeDaoCQImpl"></bean>
+	
+	
+	<!-- 产品转换Bean -->
+	<bean id="prodChangeBean" parent="baseBeanCQ" class="com.customize.cq.selfsvc.bean.ProdChangeCQBean"></bean>
+
+</beans>

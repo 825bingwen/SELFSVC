@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"> 
+	
+	<!-- jdbc
+	<bean id="shDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">        
+	    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />       
+		<property name="url" value="jdbc:oracle:thin:@10.163.234.180:1521:ZP" />  
+	    <property name="username" value="sdsht" />       
+	    <property name="password" value="SDjy1234^"/>    
+	</bean>
+	-->
+
+    <bean id="shDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+            <property name="url" value="jdbc:oracle:thin:@10.236.204.58:1566/smspdb" />
+        <property name="username" value="ngsh" />
+        <property name="password" value="Nx#_1104"/>
+    </bean>
+	<!--Tomcat的数据源如果你不想使用'java:comp/env/'前缀的话请设置下面的值为true，默认为false -->
+	<!-- Data Source -->
+	<!-- 
+	<bean id="shDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+        	<value>shDB</value>
+        </property>
+
+        <property name="resourceRef" value="true" />
+	</bean>
+	 -->
+	
+	<!-- sqlMapClient -->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="dataSource">
+			<ref local="shDataSource" />
+		</property>
+		<property name="configLocations">
+      		<list>
+        		<!--alertmsg config -->
+          		<value>classpath:ibatis/sqlmap-config.xml</value>
+        		<!--End alertmsg config -->
+        		<value>classpath:sql-map-config.xml</value>
+      		</list>
+    	</property>
+	</bean>
+	
+	<!-- sqlMapClientTemplate -->
+    <bean id="sqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+        <property name="sqlMapClient" ref="sqlMapClient"></property>
+    </bean>
+    
+    <!-- 独立取数据库连接池 -->
+    <bean id="jdbcTemplate" autowire="byName" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="shDataSource" />
+		</constructor-arg>
+	</bean>
+
+	<!-- Spring事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref local="shDataSource" />
+		</property>
+	</bean>
+	
+	<!-- 代理事务 -->
+	<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" abstract="true" >
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		
+		<!-- add by sWX219697 2015-5-22 抛出自定义异常ReceptionException的时候不回滚-->
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED,+ReceptionException</prop>
+				<prop key="del*">PROPAGATION_REQUIRED,+ReceptionException</prop>
+				<prop key="edit*">PROPAGATION_REQUIRED,+ReceptionException</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,+ReceptionException</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- add begin sWX219697 2015-5-7 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+	<!-- 扫描文件注解 进行解析-->
+	<context:component-scan base-package="com.gmcc.boss.selfsvc" />
+	
+	<!-- 支持@Transactional标记 注解方式管理事务  注入事务管理器，
+		当@Transactional作用于类上时，该类的所有 public 方法将都具有该类型的事务属性
+	-->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- add end sWX219697 2015-5-7 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+</beans>

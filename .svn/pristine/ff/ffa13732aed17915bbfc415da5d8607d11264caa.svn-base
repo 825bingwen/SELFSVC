@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 产品转换Action -->
+	<bean id="prodChangeAction" parent="baseAction" class="com.customize.hub.selfsvc.prodChange.action.ProdChangeHubAction" scope="prototype">
+	    <property name="prodChangeBean" ref="prodChangeBean"></property>
+	    <property name="prodChangeHubService" ref="prodChangeHubService"></property>
+	</bean>
+	
+	<!-- 产品转换service -->
+	<bean id="prodChangeHubService" parent="baseTransactionProxy">
+	    <property name="target" ref="prodChangeServiceHubImpl"></property>
+	</bean>
+	
+	<!-- 产品转换serviceImpl -->
+	<bean id="prodChangeServiceHubImpl" class="com.customize.hub.selfsvc.prodChange.service.ProdChangeServiceHubImpl">
+	    <property name="prodChangeDaoHubImpl" ref="prodChangeDaoHubImpl"></property>
+	</bean>
+	
+	<!-- 产品转换DaoImpl -->
+	<bean id="prodChangeDaoHubImpl" parent="baseDao" class="com.customize.hub.selfsvc.prodChange.dao.ProdChangeDaoHubImpl"></bean>
+	
+	
+	<!-- 产品转换Bean -->
+	<bean id="prodChangeBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.ProdChangeHubBean"></bean>
+
+
+	<!--add begin yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+
+	<!-- 主体产品转换Action -->
+	<bean id="mainProdChangeAction" parent="baseAction" class="com.customize.hub.selfsvc.prodChange.action.MainProdChangeHubAction" scope="prototype">
+		<property name="mainProdChangeHubService" ref="mainProdChangeHubService"></property>
+		<property name="mainProdChangeBean" ref="mainProdChangeBean"></property>
+	    <property name="receptionBean" ref="receptionBean"></property>
+	</bean>
+	
+	<!-- 主体产品转换Bean -->
+	<bean id="mainProdChangeBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.MainProdChangeBean">
+		<property name="intMsgUtil" ref="intMsgUtil"></property>
+	</bean>
+
+	<!-- 主体产品转换service -->
+	<bean id="mainProdChangeHubService" parent="baseTransactionProxy">
+	    <property name="target" ref="mainProdChangeServiceHubImpl"></property>
+	</bean>
+	
+	<!-- 主体产品转换serviceImpl -->
+	<bean id="mainProdChangeServiceHubImpl" class="com.customize.hub.selfsvc.prodChange.service.MainProdChangeServiceHubImpl">
+	    <property name="mainProdChangeDaoImpl" ref="mainProdChangeDaoImpl"></property>
+	</bean>
+	
+	<!-- 主体产品转换DaoImpl -->
+	<bean id="mainProdChangeDaoImpl" parent="baseDao" class="com.customize.hub.selfsvc.prodChange.dao.MainProdChangeDaoImpl"></bean>
+	
+	
+	
+   <!--add end yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+		
+</beans>

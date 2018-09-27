@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="bindBankCard">
+
+	<!-- add begin sWX219697 2014-10-7 11:22:22 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 -->
+    <typeAlias alias="bankCardInfoPO" type="com.customize.sd.selfsvc.serviceinfo.model.BankCardInfoPO" />
+	<!-- add end sWX219697 2014-10-7 11:22:22 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 -->	
+	
+	<select id="qryOrderId"  resultClass="java.lang.String">
+		select SEQ_SH_BINDBANKCARDID.Nextval OID from dual
+	</select>
+	
+	<!-- modify begin sWX219697 2014-10-7 11:23:30 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 获取银行展示信息-->
+	<select id="getBankInfoByType" parameterClass="java.lang.String" resultClass="bankCardInfoPO">
+  		SELECT T.BANKNAME, T.IMGPATH, T.NOTE, T.BANKID 
+  		FROM SH_EASYPAY_BANKINFO T 
+  		WHERE T.STATUS = '1'
+  		AND T.CARDTYPE = #bankCardType# 
+  		ORDER BY T.SORTORDER
+    </select>
+	<!-- modify end sWX219697 2014-10-7 11:23:30 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 -->
+</sqlMap>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 维护人员管理(现金稽核) -->
+	<package name="managerOperation" extends="struts-common">
+	
+		<!-- 转到维护人员选择操作菜单页面 -->
+		<action name="selectOperationType" class="managerOperationAction" method="selectOperationType">
+			<result name="selectOperationType">/jsp/managerOperation/selectOperationType.jsp</result>
+		</action>
+		
+		<!-- 转到现金稽核页面 -->
+		<action name="doCashAudit" class="managerOperationAction" method="doCashAudit">
+			<result name="cashAuditPage">/jsp/managerOperation/cashAuditPage.jsp</result>
+		</action>
+		
+		<!-- 校验稽核人密码 -->
+		<action name="checkAuditPassword" class="managerOperationAction" method="checkAuditPassword">
+			<!--add begin g00140516 2012/03/11 R003C12L03n01 OR_NX_201201_312 -->
+			<result name="nxInputCheckMoney">/jsp/managerOperation/nxInputCheckMoney.jsp</result>
+			<!--add end g00140516 2012/03/11 R003C12L03n01 OR_NX_201201_312 -->
+			<!--add begin zKF69263 2015-4-1 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+			<result name="sdInputCheckMoney">/jsp/managerOperation/sdInputCheckMoney.jsp</result>
+			<!--add end zKF69263 2015-4-1 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+			<result name="inputCheckMoney">/jsp/managerOperation/inputCheckMoney.jsp</result>
+			<result name="error">/jsp/managerOperation/cashAuditError.jsp</result>
+		</action>
+		
+		<!-- 插入现金稽核日志 -->
+		<action name="insertAuditCashLog" class="managerOperationAction" method="insertAuditCashLog">
+			<result name="error">/jsp/managerOperation/cashAuditError.jsp</result>
+			<result name="success">/jsp/managerOperation/cashAuditSuccess.jsp</result>
+		</action>
+		
+		<action name="insertNXAuditLog" class="managerOperationAction" method="insertNXAuditLog">
+			<result name="finish">/jsp/managerOperation/nxCashAuditFinish.jsp</result>
+		</action>
+		
+		<!--add begin zKF69263 2015-4-1 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+		<!-- 插入现金稽核日志-山东 -->
+		<action name="insertSDAuditLog" class="managerOperationAction" method="insertNXAuditLog">
+			<result name="finish">/jsp/managerOperation/sdCashAuditFinish.jsp</result>
+		</action>
+		
+		<!-- 获取山东现金缴费对账单打印信息-山东 -->
+		<action name="getCashPrintedData" class="managerOperationAction" method="getCashPrintedData">
+		</action>
+		<!--add end zKF69263 2015-4-1 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+		
+		<action name="getPrintedData" class="managerOperationAction" method="getPrintedData">
+		</action>
+		
+		<action name="updatePringFlag" class="managerOperationAction" method="updatePringFlag">
+		</action>		
+		
+		<action name="getUnPrintRecord" class="managerOperationAction" method="getUnPrintRecord">
+		</action>
+		
+	</package>
+</struts>

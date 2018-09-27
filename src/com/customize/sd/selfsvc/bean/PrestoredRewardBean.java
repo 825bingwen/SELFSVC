@@ -1,0 +1,352 @@
+/*
+ * 文 件 名:  PrestoredRewardServiceImpl.java
+ * 版    权:  Huawei Technologies Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
+ * 描    述:  预存有礼bean
+ * 修 改 人:  jWX216858
+ * 修改时间:  2014-11-29
+ * 跟踪单号:  <跟踪单号>
+ * 修改单号:  <修改单号>
+ * 修改内容:  <修改内容>
+ */
+package com.customize.sd.selfsvc.bean;
+
+import java.math.BigDecimal;
+import java.util.Vector;
+
+import com.customize.sd.selfsvc.bean.impl.BaseBeanSDImpl;
+import com.customize.sd.selfsvc.prestoredReward.model.PrestoredRewardPO;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.common.BusinessIdConstants;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * 预存有礼bean
+ * 
+ * @author  jWX216858
+ * @version  [版本号, 2014-11-29]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class PrestoredRewardBean extends BaseBeanSDImpl 
+{	
+	/**
+	 * 业务有效性校验
+	 * 
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @return true：可以继续办理业务，false：终止办理业务
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by jWX216858 2014-12-05 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求
+	 */
+	public void checkRecValid(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId)
+	{
+		// 组装报文头信息
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用接口
+		ReturnWrap rw = getSelfSvcCallSD().checkRecValid(msgHeader);
+		
+		//设置失败，则抛出异常
+        if(SSReturnCode.ERROR == rw.getStatus())
+        {
+        	throw new ReceptionException(rw.getReturnMsg());
+        }
+	}
+	
+	/**
+	 * 查询用户已经存在的档次
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by jWX216858 2014-11-29 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求
+	 */
+	public String qrySubsActLevelList(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId)
+	{
+		// 组装报文头信息
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用接口查询用户已存在档次
+		ReturnWrap rw = getSelfSvcCallSD().qrySubsActLevelList(msgHeader);
+
+		StringBuffer sbuf = new StringBuffer(1024);
+		
+		// 解析返回数据
+		if(SSReturnCode.SUCCESS == rw.getStatus())
+		{
+			// 组装已存在的档次编码列表
+	        
+			CRSet crset = (CRSet) rw.getReturnObject();
+			if (null != crset)
+			{
+				for (int i = 0; i < crset.GetRowCount(); i++)
+				{
+					if ((i + 1) == crset.GetRowCount())
+					{
+						sbuf.append("'").append(crset.GetValue(i, 0)).append("'");
+					}
+					else
+					{
+						sbuf.append("'").append(crset.GetValue(i, 0)).append("',");
+					}
+				}
+			}
+			return sbuf.toString();
+		}
+    	throw new ReceptionException(rw.getReturnMsg());
+	}
+	
+	/**
+	 * 查询奖品类别
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @param actLevelId 档次编码
+	 * @param activityId 活动编码
+	 * @return
+	 * @remark create by jWX216858 2014-11-29 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求
+	 */
+	public PrestoredRewardPO qryRewardList(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId, String actLevelId, String activityId)
+	{
+		// 组装消息头
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用接口查询奖品列表
+		ReturnWrap rw = getSelfSvcCallSD().qryRewardList(msgHeader, actLevelId, activityId);
+		
+		PrestoredRewardPO prestoredRewardPO = new PrestoredRewardPO();
+		
+		// 解析返回信息
+		if (SSReturnCode.SUCCESS == rw.getStatus())
+		{
+			StringBuffer sbuf = new StringBuffer(1024);
+			CRSet crset = (CRSet) rw.getReturnObject();
+			if (null != crset)
+			{
+				for (int i = 0; i < crset.GetRowCount(); i++)
+				{
+					String rewardType = crset.GetValue(i, 2);
+					
+					// 奖品类型为货品，代表奖品为实物
+					if ("RwdGift_Good".equals(rewardType))
+					{
+						prestoredRewardPO.setIsGoods("1");
+					}
+					if ((i+1) == crset.GetRowCount())
+	                {
+	                    // 奖品编码串
+						sbuf.append(crset.GetValue(i, 0));
+	                }
+	                else
+	                {
+	                    // 奖品编码串
+	                	sbuf.append(crset.GetValue(i, 0)+"|");
+	                }
+				}
+				prestoredRewardPO.setActreward(sbuf.toString());
+				
+				return prestoredRewardPO;
+			}
+			else
+			{
+				throw new ReceptionException("没有查询到相应的奖品信息");
+			}
+		}
+		throw new ReceptionException("查询奖品列表失败：" + rw.getReturnMsg());
+	}
+	
+	/**
+	 * 查询活动费用
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @param actid 活动编码
+	 * @param levelid 档次编码
+	 * @param rewardId 奖品编码
+	 * @return
+	 * @remark create by jWX216858 2014-12-05 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求
+	 */
+	public String qryActivityFee(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId, String actid, String levelid, String rewardId)
+	{
+		// 组装消息头
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用接口
+		ReturnWrap rw = getSelfSvcCallSD().qryActivityFee(msgHeader, actid, levelid, rewardId);
+		
+		String recFee = "0";
+		
+		// 解析返回信息
+		if (SSReturnCode.SUCCESS == rw.getStatus())
+		{
+		    //modify begin by cwx46134 2017-05-20 OR_huawei_201704_415_【山东移动接口迁移专题】-自助终端业务办理4
+		    if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_CHKPRIVANDCALCFEE))
+		    {
+		        Vector v =(Vector)rw.getReturnObject();
+		        CTagSet tagSet = (CTagSet)v.get(0);
+		        if (null != tagSet)
+                {
+	                recFee = String.valueOf(new BigDecimal(recFee).add(new BigDecimal(tagSet.GetValue("TOTALCONSUME"))));
+                    return recFee;
+                }
+                else
+                {
+                    throw new ReceptionException("没有查询到相应的费用信息");
+                }
+		    }else
+		    {
+		        CRSet crset = (CRSet) rw.getReturnObject();
+		        
+		        if (null != crset)
+	            {
+	                for (int i = 0; i < crset.GetRowCount(); i++)
+	                {
+	                    recFee = String.valueOf(new BigDecimal(recFee).add(new BigDecimal(crset.GetValue(i, 1))));
+	                }
+	                return recFee;
+	            }
+	            else
+	            {
+	                throw new ReceptionException("没有查询到相应的费用信息");
+	            }
+		    }
+            //modify end by cwx46134 2017-05-20 OR_huawei_201704_415_【山东移动接口迁移专题】-自助终端业务办理4
+		}
+		throw new ReceptionException(rw.getReturnMsg());
+	}
+	
+    /** 
+     * 业务办理前记录业务费用信息
+     * 
+     * @param termInfo 终端信息
+     * @param customer 客户信息
+     * @param curMenuId 菜单id
+     * @param servnumber 手机号码
+     * @param chargeType 付款类型
+     * @param terminalSeq 银行缴费流水号
+     * @param prestoredRewardPO
+     * @see [类、类#方法、类#成员]
+     * @remark create by zKF69263 2015-05-07 OR_SD_201503_333_SD_自助终端活动受理预存赠送
+     */
+    public void writeNetFeeInfo(TerminalInfoPO termInfo, NserCustomerSimp customer, String curMenuId,
+        String servnumber, String chargeType, String terminalSeq, PrestoredRewardPO prestoredRewardPO)
+    {
+        // 组装报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+            customer.getContactId(), MsgHeaderPO.ROUTETYPE_TELNUM, servnumber);
+        
+        // 调用开户接口
+        ReturnWrap rw = this.getSelfSvcCallSD().writeNetFeeInfo(msgHeader,
+            chargeType + termInfo.getBankno(), Constants.ACCEPTTYPE_PRESTORED_REWARD, terminalSeq, 
+            prestoredRewardPO.getTotalFee(), prestoredRewardPO);
+        
+        // 调用接口失败返回错误信息
+        if (rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+    }
+    
+	/**
+	 * 预存有礼受理
+	 * 
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @param prestoredRewardPO 入参信息
+	 * @param chargeType 缴费类型
+	 * @param terminalSeq 银行缴费流水号
+	 * @return
+	 * @remark create by jWX216858 2014-12-08 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求	
+	 */
+    public String recRewardCommit(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId,
+        PrestoredRewardPO prestoredRewardPO, String chargeType, String terminalSeq)
+    {
+		// 组装消息头
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// modify begin zKF69263 2015-5-8 OR_SD_201503_333_SD_自助终端活动受理预存赠送
+		// 调用接口
+        ReturnWrap rw = getSelfSvcCallSD().recRewardCommit(msgHeader,
+            prestoredRewardPO, chargeType + termInfo.getBankno(), terminalSeq);
+		// modify end zKF69263 2015-5-8 OR_SD_201503_333_SD_自助终端活动受理预存赠送
+
+		if(SSReturnCode.SUCCESS == rw.getStatus())
+		{
+			CTagSet ctagset = (CTagSet) rw.getReturnObject();
+			
+			//add begin lWX431760 2017-05-20 OR_huawei_201704_415_【山东移动接口迁移专题】-自助终端业务办理4
+			//大写转小写
+			if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_BUSI_RECREWARDCOMMITSD))
+			{
+			    ctagset = CommonUtil.lowerTagKey(ctagset);
+			}
+			//add end lWX431760 2017-05-20 OR_huawei_201704_415_【山东移动接口迁移专题】-自助终端业务办理4
+			// 受理流水
+			String recoid = ctagset.GetValue("recoid");
+			
+			return recoid;
+		}
+		throw new ReceptionException(rw.getReturnMsg());
+	}
+	
+	/**
+	 * 查询营销方案费用和用户预存费用
+	 * @param termInfo 终端机信息
+	 * @param customer 客户信息
+	 * @param menuId 菜单id
+	 * @param recoid 受理流水号
+	 * @param totalFee 用户存入的费用
+	 * @return
+	 * @remark create by jWX216858 2014-12-08 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求	
+	 */
+	public PrestoredRewardPO qryRecFeeAndPreFee(TerminalInfoPO termInfo, NserCustomerSimp customer, String menuId,
+			String recoid, String totalFee)
+	{
+		// 组装消息头
+		MsgHeaderPO msgHeader = new MsgHeaderPO(menuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用接口
+		ReturnWrap rw = getSelfSvcCallSD().qryRecFeeAndPreFee(msgHeader, recoid, CommonUtil.yuanToFen(totalFee));
+	
+		PrestoredRewardPO prestoredRewardPO = new PrestoredRewardPO();
+		
+		 // 解析返回信息
+        if (SSReturnCode.SUCCESS == rw.getStatus())
+        {
+            if (CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_PRIVFEESD))
+            {
+                CTagSet ctagset = (CTagSet) rw.getReturnObject();
+                prestoredRewardPO.setRecFee(ctagset.GetValue("RECFEE"));// 营销方案费用
+                prestoredRewardPO.setPreFee(ctagset.GetValue("PREFEE")); // 用户预存费用
+            }
+            else
+            {
+                CRSet crset = (CRSet) rw.getReturnObject();
+
+                // 解析crset内容，获取营销方案费用和用户预存费用
+                prestoredRewardPO.setRecFee(crset.GetValue(0, 0));// 营销方案费用
+                prestoredRewardPO.setPreFee(crset.GetValue(0, 1)); // 用户预存费用
+            }
+       	
+        	return prestoredRewardPO;
+        }
+        return null;
+	}
+}

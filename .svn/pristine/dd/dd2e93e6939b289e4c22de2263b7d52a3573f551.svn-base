@@ -1,0 +1,619 @@
+package com.gmcc.boss.selfsvc.bean;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import org.dom4j.DocumentException;
+
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.common.BaseBeanImpl;
+import com.gmcc.boss.selfsvc.common.BusinessIdConstants;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+public class ScoreBean extends BaseBeanImpl
+{
+    /**
+     * 积分查询
+     * @param terminalInfoPO 终端信息
+     * @param customer 客户信息
+     * @param curMenuId 当前菜单
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Map queryScoreValue(TerminalInfoPO terminalInfoPO,NserCustomerSimp customer,String curMenuId)
+    {
+    	// 山东促销活动回馈积分查询开关开启
+    	String newScoreSwitch = CommonUtil.getParamValue(Constants.SH_SCOREQRY_SWITCH);
+    	String province = CommonUtil.getParamValue(Constants.PROVINCE_ID);
+    	if ("1".equals(newScoreSwitch) && province.equalsIgnoreCase(Constants.PROOPERORGID_SD))
+    	{
+    		return this.queryScoreValueSD(terminalInfoPO, customer, curMenuId);
+    	}
+        Map paramMap = new HashMap();
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //设置客户手机号
+        paramMap.put("telnumber", customer.getServNumber());
+        
+        //设置客户接触id
+        paramMap.put("touchoid", customer.getContactId());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        ReturnWrap rw = selfSvcCall.queryScoreValue(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            String v = ((CTagSet)rw.getReturnObject()).GetValue("scoreinfo");
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            //设置返回结果
+            map.put("returnObj", v);
+            
+            //设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        else if (rw != null)
+        {
+        	Map map = new HashMap();
+            
+            //设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            
+            return map;
+        }
+        	
+        return null;
+    }
+    
+    /**
+     * 积分明细信息查询(适用于山东和湖北)
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @param terminalInfoPO 终端信息
+     * @param customer 客户信息
+     * @param curMenuId 当前菜单
+     * @return
+     * @throws DocumentException
+     * @throws DocumentException
+     * @see [类、类#方法、类#成员]
+     */
+    @SuppressWarnings("unchecked")
+    public Map qryScoreDetailHisForSd(String startDate, String endDate, TerminalInfoPO terminalInfoPO,
+            NserCustomerSimp customer, String curMenuId) throws DocumentException
+    {
+        
+        List<Map<String, String>> retList = new ArrayList<Map<String, String>>();
+        Map paramMap = new HashMap();
+        
+        // 设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        // 设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        // 设置客户手机号
+        paramMap.put("telnumber", customer.getServNumber());
+        
+        // 设置客户接触id
+        paramMap.put("touchoid", customer.getContactId());
+        
+        // 设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        // 设置开始时间
+        paramMap.put("startDate", startDate);
+        
+        // 设置开始时间
+        paramMap.put("endDate", endDate);
+        
+        // 地市编号
+        paramMap.put("region", customer.getRegionID());
+        
+        ReturnWrap rw = selfSvcCall.queryScoreDetailHis(paramMap);
+
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {	
+        	CRSet crset=(CRSet)rw.getReturnObject();
+        	
+        	String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            if(crset.GetRowCount()>0){
+            	
+            	retList = getCRSetToMap(crset);
+            	
+            	map.put("SUCCESSINFO", retList);
+            	map.put("IsInfoNull", "false");
+            }else{
+            	
+            	map.put("IsInfoNull", "true");
+            	map.put("returnMsg", rw.getReturnMsg());
+            }
+            return map;
+        }
+        else if (rw != null)
+        {
+            Map map = new HashMap();
+            // 设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            return map;
+        }
+        
+        return null;
+    }
+    
+    public List<Map<String,String>> getCRSetToMap(CRSet crset){
+    	
+    	List<Map<String,String>> list=new ArrayList<Map<String,String>>();
+    	for(int i=0,len=crset.GetRowCount();i<len;i++){
+    		Map<String,String> map=new HashMap<String,String>();
+    		
+    		for(int l=0,lens=crset.GetColumnCount();l<lens;l++)
+    		map.put("col_"+(l+1), crset.GetValue(i, l));
+    		list.add(map);
+    	}
+    	return list;
+    }
+    
+    /**
+     * 山东积分兑换历史信息查询
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @param terminalInfoPO 终端信息
+     * @param customer 客户信息
+     * @param curMenuId 当前菜单
+     * @return 
+     * @throws DocumentException 
+     * @see [类、类#方法、类#成员]
+     */
+    @SuppressWarnings("unchecked")
+    public Map queryScoreChangeHisForsd(String startDate, String endDate, TerminalInfoPO terminalInfoPO,
+            NserCustomerSimp customer, String curMenuId) throws DocumentException
+    {
+        Map paramMap = new HashMap();
+        
+        List<Map<String, String>> retList = new ArrayList<Map<String, String>>();
+        // 设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        // 设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        // 设置客户手机号
+        paramMap.put("telnumber", customer.getServNumber());
+        
+        // 设置客户接触id
+        paramMap.put("touchoid", customer.getContactId());
+        
+        // 设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        // 设置开始时间
+        paramMap.put("startDate", startDate);
+        
+        // 设置开始时间
+        paramMap.put("endDate", endDate);
+        
+        // 地市编号
+        paramMap.put("region", customer.getRegionID());
+        
+        ReturnWrap rw = selfSvcCall.queryScoreChangeHis(paramMap);
+
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+        	CRSet crset=(CRSet)rw.getReturnObject();
+
+        	String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            if(crset.GetRowCount()>0){
+            	retList = getCRSetToMap(crset);
+
+            	map.put("SUCCESSINFO", retList);
+            	map.put("IsInfoNull", "false");
+            }else{
+            	map.put("IsInfoNull", "true");
+            	map.put("returnMsg", rw.getReturnMsg());
+            }
+            return map;
+        }
+        else if (rw != null)
+        {
+            Map map = new HashMap();
+            
+            // 设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            
+            return map;
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * 湖北积分兑换历史信息查询
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @param terminalInfoPO 终端信息
+     * @param customer 客户信息
+     * @param curMenuId 当前菜单
+     * @return
+     * @throws DocumentException 
+     * @see [类、类#方法、类#成员]
+     */
+    @SuppressWarnings("unchecked")
+    public Map queryScorePrizeHisForhub(String startDate, String endDate, TerminalInfoPO terminalInfoPO,
+            NserCustomerSimp customer, String curMenuId) throws DocumentException
+    {
+        Map paramMap = new HashMap();
+        
+        List<Map<String, String>> retList = new ArrayList<Map<String, String>>();
+        // 设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        // 设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        // 设置客户手机号
+        paramMap.put("telnumber", customer.getServNumber());
+        
+        // 设置客户接触id
+        paramMap.put("touchoid", customer.getContactId());
+        
+        // 设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        // 设置开始时间
+        paramMap.put("startDate", startDate);
+        
+        // 设置开始时间
+        paramMap.put("endDate", endDate);
+        
+        // 地市编号
+        paramMap.put("region", customer.getRegionID());
+        
+        ReturnWrap rw = selfSvcCall.queryScorePrizeHis(paramMap);
+
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+        	CRSet crset=(CRSet)rw.getReturnObject();
+
+        	String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            if(crset.GetRowCount()>0){
+
+            	retList = getCRSetToMap(crset);
+            
+            	map.put("SUCCESSINFO", retList);
+            
+            	map.put("IsInfoNull", "false");
+            
+            }else{
+            	map.put("IsInfoNull", "true");
+            	map.put("returnMsg", rw.getReturnMsg());
+            }
+            return map;
+        }
+        else if (rw != null)
+        {
+            Map map = new HashMap();
+            
+            // 设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            
+            return map;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * <查询用户是否开通积分计划 山东>
+     * <功能详细描述>
+     * @param terminalInfoPO 终端信息
+     * @param customer 客户资料信息
+     * @param curMenuId 当前菜单
+     * @return true：已开通。false：没有开通
+     * @see [类、类#方法、类#成员]
+     * @remark create sWX219697 2014-05-12 OR_SD_201404_777_山东_网厅、自助终端、掌厅__全渠道积分查询及兑换功能
+     */
+    public boolean qryIsScoreOpenForSd(TerminalInfoPO terminalInfoPO, NserCustomerSimp customer, String curMenuId)
+    {
+    	Map<String,String> paramMap = new HashMap<String,String>();
+    	
+    	//操作员编号
+    	paramMap.put("operID", terminalInfoPO.getOperid());
+    	
+    	//终端机编号
+    	paramMap.put("termID", terminalInfoPO.getTermid());
+    	
+    	//客户手机号码
+    	paramMap.put("telnum", customer.getServNumber());
+    	
+    	//用户接触id
+    	paramMap.put("contactID", customer.getContactId());
+    	
+    	//当前菜单编号
+    	paramMap.put("curMenuId", curMenuId);
+    	
+    	//查询地区
+    	paramMap.put("region", customer.getRegionID());
+    	
+    	//从缓存中取出产品id
+    	String prodID = (String) PublicCache.getInstance().getCachedData(Constants.SCORE_PLAN_PROD_ID);
+    	paramMap.put("prodID", prodID);
+    	
+    	ReturnWrap rw = selfSvcCall.qryIsScoreOpen(paramMap);
+    	
+    	//是否开通积分计划：true：开通，false：没有开通
+    	boolean isOpenScore = false;
+    	
+    	if (null != rw && rw.getStatus() == SSReturnCode.SUCCESS)
+    	{
+    		CTagSet tSet = (CTagSet)rw.getReturnObject();
+    		
+    		//判断用户是否开通积分计划
+    		String scoresOpen = tSet.GetValue("result");
+    		
+    		//0 没有订购
+    		if (!"0".equals(scoresOpen))
+    		{
+    			isOpenScore = true;
+    		}
+    	}
+    	return isOpenScore;
+    }
+    
+    /**
+     * 积分发放查询
+     * @param curMenuId 菜单id
+     * @param termInfo 终端机信息
+     * @param customer 用户信息
+     * @param endDate 结束时间
+     * @param startDate 开始时间
+     * @return
+     * @remark create by jWX216858 2014-10-20 R003C10LG1001 OR_SD_201407_498_山东移动促销回馈积分查询方案支撑需求
+     */
+    public Map<String, Object> qryScorePaymentSD(String startDate, String endDate, NserCustomerSimp customer, TerminalInfoPO termInfo, String curMenuId)
+    {
+    	// 组装报文头信息
+		MsgHeaderPO header = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+    	
+		// 调用call查询积分发放信息 
+		ReturnWrap rw = this.selfSvcCall.qryPayMentScoreSD(header, startDate, endDate);
+		
+		if (SSReturnCode.SUCCESS == rw.getStatus())
+		{
+			CRSet crset = (CRSet) rw.getReturnObject();
+			 
+			Map<String, Object> map = new HashMap<String, Object>();
+			if (null != crset && crset.GetRowCount() > 0)
+			{
+			    //如果积分发放明细查询走openEbus则加判断转换时间格式
+			    if (CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_PAYMENTSOCRE))
+			    {
+			        for (int i = 0; i < crset.GetRowCount(); i++)
+	                {
+	                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+	                    
+	                    try
+	                    {
+	                        Date payTime = sdf.parse(crset.GetValue(i, 0));
+	                        crset.SetValue(i, 0, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(payTime));
+	                    }
+	                    catch (ParseException e)
+	                    {
+	                        e.printStackTrace();
+	                    }	                   
+	                }
+			    }
+			    
+				List<Map<String, String>> retList = getCRSetToMap(crset);
+            
+            	map.put("SUCCESSINFO", retList);
+            
+            	map.put("IsInfoNull", "false");
+			}
+			else
+			{
+				map.put("IsInfoNull", "true");
+			}
+			
+			// 设置返回信息
+			map.put("returnMsg", rw.getReturnMsg());
+			return map;
+		}
+		else
+		{
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("returnMsg", rw.getReturnMsg());
+			return map;
+		}
+    }
+    
+    /**
+     * 积分查询（山东）
+     * @param termInfo 终端机信息
+     * @param customer 用户信息
+     * @param curMenuId 菜单id
+     * @return
+     * @remark create by jWX216858 2014-10-20 R003C10LG1001 OR_SD_201407_498_山东移动促销回馈积分查询方案支撑需求
+     */
+    public Map queryScoreValueSD(TerminalInfoPO termInfo, NserCustomerSimp customer, String curMenuId)
+    {
+    	// 组装报文头信息
+		MsgHeaderPO header = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+				customer.getContactId(), "1", customer.getServNumber());
+		
+		// 调用call查询用户积分
+		ReturnWrap rw = this.selfSvcCall.qryScoreValueSD(header);
+		
+		if (SSReturnCode.SUCCESS == rw.getStatus())
+		{
+			Map map = new HashMap();
+			
+	            // modify begin fwx439896 2017-04-19 OR_huawei_201703_629_【山东移动接口迁移专题】-自助终端已有接口1
+	        	//走能开出参转换
+	        	if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_SCOREVALUESD))
+	            { 
+	        		CTagSet tagSet = (CTagSet)rw.getReturnObject();
+	            
+	                // 将openEBUS  和 UAP 出参统一
+	                String[] openEbusRtn = {"availscore"};
+	                String[] destRtn = {"pointBalance"};
+	                tagSet = CommonUtil.rtnConvert(tagSet, BusinessIdConstants.CLI_QRY_BALANCE, openEbusRtn, destRtn);
+	                rw.setReturnObject(tagSet);   
+	            }
+	             
+			// 走UAP用户积分不为0时
+			if (rw.getReturnObject() instanceof Vector)
+			{
+				Vector v = (Vector) rw.getReturnObject();
+				CTagSet ctagset = (CTagSet) v.get(0);
+				CRSet crset = (CRSet) v.get(1);
+				if (crset.GetRowCount() > 0)
+				{
+					List<Map<String, String>> retList = getCRSetToMap(crset);
+		            
+	            	map.put("SUCCESSINFO", retList);
+	            	map.put("IsInfoNull", "false");
+				}
+				// 用户可用积分
+				map.put("pointBalance", ctagset.get("pointBalance"));
+			}
+			
+			// 走UAP用户积分为0时或走OPenEbus时用户积分不为0
+			else if (rw.getReturnObject() instanceof CTagSet)
+			{
+				CTagSet ctagset = (CTagSet) rw.getReturnObject();
+			    //走能开  组装crset
+				if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_SCOREVALUESD))
+				{
+					List<Map<String, String>> retList=new ArrayList<Map<String,String>>();
+					Map<String, String> reMap=new HashMap<String, String>();
+					reMap.put("col_"+(1), " ");
+					reMap.put("col_"+(2),(String) ctagset.get("pointBalance"));
+					reMap.put("col_"+(3), " ");
+					retList.add(reMap) ;   
+		            map.put("SUCCESSINFO", retList);
+					map.put("IsInfoNull", "false");
+				}
+				else
+				{
+					map.put("IsInfoNull", "true");
+				}	
+			    // modify end fwx439896 2017-04-19 OR_huawei_201703_629_【山东移动接口迁移专题】-自助终端已有接口1
+	          	
+				// 用户可用积分
+				map.put("pointBalance", ctagset.get("pointBalance"));
+			}
+			map.put("returnMsg", rw.getReturnMsg());
+			return map;
+		}
+		else
+		{	Map map = new HashMap();
+			map.put("returnMsg", rw.getReturnMsg());
+			return map;
+		}
+    }
+    /**
+     * 获得指定月的第一天0表示当前月-1下一个月;1表示上一个月
+     * @param i
+     * @return
+     */
+    public static String getLastMonthBeginDate(int i)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - i);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return getDate(cal);
+    }
+    
+    /**
+     * 获得指定月的最后一天0表示当前月；-1下一个月;1上一个月
+     * @param i
+     * @return
+     */
+    public static String getLastMonthEndDate(int i)
+    {
+    	i=i-1;
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - i);
+        cal.set(Calendar.DAY_OF_MONTH, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        return getDate(cal);
+    }
+    
+    /**
+     *  获得日期
+     * @param cal Calendar
+     * @return
+     */
+    private static String getDate(Calendar cal)
+    {
+        String v_strDate = "";
+        int v_intYear = cal.get(Calendar.YEAR);
+        int v_intMonth = cal.get(Calendar.MONTH) + 1;
+        int v_intDAY = cal.get(Calendar.DAY_OF_MONTH);
+        
+        if (v_intDAY < 10)
+        {
+            v_strDate = v_strDate + "0" + v_intDAY;
+        }
+        else
+        {
+            v_strDate = v_strDate + v_intDAY;
+        }
+        if (v_intMonth < 10)
+        {
+            v_strDate = "0" + v_intMonth + v_strDate;
+        }
+        else
+        {
+            v_strDate = v_intMonth + v_strDate;
+        }
+        v_strDate = v_intYear + "" + v_strDate;
+        cal = null;
+        return v_strDate;
+    }
+}

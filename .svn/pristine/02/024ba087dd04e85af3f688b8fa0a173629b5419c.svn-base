@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 账户余额查询 -->
+	<package name="feeBalance" extends="struts-common" namespace="/feeBalance">
+	    
+		<!-- 账户余额查询  -->
+		<action name="qryAccBalance" class="qryFeeBalanceAction" method="qryAccBalance">
+		    <result name="qryBalance">/jsp/customize/sd/feeBalance/qrybalance.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+	</package>
+</struts>

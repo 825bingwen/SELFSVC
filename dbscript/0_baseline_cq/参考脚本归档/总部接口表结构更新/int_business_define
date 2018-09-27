@@ -1,0 +1,46 @@
+-- Create table
+create table INT_BUSINESS_DEFINE
+(
+  BUSINESSID VARCHAR2(64) not null,
+  CHANNELID  VARCHAR2(32) not null,
+  PROTOCOLID VARCHAR2(64) not null,
+  BUSITYPE   VARCHAR2(32) default 'IntNGMain' not null,
+  URGENCY    NUMBER(1) default 0 not null,
+  TIMEOUT    NUMBER(4) default -1 not null,
+  FLOWID     VARCHAR2(64) not null,
+  FLOWNAME   VARCHAR2(128),
+  DESCRIBE   VARCHAR2(256),
+  EFFTIME    DATE default sysdate not null,
+  EXPTIME    DATE,
+  LOGLEVEL   NUMBER(2) default 0 not null,
+  COLPERF    NUMBER(1) default 1
+);
+-- Add comments to the columns 
+comment on column INT_BUSINESS_DEFINE.BUSINESSID
+  is '业务ID';
+comment on column INT_BUSINESS_DEFINE.CHANNELID
+  is '渠道ID';
+comment on column INT_BUSINESS_DEFINE.PROTOCOLID
+  is '协议ID';
+comment on column INT_BUSINESS_DEFINE.BUSITYPE
+  is '业务类型';
+comment on column INT_BUSINESS_DEFINE.URGENCY
+  is '是否为关键业务0：否，1是，关键业务应急可用，非关键业务应急不可用';
+comment on column INT_BUSINESS_DEFINE.TIMEOUT
+  is '超时控制 -1表示默认';
+comment on column INT_BUSINESS_DEFINE.FLOWID
+  is '流程ID';
+comment on column INT_BUSINESS_DEFINE.FLOWNAME
+  is '流程名称';
+comment on column INT_BUSINESS_DEFINE.DESCRIBE
+  is '描述';
+comment on column INT_BUSINESS_DEFINE.EFFTIME
+  is '生效时间';
+comment on column INT_BUSINESS_DEFINE.EXPTIME
+  is '失效时间';
+comment on column INT_BUSINESS_DEFINE.LOGLEVEL
+  is '日志级别 0：错误日志 1:指标日志 2:TRACE日志 3DEBUG日志';
+comment on column INT_BUSINESS_DEFINE.COLPERF
+  is '指标采集 0：不采集指标，也不进行统计；1：采集指标，只进行统计，不记录详细日志；2：采集指标，进行统计，并且记录详细日志';
+-- Create/Recreate indexes 
+create unique index INX_INT_BUSINESS_DEFINE on INT_BUSINESS_DEFINE (BUSINESSID, CHANNELID, PROTOCOLID);

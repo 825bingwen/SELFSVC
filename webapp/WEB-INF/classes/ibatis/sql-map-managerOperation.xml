@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="managerOperation">
+	<typeAlias alias="managerOperationPO" type="com.gmcc.boss.selfsvc.managerOperation.model.ManagerOperationPO"/>
+	<typeAlias alias="cashDetailPO" type="com.gmcc.boss.selfsvc.managerOperation.model.CashDetailPO" />
+	<typeAlias alias="chargeLogVO" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	
+	<!-- 校验现金稽核人密码 -->
+	<select id="checkAuditPassword" parameterClass="managerOperationPO" resultClass="managerOperationPO">
+		SELECT * FROM SH_TERM_CONFIG M WHERE M.TERMID = #termid# AND M.PASSWORD = #auditPsw#
+	</select>
+	
+	<!-- add begin zKF69263 2015-4-2 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	<!-- 查询终端机稽核人密码 -->
+	<select id="qryTermAuditPass" parameterClass="managerOperationPO" resultClass="java.lang.String">
+		SELECT PASSWORD auditPsw FROM SH_TERM_CONFIG M WHERE M.TERMID = #termid# AND M.REGION = #region#
+	</select>
+	<!-- add end zKF69263 2015-4-2 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	
+	<!-- 查询终端机现金稽核最后时间 -->
+	<select id="selectAuditEndTime" parameterClass="String" resultClass="String">
+		SELECT MAX(M.ENDTIME) ENDTIME FROM SH_LOG_AUDIT M WHERE M.TERMID = #termid#
+	</select>
+	
+	<!-- 获取系统计算总金额 -->
+	<select id="selectAuditTotalFee" parameterClass="managerOperationPO" resultClass="String">
+		SELECT SUM(M.FEE) TOTALMONEY FROM SH_CHARGE_LOG M
+ 		WHERE M.PAYTYPE = '4' 
+		       AND M.STATUS IN ('11','10') 
+		       AND M.RECDATE &gt; to_date(#auditEndTime#,'yyyy-mm-dd hh24:mi:ss')
+		       AND M.RECDATE &lt; SYSDATE
+		       AND M.TERMID = #termid#
+	</select>
+	
+	<!-- 插入现金稽核日志 -->
+	<insert id="insertAuditCashLog" parameterClass="managerOperationPO">
+		INSERT INTO SH_LOG_AUDIT (ID,TERMID,STARTTIME,ENDTIME,SYSMONEY,REALMONEY)
+            VALUES(SEQ_SH_RECOID.NEXTVAL,#termid#,to_date(#auditEndTime#,'yyyy-mm-dd hh24:mi:ss'),SYSDATE,#sysMoney#,#realMoney#)
+	</insert>
+	
+	<!--add begin g00140516 2012/03/11 R003C12L03n01 OR_NX_201201_312 -->
+	<select id="selectLastAuditLog" parameterClass="String" resultClass="managerOperationPO">
+		SELECT A.TERMID, TO_CHAR(A.STARTTIME, 'YYYY.MM.DD HH24:MI:SS') auditStartTime, TO_CHAR(A.ENDTIME, 'YYYY.MM.DD HH24:MI:SS') auditEndTime
+  		  FROM (SELECT TERMID, STARTTIME, ENDTIME 
+  		           FROM SH_LOG_AUDIT 
+  		          WHERE TERMID = #termid# and PRINTFLAG = 1 
+  		          ORDER BY ENDTIME DESC) A
+  		 WHERE ROWNUM = 1
+	</select>
+	
+	<!-- modify begin zKF69263 2015-4-9 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	<!-- 系统统计金额 -->
+	<select id="selectSystemTotalFee" parameterClass="managerOperationPO" resultClass="String">
+		SELECT SUM(M.FEE) TOTALMONEY
+          FROM SH_CHARGE_LOG M
+         WHERE PAYTYPE = '4' AND TERMID = #termid# AND REGION = #region#
+         <dynamic>
+			<isNotEmpty prepend="AND" property="auditStartTime">
+				RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="auditEndTime">
+				RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- modify end zKF69263 2015-4-9 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	
+	<!-- 现金明细 -->
+	<select id="getCashDetailInfo" parameterClass="managerOperationPO" resultClass="cashDetailPO">
+        SELECT C2.CASHFEE,COUNT(C2.TERMID) CASHNUM
+		FROM 
+		(
+		       SELECT * FROM SH_CHARGE_LOG 
+		       WHERE PAYTYPE = '4'
+		       AND TERMID = #termid#
+		       AND REGION = (SELECT REGION FROM SH_TERM_CONFIG WHERE TERMID = #termid#) 
+		       <dynamic>
+				   <isNotEmpty prepend="AND" property="auditStartTime">
+					   RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+				   </isNotEmpty>
+				   <isNotEmpty prepend="AND" property="auditEndTime">
+					   RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+				   </isNotEmpty>
+			  </dynamic>
+		) C1  
+		JOIN (SELECT * FROM SH_CHARGE_CASHINFO WHERE TERMID = #termid#) C2 ON C2.TERMID = C1.TERMID
+		AND C2.FORMNUM = C1.TERMINALSEQ  
+		GROUP BY C2.CASHFEE 
+		ORDER BY CASHFEE DESC
+	</select>
+	
+	<insert id="insertNXFirstAuditLog">
+		INSERT INTO SH_LOG_AUDIT (ID, TERMID, STARTTIME, ENDTIME, SYSMONEY, REALMONEY)
+        VALUES(SEQ_SH_RECOID.NEXTVAL, #termid#, '', SYSDATE, #sysMoney#, #realMoney#)
+	</insert>
+	
+	<insert id="insertNXAuditLog" parameterClass="managerOperationPO">
+		INSERT INTO SH_LOG_AUDIT (ID, TERMID, STARTTIME, ENDTIME, SYSMONEY, REALMONEY)
+        VALUES(SEQ_SH_RECOID.NEXTVAL, #termid#, to_date(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS'), SYSDATE, #sysMoney#, #realMoney#)
+	</insert>
+	
+	<!-- modify begin zKF69263 2015-4-9 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	<!-- 前6条记录 -->
+	<select id="selectFirstSixChargeRecords" parameterClass="managerOperationPO" resultClass="chargeLogVO">
+	SELECT B.RECDATE, B.SERVNUMBER, B.FEE
+      FROM (SELECT TO_CHAR(M.RECDATE, 'YYYY-MM-DD HH24:MI:SS') RECDATE, M.SERVNUMBER, M.FEE/100 FEE
+              FROM SH_CHARGE_LOG M
+             WHERE M.FEE > 0 AND M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region# 
+       	    <dynamic>
+				<isNotEmpty prepend="AND" property="auditStartTime">
+					M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="auditEndTime">
+					M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+				</isNotEmpty>
+	   		</dynamic> 
+       	     ORDER BY M.RECDATE) B
+ 	 WHERE ROWNUM &lt;= 6
+ 	</select>
+ 	 
+ 	<!-- 后6条记录 -->
+ 	<select id="selectLastSixChargeRecords" parameterClass="managerOperationPO" resultClass="chargeLogVO">
+	SELECT A.RECDATE, A.SERVNUMBER, A.FEE
+  	  FROM (SELECT TO_CHAR(M.RECDATE, 'YYYY-MM-DD HH24:MI:SS') RECDATE, M.SERVNUMBER, M.FEE/100 FEE
+              FROM SH_CHARGE_LOG M
+             WHERE M.FEE > 0 AND M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region#
+            <dynamic>
+				<isNotEmpty prepend="AND" property="auditStartTime">
+					M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="auditEndTime">
+					M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+				</isNotEmpty>
+	   		</dynamic> 
+             ORDER BY M.RECDATE DESC) A
+ 	 WHERE ROWNUM &lt;= 6
+	</select>
+	
+	<!-- 总记录数 -->
+	<select id="selectChargeRecordsNum" parameterClass="managerOperationPO" resultClass="String">
+	SELECT COUNT(1)
+      FROM SH_CHARGE_LOG M
+     WHERE M.FEE > 0 AND M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region#
+	<dynamic>
+		<isNotEmpty prepend="AND" property="auditStartTime">
+			M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="auditEndTime">
+			M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+	</dynamic> 
+	</select>
+	
+	<!-- 回退记录数 -->
+	<select id="selectRollbackRecordsNum"  parameterClass="managerOperationPO" resultClass="String">
+	SELECT COUNT(1)
+      FROM SH_CHARGE_LOG M
+     WHERE M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region#
+	<dynamic>
+		<isNotEmpty prepend="AND" property="auditStartTime">
+			M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="auditEndTime">
+			M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+	</dynamic>
+	 AND STATUS = '11' AND CHECKRESULT = 4
+	</select>
+	
+	<!-- 失败记录数 -->
+	<select id="selectFailedRecordsNum"  parameterClass="managerOperationPO" resultClass="String">
+	SELECT COUNT(1)
+      FROM SH_CHARGE_LOG M
+     WHERE M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region#
+	<dynamic>
+		<isNotEmpty prepend="AND" property="auditStartTime">
+			M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="auditEndTime">
+			M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+	</dynamic>
+	 AND STATUS = '10'
+	</select>
+	<!--add end g00140516 2012/03/11 R003C12L03n01 OR_NX_201201_312 -->
+	
+	<!--add begin cKF76106 2012/08/07 R003C12L07n01 OR_NX_201207_780 -->
+	<!-- 缴费失败记录 -->
+	<select id="selectFailedRecords"  parameterClass="managerOperationPO" resultClass="chargeLogVO">
+	SELECT TO_CHAR(M.RECDATE, 'YYYY-MM-DD HH24:MI:SS') RECDATE, M.SERVNUMBER, M.FEE/100 FEE, M.TERMINALSEQ, M.DESCRIPTION 
+      FROM SH_CHARGE_LOG M
+     WHERE M.PAYTYPE = '4' AND M.TERMID = #termid# AND M.REGION = #region#
+	<dynamic>
+		<isNotEmpty prepend="AND" property="auditStartTime">
+			M.RECDATE &gt; TO_DATE(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="auditEndTime">
+			M.RECDATE &lt;= TO_DATE(#auditEndTime#, 'YYYY.MM.DD HH24:MI:SS')
+		</isNotEmpty>
+	</dynamic>
+	 AND STATUS = '10'
+	</select>
+	<!--add begin cKF76106 2012/08/07 R003C12L07n01 OR_NX_201207_780 -->
+	<!-- modify end zKF69263 2015-4-9 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	
+	
+	<!-- 查询未打印的记录 -->
+	<select id="qryUnPrintRecords" parameterClass="managerOperationPO" resultClass="managerOperationPO">
+		SELECT T.ID,T.TERMID,TO_CHAR(T.STARTTIME, 'YYYY.MM.DD HH24:MI:SS') AUDITSTARTTIME,TO_CHAR(T.ENDTIME, 'YYYY.MM.DD HH24:MI:SS') AUDITENDTIME,T.SYSMONEY,T.REALMONEY,T.PRINTFLAG
+		FROM SH_LOG_AUDIT T
+	    WHERE T.TERMID = #termid# and T.PRINTFLAG = 0
+	    ORDER BY T.ID DESC
+	</select>
+	
+	<!-- 稽核前插入记录 -->
+	<insert id="insertLogByAuditBefore" parameterClass="managerOperationPO">
+		INSERT INTO SH_LOG_AUDIT (ID,TERMID,STARTTIME,ENDTIME,SYSMONEY,REALMONEY,PRINTFLAG)
+            VALUES(SEQ_SH_RECOID.NEXTVAL,#termid#,'','','','',0)
+	</insert>
+	
+	<!-- 更新现金稽核日志 -->
+	<insert id="updateNXAuditLog" parameterClass="managerOperationPO">
+		UPDATE SH_LOG_AUDIT 
+		SET STARTTIME = to_date(#auditStartTime#, 'YYYY.MM.DD HH24:MI:SS'), ENDTIME = SYSDATE, SYSMONEY = #sysMoney#, REALMONEY = #realMoney#
+		WHERE ID = #id#
+	</insert>
+	
+	<!-- 更新现金稽核打印状态 -->
+	<insert id="updatePringFlag" parameterClass="managerOperationPO">
+		UPDATE SH_LOG_AUDIT 
+		SET PRINTFLAG = 1
+		WHERE ID = #id#
+		AND STARTTIME IS NOT NULL 
+		AND ENDTIME IS NOT NULL
+	</insert>
+	
+</sqlMap>

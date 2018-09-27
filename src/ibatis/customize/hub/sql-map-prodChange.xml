@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="prodChange">
+	<!-- 优惠产品添加日志 -->
+	
+	<typeAlias alias="prodLogVO" type="com.customize.hub.selfsvc.prodChange.model.ProdLogVO" />
+	<typeAlias alias="tempFilterInfoVO" type="com.customize.hub.selfsvc.prodChange.model.TemplateFilterInfoVO" />
+	<!--add begin yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->	
+	<typeAlias alias="mainProdTempletInfoPO" type="com.customize.hub.selfsvc.prodChange.model.MainProdTempletInfoPO" />
+	<typeAlias alias="mainProdTempletPO" type="com.customize.hub.selfsvc.prodChange.model.MainProdTempletPO" />	
+	<!--add end yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+	
+	
+	<!-- 添加产品日志记录 -->
+	<insert id="insertProdLog" parameterClass="prodLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="prodLogOID">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		    INSERT INTO SH_LOG_PRODCHANGE(PRODLOGOID,PRODSN,REGION,SERVNUMBER,FROMPRODID,TOPRODID,
+					OPTYPE,PRODTYPE,CHANGEID,RECDATE,RECSTAUTS)
+	        VALUES(
+	             #prodLogOID#, #prodSn#,#region#,#servnumber#,#fromProdId#,#toProdId#,#opType#,
+	             #prodType#,#changeId#,to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'),#recStauts#)
+	</insert>
+	
+	<!-- 更新产品日志状态记录 -->
+	<update id="updateProdLog" parameterClass="prodLogVO">
+		UPDATE SH_LOG_PRODCHANGE SET RECSTAUTS = #recStauts#
+					             WHERE PRODSN = #prodSn#
+	</update>
+	
+	<!-- 过滤产品模板 -->
+	<select id="qryTempFilterInfo" resultClass="tempFilterInfoVO" parameterClass="tempFilterInfoVO">
+		select t.oldprodid, t.newprodid, t.templetno, t.region, t.status, t.statusdate
+		  from sh_atsv_templatefilter t
+		 where t.status = 1
+		   and t.oldprodid = #oldProdID#
+		   and t.newprodid = #newProdID#
+		   and t.region = #region#
+	</select>
+	
+	<!--add begin yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->	
+	
+	<!-- 根据用户的当前主体产品ID、归属地区、品牌查询可转换的主体产品信息列表 -->	
+	<select id="qryMainProdTempChangeList" resultClass="mainProdTempletInfoPO" parameterClass="mainProdTempletPO">		
+		SELECT A.OLDPRODID oldPordID,A.AREA region ,A.NEWPRODID newPordID,B.TEMPLETNO,B.BRAND,B.NEWPRODNAME,B.PRIVNAME,B.MONTHCOST,B.CALLDURING,
+			   B.FREECALLED,B.GPRSFLUX ,B.OUTPACKAGEFEE,B.DATABASESERVICE,B.REMARK, B.NCODE
+		FROM  SH_PROD_TEMPLET  A,SH_PROD_TEMPLETINFO B
+		WHERE  A.OLDPRODID IN (#oldProdID#,'ALL') AND A.STATUS='1' AND A.AREA IN (#region# ,999) AND A.TEMPLETNO = B.TEMPLETNO
+		<isNotEmpty prepend="AND" property="brand"> 
+				A.BRAND=#brand#
+		</isNotEmpty>
+		ORDER BY A.SORTORDER 
+	</select>	
+	
+	
+	<!-- 添加主体产品变更日志记录 -->
+	<insert id="insertProdChangeLog" parameterClass="prodLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="prodLogOID">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		    INSERT INTO SH_LOG_PRODCHANGE(PRODLOGOID,PRODSN,REGION,SERVNUMBER,FROMPRODID,TOPRODID,
+					OPTYPE,PRODTYPE,CHANGEID,RECDATE,RECSTAUTS,CHGDESP)
+	        VALUES(
+	             #prodLogOID#, #prodSn#,#region#,#servnumber#,#fromProdId#,#toProdId#,#opType#,
+	             #prodType#,#changeId#,to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'),#recStauts#,#chgdesp#)
+	</insert>
+	<!--add end yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+	
+</sqlMap>

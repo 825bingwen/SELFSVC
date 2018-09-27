@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="cdrquery" extends="struts-common" namespace="/cdrquery">		
+		
+		<action name="selectMonth" class="newDetailedRecordsAction" method="selectMonth">
+			<result name="months">/jsp/customize/sd/detailedRecords/months.jsp</result>
+		</action>
+		
+		<action name="inputTime" class="newDetailedRecordsAction" method="inputTime">
+			<result name="input">/jsp/customize/sd/detailedRecords/inputDate.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="selectCycle" class="newDetailedRecordsAction" method="selectCycle">
+			<result name="cycles">/jsp/customize/sd/detailedRecords/cycles.jsp</result>
+			<result name="singleCycle" type="redirect">/cdrquery/selectType.action?CurMenuid=${CurMenuid}&amp;custName=${custName}&amp;cycle=${cycle}&amp;startDate=${startDate}&amp;endDate=${endDate}&amp;iscycle=${iscycle}&amp;month=${month}</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="selectType" class="newDetailedRecordsAction" method="selectType">
+			<result name="types">/jsp/customize/sd/detailedRecords/types.jsp</result>
+			<result name="oldTypes">/jsp/customize/sd/detailedRecords/oldTypes.jsp</result>
+		</action>
+		
+		<!-- add begin sWX219697 2014-6-3 OR_huawei_201405_877 跳转详单补打密码输入页面-->
+		<action name="detailPrintPwd" class="newDetailedRecordsAction" method="detailPrintPwd">
+		    <result name="detailPwd">/jsp/customize/sd/detailedRecords/detailPrintPwd.jsp</result>
+		</action>	
+		
+		<!-- 补打密码验证 -->
+		<action name="authDetailPrintPwd" class="newDetailedRecordsAction" method="authDetailPrintPwd">
+		</action>	
+		
+		<!-- add  end sWX219697 2014-6-3 OR_huawei_201405_877-->
+		
+		<action name="qryDetailedRecords" class="newDetailedRecordsAction" method="qryDetailedRecords">
+			<result name="FIXFEE">/jsp/customize/sd/detailedRecords/fixfeeRecords.jsp</result>
+			<result name="GSM">/jsp/customize/sd/detailedRecords/gsmRecords.jsp</result>
+			<result name="SMS">/jsp/customize/sd/detailedRecords/smsRecords.jsp</result>
+			<result name="GPRSWLAN">/jsp/customize/sd/detailedRecords/gprswlanRecords.jsp</result>
+			<result name="ISMG">/jsp/customize/sd/detailedRecords/ismgRecords.jsp</result>
+			<result name="INFOFEE">/jsp/customize/sd/detailedRecords/infofeeRecords.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="qryDetailedRecordsOld" class="newDetailedRecordsAction" method="qryDetailedRecordsOld">
+			<result name="success">/jsp/customize/sd/detailedRecords/records.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="getPrintData" class="newDetailedRecordsAction" method="getPrintData">
+			<result name="success">/jsp/customize/sd/detailedRecords/hiddenFrame.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="getPrintDataNew" class="newDetailedRecordsAction" method="getPrintDataNew">
+			<result name="success">/jsp/customize/sd/detailedRecords/hiddenFrame.jsp</result>
+			<result name="failed">/jsp/customize/sd/detailedRecords/hiddenFrame.jsp</result>
+		</action>
+		
+		<action name="updatePrintTimes" class="newDetailedRecordsAction" method="updatePrintTimes">
+		</action>
+		
+		<action name="qryMailbox" class="newDetailedRecordsAction" method="qryMailbox">
+		</action>
+		
+		<action name="add139Mail" class="newDetailedRecordsAction" method="add139Mail">
+		</action>
+		
+		<action name="sendRandomPwd" class="newDetailedRecordsAction" method="sendRandomPwd">
+		</action>
+	</package>	
+</struts>

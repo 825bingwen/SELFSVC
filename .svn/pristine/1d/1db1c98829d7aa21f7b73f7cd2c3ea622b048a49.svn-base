@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- 获取子菜单Action -->
+    <bean id="receptionFuncActionSD" parent="baseAction" class="com.gmcc.boss.selfsvc.reception.action.ReceptionFuncActionSD" scope="prototype">
+    </bean>
+	
+	<!-- 移动业务办理 -->
+	
+	<!-- daoImpl -->
+	<bean id="menuDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.reception.dao.MenuDaoImpl"/>
+	
+	<!-- serviceImpl -->
+	<bean id="menuServiceImpl" class="com.gmcc.boss.selfsvc.reception.service.MenuServiceImpl">
+		<property name="menuDaoImpl"><ref bean="menuDaoImpl"/></property>
+	</bean>
+	
+	<!-- service -->
+	<bean id="menuService" parent="baseTransactionProxy">
+		<property name="target"><ref local="menuServiceImpl"/></property>
+	</bean>
+	
+	<!-- action -->
+	<bean id="receptionAction" parent="baseAction" class="com.gmcc.boss.selfsvc.reception.action.ReceptionAction" scope="prototype">
+		<property name="menuService"><ref bean="menuServiceImpl"/></property>
+		<!-- add begin CKF76106 2012/10/12 R003C12L09n01 OR_HUB_201209_884  -->
+		<property name="quickPubService"><ref bean="quickPubServiceImpl"/></property>
+		<!-- add end CKF76106 2012/10/12 R003C12L09n01 OR_HUB_201209_884  -->
+	</bean>
+	
+	
+	
+	<!-- 呼叫转移 -->	
+	<bean id="callTransferBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.CallTransferBean" scope="prototype"></bean>
+	<bean id="callTransferAction" parent="baseAction" class="com.gmcc.boss.selfsvc.reception.action.CallTransferAction" scope="prototype">
+		<property name="callTransferBean">
+			<ref local="callTransferBean" />
+		</property>
+	</bean>
+</beans>

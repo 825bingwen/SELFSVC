@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="valueCard" extends="struts-common" namespace="/valueCard">
+		
+		<!-- add begin wWX217192 2015-04-27 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+		<!-- 跳转至手机号码输入页面 -->
+		<action name="inputNumber" class="valueCardAction" method="inputNumber">
+			<result name="success">/jsp/valuecard/inputValueCardNum.jsp</result>
+			<result name="success_sd">/jsp/valuecard/inputValueCardNum_sd.jsp</result>
+		</action>
+		
+		<!-- 跳转至选择有价卡类型、面值和数量的页面 -->
+		<action name="chooseValueCard" class="valueCardAction" method="chooseValueCard">
+			<result name="success">/jsp/valuecard/chooseValueCard.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 跳转至有价卡交费支付页面 -->
+		<action name="qryPayType" class="valueCardAction" method="qryPayType">
+			<result name="success">/jsp/valuecard/selectPayTypeJS.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 跳转至投币页面 -->
+		<action name="cashCharge" class="valueCardAction" method="cashCharge">
+			<result name="success">/jsp/valuecard/cash/cashChargeJS.jsp</result>
+			<result name="cashCharge_sd">/jsp/valuecard/cash/cashCharge_sd.jsp</result>
+		</action>
+		
+		<!-- 现金交费投币后记录日志 -->
+		<action name="updateCashChargeLog" class="valueCardAction" method="updateCashChargeLog">
+		</action>
+		
+		<!-- 购买有价卡 -->
+		<action name="buyValueCards" class="valueCardAction" method="buyValueCards">
+			<result name="success">/jsp/valuecard/finishJS.jsp</result>
+		    <result name="cashError">/jsp/valuecard/cash/cashErrorPageJS.jsp</result>
+		    <result name="cardError">/jsp/valuecard/card/cardErrorPageJS.jsp</result>
+		    <result name="repeatError">/jsp/valuecard/cash/repeatFeeChargeJS.jsp</result>
+		</action>
+		
+		<!-- 现金交费异常 -->
+		<action name="goCashError" class="valueCardAction" method="goCashError">
+			<result name="success">/jsp/valuecard/cash/cashErrorPageJS.jsp</result>
+		</action>
+		
+		<!-- 跳转至银联卡交费的免责声明页面 -->
+		<action name="cardCharge" class="valueCardAction" method="cardCharge">
+			<result name="success">/jsp/valuecard/card/dutyInfoJS.jsp</result>
+		</action>
+		
+		<!-- 跳转至读取银行卡页面 -->
+		<action name="readCard" class="valueCardAction" method="readCard">
+			<result name="success">/jsp/valuecard/card/readCardJS.jsp</result>
+		</action>
+		
+		<!-- 跳转至输入银行卡密码页面 -->
+		<action name="inputCardPwd" class="valueCardAction" method="inputCardPwd">
+			<result name="success">/jsp/valuecard/card/cardPasswordJS.jsp</result>
+		</action>
+		
+		<!-- 转向银行缴费信息确认页面 -->
+		<action name="makeSure" class="valueCardAction" method="makeSure">
+			<result name="success">/jsp/valuecard/card/makeSureJS.jsp</result>
+		</action>
+		
+		<!-- 银联扣款之前添加缴费日志 -->
+		<action name="addCardChargeLog" class="valueCardAction" method="addCardChargeLog"></action>
+		
+		<!-- 银联扣款完成后更新交费日志 -->
+		<action name="updateCardChargeLog" class="valueCardAction" method="updateCardChargeLog"></action>
+		
+		<!-- 银联交费异常页面 -->
+		<action name="goCardError" class="valueCardAction" method="goCardError">
+			<result name="success">/jsp/valuecard/card/cardErrorPageJS.jsp</result>
+		</action>
+		<!-- add end wWX217192 2015-04-27 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+		
+		<!-- add begin wWX217192 2015-06-15 OR_SD_201505_1022_山东_山东电子充值卡改造需求_自助终端改造 -->
+		<action name="chargeError" class="valueCardAction" method="chargeError">
+			<result name="chargeError">/jsp/valuecard/chargeError.jsp</result>
+		</action>
+		
+		<action name="readCard_sd" class="valueCardAction" method="readCard_sd">
+			<result name="success">/jsp/valuecard/card/readCard_sd.jsp</result>
+		</action>
+		
+		<action name="updateCardChargeLog_sd" class="valueCardAction" method="updateCardChargeLog_sd">
+		</action>
+		
+		<action name="buyValueCards_sd" class="valueCardAction" method="buyValueCards_sd">
+			<result name="chargeError">/jsp/valuecard/chargeError.jsp</result>
+			<result name="success">/jsp/valuecard/finishJS_sd.jsp</result>
+		</action>
+		<!-- add end wWX217192 2015-06-15 OR_SD_201505_1022_山东_山东电子充值卡改造需求_自助终端改造 -->
+	</package>
+	
+	<!-- add begin sWX219697 2015-5-11 10:27:25 OR_HUB_201503_1068_HUB_有价卡充值 -->
+	<package name="valueCardCharge" extends="struts-common" namespace="/valueCardCharge">
+	
+		<!-- 跳转至充值页面，输入手机号码和有价卡密码 -->
+		<action name="chargePage" class="valueCardChargeAction" method="chargePage">
+			<result name="success">/jsp/valuecard/valueCardCharge.jsp</result>
+		</action>
+		
+		<!-- 有价卡充值提交 -->
+		<action name="chargeCommit" class="valueCardChargeAction" method="chargeCommit">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="authError">/jsp/valuecard/valueCardCharge.jsp</result>
+		</action>
+		
+	</package>
+	<!-- add end sWX219697 2015-5-11 10:27:25 OR_HUB_201503_1068_HUB_有价卡充值 -->
+	
+</struts>

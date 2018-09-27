@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <bean id="recommend4GDao" parent="baseDao" class="com.customize.sd.selfsvc.recommend4G.dao.Recommend4GDaoImpl"></bean>
+    <bean id="recommend4GServiceImpl" class="com.customize.sd.selfsvc.recommend4G.service.Recommend4GServiceImpl">
+        <property name="recommend4GDao" ref="recommend4GDao"></property>
+    </bean>
+    
+    <bean id="recommend4GService" parent="baseTransactionProxy">
+        <property name="target" ref="recommend4GServiceImpl"></property>
+    </bean>
+    
+    <!-- 4G终端推荐Action -->
+    <bean id="recommend4GAction" parent="baseAction" class="com.customize.sd.selfsvc.recommend4G.action.Recommend4GAction" scope="prototype">
+        <property name="recommend4GService" ref="recommend4GService"></property>
+    </bean>
+</beans>

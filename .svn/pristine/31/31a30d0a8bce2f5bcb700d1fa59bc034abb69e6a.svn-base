@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="menuHub">
+
+	<!-- menu对象 -->
+	<typeAlias alias="menuPO" type="com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO" />
+	
+	<!-- 热点业务推荐菜单 (热点业务推荐 = 直属子菜单 + 非直属子菜单并且menutype=hot) + sp表menutype=hot -->
+	<select id="qryRecHotspot" resultClass="menuPO" parameterClass="menuPO">
+		select menuid,menuname,parentid,guiobj,tiptext,sortorder,createdate,status,statusdate,imgpath,
+		       region,brandid,authcode,menulevel,busidetail,
+		       position,imgpath2,additionalinfo,menutype 
+		from sh_menu_item 
+		where parentid = #parentid# and status = 1
+		and exists (select * from sh_group_menu where sh_menu_item.menuid = sh_group_menu.menuid and termgrpid = #termgrpid#)
+		union all
+		select menuid,menuname,parentid,guiobj,tiptext,sortorder,createdate,status,statusdate,imgpath,
+		       region,brandid,authcode,menulevel,busidetail,
+		       position,imgpath2,additionalinfo,menutype 
+		       
+		from sh_menu_item 
+		where parentid != #parentid# and menutype = 'hot' and status = 1
+		and exists (select * from sh_group_menu where sh_menu_item.menuid = sh_group_menu.menuid and termgrpid = #termgrpid#)
+		union all
+		select spcode || '-' || operatorcode menuid, operatorname menuname,'sp' parentid,linkurl guiobj,'' tiptext,1 sortorder,
+        sysdate createdate, 1 status, sysdate statusdate, imgpath, 999 region, 'All' brandid, authcode, 2 menulevel, '' busidetail,
+        '' position, imgpath imgpath2, '' additionalinfo, menutype
+        from sh_pc_dsmp_spbizinfo 
+        where menutype = 'hot' and status = 1
+	</select>
+	
+	<!-- 热门业务推荐下一级功能菜单 -->
+	<select id="qryRecHotspotNext" resultClass="menuPO" parameterClass="menuPO">
+		select menuid,menuname,parentid,guiobj,tiptext,sortorder,createdate,status,statusdate,imgpath,
+		       region,brandid,authcode,menulevel,busidetail,
+		       position,imgpath2,additionalinfo,menutype 
+		from sh_menu_item 
+		where parentid = #parentid# and status = 1
+		and sh_menu_item.menuid in (select menuid from sh_group_menu where termgrpid = #termgrpid#)
+	</select>
+	
+	<!-- 业务菜单查询 -->
+	<select id="qryMinChildNode" resultClass="menuPO" parameterClass="menuPO">
+		SELECT M.MENUID,M.MENUNAME,M.PARENTID,M.GUIOBJ,M.TIPTEXT,M.SORTORDER,M.CREATEDATE,M.STATUS,M.STATUSDATE,
+			M.IMGPATH,M.REGION,M.BRANDID,M.AUTHCODE,M.MENULEVEL,M.BUSIDETAIL,M.POSITION,M.IMGPATH2,M.ADDITIONALINFO,
+  			M.MENUTYPE 
+  		 FROM SH_GROUP_MENU G,(SELECT T.MENUID,T.MENUNAME,T.PARENTID,T.GUIOBJ,T.TIPTEXT,T.SORTORDER,T.CREATEDATE,
+ 			T.STATUS,T.STATUSDATE,T.IMGPATH,T.REGION,T.BRANDID,T.AUTHCODE,T.MENULEVEL,T.BUSIDETAIL,T.POSITION,
+ 			T.IMGPATH2,T.ADDITIONALINFO,T.MENUTYPE,T.MENUFLAG 
+ 		 FROM sh_menu_item T START WITH T.MENUID='rec' CONNECT BY T.PARENTID= PRIOR T.MENUID) M 
+ 		 WHERE M.MENUFLAG='1' AND M.MENUID=G.MENUID 
+ 		 AND G.STATUS =1
+         AND M.STATUS = 1
+ 		<isNotNull prepend="AND" property="brandID"> 
+				(M.BRANDID = 'ALL' OR M.BRANDID=#brandID#) 
+		</isNotNull>
+		<isNotNull prepend="AND" property="termgrpid"> 
+				G.TERMGRPID=#termgrpid#
+		</isNotNull>
+ 		AND NOT EXISTS (SELECT 1 FROM sh_menu_item I WHERE I.PARENTID=M.MENUID AND I.MENUFLAG = 1)
+	</select>
+	
+</sqlMap>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="chooseTel" extends="struts-common" namespace="/chooseTel">		
+
+		<!-- 选择规则页面 -->
+		<action name="selectRule" class="chooseTelAction" method="selectRule">
+		    <result name="selectRule">/jsp/customize/sd/chooseTel/selectRule.jsp</result>
+		</action>
+		
+		<!-- 根据规则输入号码页面 -->
+		<action name="inputTelNumByRule" class="chooseTelAction" method="inputTelNumByRule">
+		    <result name="inputTelNumByRule">/jsp/customize/sd/chooseTel/inputTelNumByRule.jsp</result>
+		    <result name="manuNumber">/jsp/customize/sd/chooseTel/chooseManuNumber.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="telNumResult" class="chooseTelAction" method="telNumResult">
+		    <result name="telNumResult">/jsp/customize/sd/chooseTel/telNumResult.jsp</result>
+		    <result name="telNumResultNew">/jsp/customize/sd/chooseTel/telNumResultNew.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="inputCertid" class="chooseTelAction" method="inputCertid">
+		    <result name="inputCertid">/jsp/customize/sd/chooseTel/inputCertid.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="makeSureTel" class="chooseTelAction" method="makeSureTel">
+		    <result name="makeSureTel">/jsp/customize/sd/chooseTel/makeSureTel.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 转到输入发送手机号码页面 -->
+		<action name="inputSendNum" class="chooseTelAction" method="inputSendNum">
+		    <result name="inputSendNum">/jsp/customize/sd/chooseTel/inputSendNum.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 发送短信完成页面 -->
+		<action name="sendNumFinish" class="chooseTelAction" method="sendNumFinish">
+		    <result name="sendNumFinish">/jsp/customize/sd/chooseTel/sendNumFinish.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- add begin wWX217192 2015-03-13 OR_SD_201411_988_SD_关于自助终端选号规则优化的需求 -->
+		<!-- 查询号码接口 -->
+		<action name="queryNum" class="chooseTelAction" method="queryNum">
+			<result name="success">/jsp/customize/sd/chooseTel/telNumResultNew.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<action name="pickNum" class="chooseTelAction" method="pickNum">
+			<result name="success">/jsp/customize/sd/chooseTel/inputCertid.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<action name="bookNum" class="chooseTelAction" method="bookNum">
+			<result name="success">/jsp/customize/sd/chooseTel/makeSureTel.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		<!-- add end wWX217192 2015-03-13 OR_SD_201411_988_SD_关于自助终端选号规则优化的需求 -->
+		
+	</package>	
+</struts>

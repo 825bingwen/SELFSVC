@@ -1,0 +1,293 @@
+package com.gmcc.boss.selfsvc.privilege.service;
+
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.common.service.BaseServiceImpl;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.privilege.dao.PrivilegeDaoImpl;
+import com.gmcc.boss.selfsvc.privilege.model.CustNcodeInfoPO;
+import com.gmcc.boss.selfsvc.privilege.model.GroupNcodePO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+
+public class PrivilegeServiceImpl extends BaseServiceImpl implements PrivilegeService
+{
+    public PrivilegeDaoImpl privilegeDaoImpl;
+	
+    /**
+     * 山东移动梦网业务订购
+     * @param termInfo
+     * @param customer
+     * @param curMenuId
+     * @param telnum
+     * @param spid
+     * @param bizid
+     * @return
+     * @remark create by wWX217192 2014-04-02 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求
+     */
+    public String addSPReception(TerminalInfoPO termInfo, NserCustomerSimp customer, String curMenuId, String telnum, String spid, String bizid)
+    {
+    	String flag = "";
+    	// 组装请求报文头
+    	MsgHeaderPO header = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+                customer.getContactId(), MsgHeaderPO.ROUTETYPE_TELNUM, customer.getServNumber());
+    	
+    	// 调用梦网业务订购
+    	ReturnWrap rw = selfSvcCall.orderSP(header, spid, bizid);
+    	
+    	// 接口调用成功
+    	if(SSReturnCode.SUCCESS == rw.getStatus())
+    	{
+    		flag = rw.getStatus() + "";
+    		this.insertRecLog(curMenuId, "0", "0", "0", "梦网订购业务成功!");
+    	}
+    	else
+    	{
+    		// 错误信息
+    		String errorMsg = "";
+    		
+    		// 若返回信息为空，则显示默认返回信息
+    		if(StringUtils.isEmpty(rw.getReturnMsg()))
+    		{
+    			errorMsg = "业务办理失败，请稍后再试！";
+    		}
+    		else
+    		{
+    			errorMsg = rw.getReturnMsg();
+    		}
+    		
+    		this.insertRecLog(curMenuId, "0", "0", "1", errorMsg);
+    		throw new ReceptionException(errorMsg);
+    	}
+    	
+    	return flag;
+    }
+    
+    /**
+     * 根据组ID查询同组业务列表
+     * @param groupId 组ID
+     * @param menuid 菜单id
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-4-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    public CustNcodeInfoPO qryCustNcodeInfo(String groupId,String menuid)
+    {
+        // 根据组id查询同组业务列表
+        List<GroupNcodePO> ncodeList = privilegeDaoImpl.qryGroupNcodeInfo(new GroupNcodePO(groupId));
+        
+        // 终端机信息
+        TerminalInfoPO termInfo = this.getTermInfo();
+        
+        // 用户信息
+        NserCustomerSimp customer = this.getCustomer(); 
+        
+        CustNcodeInfoPO custNcodeInfo = new CustNcodeInfoPO();
+        
+        // 组装消息头
+        MsgHeaderPO msgHeader = new MsgHeaderPO(menuid, termInfo.getOperid(), 
+                termInfo.getTermid(), customer.getContactId(), MsgHeaderPO.ROUTETYPE_TELNUM, customer.getServNumber());
+        
+        // 存在同组业务
+        if(CollectionUtils.isEmpty(ncodeList))
+        {
+            throw new ReceptionException("对不起，没有找到对应的同组业务！");
+        }
+
+        // 调用接口查询用户已办理业务信息
+        ReturnWrap result = selfSvcCall.recCommonServ(msgHeader, ncodeList.get(0).getNcode(), "QRY", "", "");
+        
+        if(SSReturnCode.ERROR == result.getStatus())
+        {
+            // 业务日志
+            this.insertRecLog(menuid, "0", "0", Constants.RECSTATUS_FALID, "查询同组业务用户办理状态失败！");
+      
+            if(StringUtils.isBlank(result.getReturnMsg()))
+            {
+                result.setReturnMsg("对不起，查询同组业务用户办理状态失败！请稍后再试！");
+            }
+            throw new ReceptionException(result.getReturnMsg());
+        }
+        
+        CTagSet tagSet = (CTagSet) result.getReturnObject();
+        
+        if (null != tagSet)
+        {
+            // 当前套餐ncode
+            custNcodeInfo.setCurrNcode(tagSet.GetValue("curncode"));
+            
+            // 下月套餐ncode
+            custNcodeInfo.setNextNcode(tagSet.GetValue("nextncode"));
+        }
+        
+        // 设置用户已办理业务名称和费用
+        if(StringUtils.isNotBlank(custNcodeInfo.getCurrNcode()) || StringUtils.isNotBlank(custNcodeInfo.getNextNcode()))
+        {
+            for(GroupNcodePO ncodePO:ncodeList)
+            {
+                // 当月套餐
+                if(ncodePO.getNcode().equals(custNcodeInfo.getCurrNcode()))
+                {
+                    custNcodeInfo.setCurrNcodeName(ncodePO.getNcodeName());
+                    custNcodeInfo.setCurrNcodeFee(ncodePO.getFee());
+                }
+                
+                // 下月套餐
+                if(ncodePO.getNcode().equals(custNcodeInfo.getNextNcode()))
+                {
+                    custNcodeInfo.setNextNcodeName(ncodePO.getNcodeName());
+                    custNcodeInfo.setNextNcodeFee(ncodePO.getFee());
+                }
+                
+                // 当月套餐和下月套餐都设置名称后跳出循环
+                if(StringUtils.isNotBlank(custNcodeInfo.getCurrNcodeName()) 
+                        && StringUtils.isNotBlank(custNcodeInfo.getNextNcodeName()))
+                {
+                    break;
+                }
+            }
+        }
+        
+        // 设置同组业务列表
+        custNcodeInfo.setGroupNcodeList(ncodeList);
+        
+        return custNcodeInfo;
+    }
+    
+    /**
+     * 根据组ID和ncode查询业务信息
+     * @param groupId 组ID
+     * @param ncode 
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-5-26 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    public GroupNcodePO qryGroupNcodeInfo(String groupId,String ncode)
+    {
+        // 查询业务信息
+        List<GroupNcodePO> ncodeList = privilegeDaoImpl.qryGroupNcodeInfo(new GroupNcodePO(groupId, ncode));
+        
+        // 返回业务信息
+        if(CollectionUtils.isEmpty(ncodeList))
+        {
+            throw new ReceptionException("对不起，没有查询到对应的套餐信息！");
+        }
+        else
+        {
+            return ncodeList.get(0);
+        }
+    }
+    
+    /**
+     * <办理同组业务产品>
+     * @param custNcodeInfoPO 用户订购业务信息
+     * @param groupNcodePO 要办理或变更业务信息
+     * @param operType 操作类型 ADD开通  DEL取消
+     * @param effectType 生效方式 1:立即生效  3：下月生效
+     * @param curMenuId 菜单id
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-5-28 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    public String commitPrivNcode(CustNcodeInfoPO custNcodeInfo, GroupNcodePO groupNcodePO, String operType, 
+            String effectType, String curMenuId)
+    {
+        // 终端机信息
+        TerminalInfoPO termInfo = this.getTermInfo();
+        
+        // 用户信息
+        NserCustomerSimp customer = this.getCustomer();
+        
+        // 组装消息头
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+                customer.getContactId(), MsgHeaderPO.ROUTETYPE_TELNUM, customer.getServNumber());
+        
+        // 业务办理
+        ReturnWrap result = selfSvcCall.recCommonServ(msgHeader, groupNcodePO.getNcode(), operType, effectType, "");
+        
+        // 业务受理流水号
+        String recFormnum = "0";
+        
+        // 开通业务Ncode
+        String addncode = "";
+        
+        // 退订业务Ncode
+        String delncode = "";
+        
+        // 调用失败
+        if (SSReturnCode.ERROR == result.getStatus())
+        {
+            // 业务日志
+            this.insertRecLog(curMenuId, recFormnum, "0", Constants.RECSTATUS_FALID, "业务受理失败！");
+            
+            if(StringUtils.isBlank(result.getReturnMsg()))
+            {
+                result.setReturnMsg("对不起，" + groupNcodePO.getNcodeName() + "业务办理失败！");
+            }
+            throw new ReceptionException(result.getReturnMsg());
+        }
+        
+        // 获取业务流水
+        CTagSet tagSet = (CTagSet)result.getReturnObject();
+        
+        if(null != tagSet)
+        {
+            addncode = tagSet.GetValue("addncode");
+            
+            delncode = tagSet.GetValue("delncode");
+        }
+        
+        // 开通成功提示
+        StringBuffer successMsg = new StringBuffer();
+        
+        // 设置用户已办理业务名称和费用
+        if(StringUtils.isNotBlank(addncode) || StringUtils.isNotBlank(delncode))
+        {
+            // 根据组id查询同组业务列表
+            List<GroupNcodePO> ncodeList = privilegeDaoImpl.qryGroupNcodeInfo(new GroupNcodePO(groupNcodePO.getGroupId()));
+            
+            for(GroupNcodePO ncodePO:ncodeList)
+            {
+                // 开通成功提示
+                if(addncode.equals(ncodePO.getNcode()))
+                {
+                    successMsg.append(ncodePO.getNcodeName() + "开通成功!");
+                }
+                
+                // 退订成功提示
+                if(delncode.equals(ncodePO.getNcode()))
+                {
+                    successMsg.append(ncodePO.getNcodeName() + "退订成功!");
+                }
+            }
+        }
+        
+        if(StringUtils.isBlank(successMsg.toString()))
+        {
+            successMsg.append("业务办理成功！");
+        }
+            
+        // 记录业务日志
+        this.insertRecLog(curMenuId, recFormnum, "0", Constants.RECSTATUS_SUCCESS, "业务受理成功");
+        
+        return successMsg.toString();
+    }
+
+    public PrivilegeDaoImpl getPrivilegeDaoImpl()
+    {
+        return privilegeDaoImpl;
+    }
+
+    public void setPrivilegeDaoImpl(PrivilegeDaoImpl privilegeDaoImpl)
+    {
+        this.privilegeDaoImpl = privilegeDaoImpl;
+    }
+    
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 实名制认证受理Action -->
+	<bean id="RealNameRegAction" parent="baseAction" class="com.customize.sd.selfsvc.realNameReg.action.RealNameRegAction" scope="prototype">
+		<property name="realNameRegBean">
+			<ref bean="realNameRegBean" />
+		</property>
+	</bean>
+	
+	<!-- 实名制认证受理bean  -->
+	<bean id="realNameRegBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.RealNameRegBean"/>
+	
+	<!-- 非实名制认证补卡Action -->
+	<bean id="noRealNameRegAction" parent="baseAction" class="com.customize.sd.selfsvc.realNameReg.action.NoRealNameRegAction" scope="prototype">
+		<property name="registerCardBean" ref="registerCardBean"></property>
+	</bean>
+	
+	<!-- 非实名制认证补卡Bean -->
+	<bean id="registerCardBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.NoRealNameRegBean">
+	</bean>
+</beans>

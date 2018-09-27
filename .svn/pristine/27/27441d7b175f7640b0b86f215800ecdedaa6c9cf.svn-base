@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 话费充值Action -->
+	<!-- modify begin by qWX279398 2015-11-25  OR_SD_201511_30_山东_自助终端缴费时直接打印发票的优化 -->
+	<bean id="feeChargeAction" parent="baseAction" class="com.customize.sd.selfsvc.charge.action.FeeChargeAction" scope="prototype">
+	    <property name="feeChargeBean" ref="feeChargeBean"></property>
+	    <property name="feeChargeService" ref="feeChargeService"></property>
+	    
+	    <!-- 登陆service注入 -->
+	    <property name="loginService" ref="loginService">
+		</property>
+		
+		<!-- 登陆bean注入 -->
+		<property name="userLoginBean" ref="userLoginBean">
+		</property>
+		
+	</bean>
+	
+	<!-- 代理商空中充值账户续费Action -->
+	<!-- create begin sWX219697 2014-6-5 20:07:56 OR_huawei_201404_1118 -->
+	<bean id="agentChargeAction" parent="baseAction" class="com.customize.sd.selfsvc.charge.action.AgentChargeAction" scope="prototype">
+	    <property name="agentChargeBean" ref="agentChargeBean"></property>
+	    <property name="feeChargeService" ref="feeChargeService"></property>
+	</bean>
+	
+	<bean id="agentChargeBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.AgentChargeBean"></bean>
+	<!-- create end sWX219697 2014-6-5 20:07:56 OR_huawei_201404_1118 -->
+	
+	<!-- 话费充值service -->
+	<bean id="feeChargeService" parent="baseTransactionProxy">
+	    <property name="target" ref="feeChargeServiceImpl"></property>
+	</bean>
+	
+	<!-- 话费充值serviceImpl -->
+	<bean id="feeChargeServiceImpl" class="com.customize.sd.selfsvc.charge.service.FeeChargeServiceImpl">
+	    <property name="feeChargeDaoImpl" ref="feeChargeDaoImpl"></property>
+	</bean>
+	
+	<!-- 话费充值DaoImpl -->
+	<bean id="feeChargeDaoImpl" parent="baseDao" class="com.customize.sd.selfsvc.charge.dao.FeeChargeDaoImpl"></bean>
+	
+	<!-- 话费充值Bean -->
+	<bean id="feeChargeBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.FeeChargeBean"></bean>
+
+</beans>

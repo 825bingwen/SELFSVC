@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="prestoredReward">
+    <!-- 预存有礼PO -->
+    <typeAlias alias="prestoredRewardPO" type="com.customize.sd.selfsvc.prestoredReward.model.PrestoredRewardPO"/>
+
+    <!-- 缴费日志PO -->
+    <typeAlias alias="cardChargeLog" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+
+    <!-- 缴费日志PO -->
+    <typeAlias alias="activityLogPO" type="com.customize.sd.selfsvc.prestoredReward.model.ActivityLogPO"/>
+        
+    <!--modify begin sWX219697 2015-5-28 17:19:00 OR_SD_201505_61自助终端上增加积分兑换电子券 
+    	添加  AND (ACTTYPE IS NULL OR ACTTYPE = 'rtChargePrepay')-->
+    <!-- 查询促销活动组 -->
+    <select id="getActivitiesGroups" resultClass="prestoredRewardPO" parameterClass="prestoredRewardPO">
+        SELECT DISTINCT A.GROUPID, A.GROUPNAME 
+        FROM SH_ACTIVITY_INFO_SD A
+        WHERE A.STATUS = 1 
+        AND (A.ACTTYPE IS NULL OR A.ACTTYPE = 'rtChargePrepay') 
+        AND <![CDATA[A.VALIDDATE <= sysdate]]>
+        AND <![CDATA[A.EXPIREDATE >= sysdate ]]>
+        AND A.GROUPID NOT IN 
+        (
+            SELECT GROUPID 
+            FROM SH_ACTIVITY_INFO_SD
+            WHERE STATUS = 1 
+            <isNotEmpty prepend="AND" property="region"> 
+                AREA in (#region#, 999)
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="actLevelId"> 
+                DANGCIID in ($actLevelId$)
+            </isNotEmpty>
+        )
+        <isNotEmpty prepend="AND" property="region"> 
+                A.AREA in (#region#, 999)
+        </isNotEmpty>
+    </select>
+    
+    <!-- 根据所有可用查询档次 -->
+    <select id="getAllActLevels" resultClass="prestoredRewardPO" parameterClass="prestoredRewardPO">
+        SELECT AREA REGION,ACTIVITYID,DANGCIID ACTLEVELID,DANGCINAME ACTLEVELNAME,PREPAYFEE,PRESENTVALUE,GROUPID,GROUPNAME,ACTIVITYDESC,AWARDDESC
+        FROM SH_ACTIVITY_INFO_SD
+        WHERE STATUS = 1 
+        AND <![CDATA[VALIDDATE <= sysdate]]>
+        AND <![CDATA[EXPIREDATE >= sysdate ]]>
+        AND (ACTTYPE IS NULL OR ACTTYPE = 'rtChargePrepay')
+    </select>
+    <!--modify end sWX219697 2015-5-28 17:19:00 OR_SD_201505_61自助终端上增加积分兑换电子券 -->
+    
+    <!-- 更新缴费日志状态 -->
+    <update id="updateCardChargeLog" parameterClass="cardChargeLog">
+        UPDATE SH_CHARGE_LOG 
+            SET DESCRIPTION = #description#
+            <isNotEmpty prepend="," property="status">
+                STATUS = #status#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="dealnum">
+                DEALNUM=#dealnum#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="cardnumber">
+                CARDNUMBER=#cardnumber#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="unionpayuser">
+                UNIONPAYUSER=#unionpayuser#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="unionpaycode">
+                UNIONPAYCODE=#unionpaycode#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="busiType">
+                BUSITYPE=#busiType#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="batchnum">
+                BATCHNUM=#batchnum#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="authorizationcode">
+                AUTHORIZATIONCODE=#authorizationcode#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="businessreferencenum">
+                BUSINESSREFERENCENUM=#businessreferencenum#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="unionpaytime">
+                UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmddhh24miss')
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="vouchernum">
+                VOUCHERNUM=#vouchernum#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="unionpayfee">
+                UNIONPAYFEE=#unionpayfee#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="posResCode">
+                UNIONRETCODE = #posResCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="authorizationcode">
+                AUTHORIZATIONCODE=#authorizationcode#
+            </isNotEmpty>
+         WHERE CHARGELOGOID = #chargeLogOID#
+    </update>
+    
+    
+    <!-- 银行卡缴费日志记录 -->
+    <insert id="createActivityLog" parameterClass="activityLogPO">
+        <selectKey resultClass="java.lang.String" keyProperty="activityLogId">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+        INSERT INTO SH_LOG_ACTIVITY(ACTIVITYLOGID,CHARGEID,REGION,SERVNUMBER,ACTIVITYID,ACTLEVELID,RECDATE, 
+               RECFEE,TOTALFEE,PREFEE,PAYTYPE,RECSTAUTS,RECSTAUTSDESC)
+        VALUES(#activityLogId#,#chargeId#,#region#,#telNum#,#activityId#,#actLevelId#,sysdate,#recFee#,
+               #totalFee#,#preFee#,#payType#,#recStatus#,#redStatusDesc#)
+    </insert>
+    
+    <!-- add begin by qWX279398 OR_SD_201507_533_山东_自助终端积分兑换功能优化 -->
+    <!--add begin sWX219697 2015-5-28 17:19:00 OR_SD_201505_61自助终端上增加积分兑换电子券 -->
+    <!--查询可以兑换的电子券:批次编码，活动名称，档次编码，档次说明，奖品串编码，奖品名称，交费金额，需要扣减的积分-->
+    <select id="qryScoreExECash" parameterClass="java.lang.Integer" resultClass="prestoredRewardPO">
+        SELECT ACTIVITYID,ACTIVITYDESC,DANGCIID ACTLEVELID,DANGCINAME ACTLEVELNAME,REWARDID ACTREWARD,
+        REWARDNAME,PREPAYFEE,ACTSCORE
+        FROM SH_ACTIVITY_INFO_SD A
+        WHERE A.STATUS = 1 
+        AND A.ACTTYPE = 'rtScoreExECash'
+        AND <![CDATA[A.ACTSCORE <= #value# ]]>
+        AND <![CDATA[A.VALIDDATE <= sysdate]]>
+        AND <![CDATA[A.EXPIREDATE >= sysdate ]]>
+        AND A.SHOWSTATUS = 1
+        ORDER BY A.SORTORDER ASC
+    </select>
+    
+    <!--add begin sWX219697 2015-5-28 17:19:00 OR_SD_201505_61自助终端上增加积分兑换电子券 -->
+    <select id="qryScoreQuantity" resultClass="prestoredRewardPO">
+        SELECT ACTIVITYID,ACTIVITYDESC,DANGCIID ACTLEVELID,DANGCINAME ACTLEVELNAME,REWARDID ACTREWARD,
+        REWARDNAME,PREPAYFEE,ACTSCORE,ACTTYPE
+        FROM SH_ACTIVITY_INFO_SD A
+        WHERE A.STATUS = 1 
+        AND A.ACTTYPE = 'rtScoreExECashAll'
+        AND <![CDATA[A.VALIDDATE <= sysdate]]>
+        AND <![CDATA[A.EXPIREDATE >= sysdate ]]>
+        AND A.SHOWSTATUS = 1
+        ORDER BY A.SORTORDER ASC
+    </select>
+	<!-- add end by qWX279398 OR_SD_201507_533_山东_自助终端积分兑换功能优化 -->
+	
+</sqlMap>

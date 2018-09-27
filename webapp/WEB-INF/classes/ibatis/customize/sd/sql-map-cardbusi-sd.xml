@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="cardbusi">
+
+	<!-- 在线开户 -->
+	<typeAlias alias="prodTempletPO" type="com.customize.sd.selfsvc.cardbusi.model.ProdTempletPO" />	
+	<typeAlias alias="cardBusiLogPO" type="com.customize.sd.selfsvc.cardbusi.model.CardBusiLogPO" />
+	<typeAlias alias="dictItemPO" type="com.gmcc.boss.selfsvc.resdata.model.DictItemPO" />
+	<typeAlias alias="cardChargeLog" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	
+	<!-- 查询开户产品模板 -->	
+	<select id="qryProdTempletList" resultClass="prodTempletPO" parameterClass="prodTempletPO">		
+		SELECT TEMPLETID,TEMPLETNAME,MAINPRODID,MAINPRODNAME,BRAND,MONTHFEE/100 AS MONTHFEE,DESCRIPTION,
+			REGION,ORGID,CREATEDATE,STATUSDATE,SORTORDER,MINFEE,OPERID,NOTES
+		FROM SH_TPLT_PRODTEMPLET
+		WHERE STATUS = 1 AND (REGION = #region# OR REGION = 999) 
+	</select>
+	
+	<!-- 查询终端支持空白卡写卡支持的卡类型-->	
+	<select id="qryTermBlankCardType" resultClass="dictItemPO" parameterClass="java.lang.String">		
+		SELECT DICTID, DICTNAME, DESCRIPTION
+		FROM SH_TERM_CARDTYPE CT, SH_DICT_ITEM DI
+		WHERE CT.TERMID = #termId# AND DI.GROUPID = 'BlankCardType' AND CT.BLANKCARDTYPE = DI.DICTID
+	</select>
+	
+	<!-- 取开户流水号 -->
+	<select id="getInstallId" resultClass="java.lang.String">
+		SELECT SEQ_LOG_INSTALL_OID.NEXTVAL FROM DUAL
+	</select>
+	
+	<!-- 记录开户日志 -->
+	<insert id="addLogInstall" parameterClass="cardBusiLogPO">
+	    INSERT INTO SH_CARDBUSI_LOG 
+	    (OID, TERMID, CHARGEID, REGION, SERVNUMBER, MAINPRODIID, PRODTEMPLETID,RECTYPE, CHARGETYPE, RECFEE, TOFEE, CUSTNAME, CERTID, LINKADDR, SEX, BLANKCARD, ICCID, IMSI, SMSP, LINKPHONE, PRODUCTLIST,
+	     SUBMAILADDR, CREATEDATE, STATUSDATE, WRITECARDSTATUS, PAYSTATUS, INSTALLSTATUS, REFUNDMENT, FORMNUM, SUBSID, NOTES)
+		VALUES
+		(#oid#,#termId#,#chargeId#,#region#,#servnumber#,#mainProdId#,#prodTempletId#,#rectype#,#chargeType#,#recFee#,#toFee#,#custName#,#certId#,#linkAddr#,#sex#,#blankCard#,#iccid#,#imsi#,#smsp#,#linkPhone#,#productList#,#submailAddr#,sysdate,sysdate,#writeCardStatus#,#payStatus#,#installStatus#,#refundment#,#formnum#,#subsId#,#notes#)
+	</insert>
+	
+	<!-- 更新开户日志 -->
+	<update id="updateInstallLog" parameterClass="cardBusiLogPO">
+	    UPDATE SH_CARDBUSI_LOG 
+	    	SET  STATUSDATE=sysdate
+	     <dynamic>
+	      	 <isNotEmpty prepend="," property="chargeId">
+	      	 	CHARGEID=#chargeId#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="chargeType">
+	      	 	CHARGETYPE=#chargeType#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="toFee">
+	      	 	TOFEE=#toFee#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="writeCardStatus">
+	      	 	WRITECARDSTATUS=#writeCardStatus#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="payStatus">
+	      	 	PAYSTATUS=#payStatus#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="installStatus">
+	      	 	INSTALLSTATUS=#installStatus#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="formnum">
+	      	 	FORMNUM=#formnum#
+			 </isNotEmpty>
+		     <isNotEmpty prepend="," property="notes">
+	      	 	NOTES=#notes#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="blankCard">
+	      	 	BLANKCARD=#blankCard#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="iccid">
+	      	 	ICCID=#iccid#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="imsi">
+	      	 	IMSI=#imsi#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="smsp">
+	      	 	SMSP=#smsp#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="," property="subsId">
+                SUBSID=#subsId#
+             </isNotEmpty>
+		 </dynamic>
+	     WHERE OID=#oid#
+	</update>
+	
+	<!-- 更新缴费日志状态 -->
+	<update id="updateCardChargeLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG 
+			SET DESCRIPTION = #description#
+			<isNotEmpty prepend="," property="fee">
+	      	 	FEE = #fee#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="status">
+	      	 	STATUS = #status#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="cardnumber">
+	      	 	CARDNUMBER=#cardnumber#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="unionpayuser">
+	      	 	UNIONPAYUSER=#unionpayuser#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="unionpaycode">
+	      	 	UNIONPAYCODE=#unionpaycode#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="busiType">
+	      	 	BUSITYPE=#busiType#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="batchnum">
+	      	 	BATCHNUM=#batchnum#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="authorizationcode">
+	      	 	AUTHORIZATIONCODE=#authorizationcode#
+		    </isNotEmpty>
+		   	<isNotEmpty prepend="," property="businessreferencenum">
+	      	 	BUSINESSREFERENCENUM=#businessreferencenum#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="unionpaytime">
+	      	 	UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmdd hh24miss')
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="vouchernum">
+	      	 	VOUCHERNUM=#vouchernum#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="unionpayfee">
+	      	 	UNIONPAYFEE=#unionpayfee#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="terminalSeq">
+	      	 	TERMINALSEQ=#terminalSeq#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="recdate">
+	      	 	RECDATE=to_date(#recdate#, 'yyyymmddhh24:mi:ss')
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="posResCode">
+	      	 	UNIONRETCODE = #posResCode#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="bankno">
+	      	 	BANKNO=#bankno#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="dealnum">
+	      	 	DEALNUM=#dealnum#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="acceptType">
+	      	 	ACCEPTTYPE=#acceptType#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="," property="posNum">
+	      	 	POSNUM=#posNum#
+		    </isNotEmpty>
+		 WHERE CHARGELOGOID = #chargeLogOID# AND ORGID = #orgID# AND REGION = #region#
+	</update>
+	
+	<!-- 查询本月用户的补卡次数 -->
+	<select id="getReissueCardNum" resultClass="java.lang.Integer" parameterClass="cardBusiLogPO">
+		SELECT COUNT(A.CHARGELOGOID) 
+		    FROM SH_CHARGE_LOG A 
+		WHERE A.SERVNUMBER=#servnumber# 
+		    AND A.STATUS = '11' 
+		    AND A.RECTYPE = 'reissueCard'
+		    AND A.REGION =#region#
+		    AND <![CDATA[A.RECDATE >= to_date(#createDate# || ' 00:00:00', 'yyyy-mm-dd HH24:MI:SS')]]>
+            AND <![CDATA[A.RECDATE <= to_date(#statusDate# || ' 23:59:59', 'yyyy-mm-dd HH24:MI:SS')]]>
+	</select>
+	
+	
+</sqlMap>

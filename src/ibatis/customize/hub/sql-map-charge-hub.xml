@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="chargeHub">
+
+	<!-- Change by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111124 Begin  -->
+	<typeAlias alias="feeErrorInfo" type="com.customize.hub.selfsvc.charge.model.CashFeeErrorInfoVO"/>
+	<!-- Change by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111124 End -->
+	
+	<!-- add by xkf57421 for XQ[2011]_10_082 begin -->
+	<typeAlias alias="cardChargeLog" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	<!-- add by xkf57421 for XQ[2011]_10_082 end -->
+	
+    <!--  yKF73963 （2012-11-09） OR_HUB_201209_706  电子渠道-抽奖平台-抽奖接口改造  begin-->
+	<typeAlias alias="sheExtractprizeRuleVO" type="com.customize.hub.selfsvc.charge.model.SheExtractprizeRuleVO"/>
+	<!-- a yKF73963 （2012-11-09） OR_HUB_201209_706  电子渠道-抽奖平台-抽奖接口改造  end -->
+	
+	<!-- Change by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111124 Begin -->
+	<insert id="insertFeeErrorLog" parameterClass="feeErrorInfo">
+        insert into sh_log_feeerror(terminalseq, termid, region, operid, orgid, servnumber, paytype, fee, status, recdate, createdate, description)
+         values (#terminalSeq#, #termid#, #region#, #operID#, #orgID#, #servnumber#, #payType#, #fee#, #status#, to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'), sysdate, #description#)
+	</insert>
+	<!-- Change by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111124 End -->
+	
+	<!-- add by xkf57421 for XQ[2011]_10_082 begin -->
+	<!-- Change by LiFeng [OR_HUB_201112_1021]自助终端-银联对账BUG[BUG转需求] 20120104 Begin -->
+	<!-- Change by lWX5316086 OR_HUB_201311_1056  自助终端银联缴费对账整改2013 -->
+	<!-- modify by sWX219697 2014-12-23 17:49:41 OR_HUB_201412_399_HUB 添加PRESENTFEE，PRESENTSTATUS，PRESENTOID -->
+	<update id="updateChargeLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG
+		   SET STATUS       = #status#,
+		       DESCRIPTION  = #description#,
+		       DEALNUM      = #dealnum#
+		       <isNotEmpty prepend="," property="presentStatus">
+		       PRESENTSTATUS = #presentStatus# 
+		       </isNotEmpty>
+		       <isNotEmpty prepend="," property="presentOid">
+		       PRESENTOID   = #presentOid# 
+		       </isNotEmpty>
+		       <isNotEmpty prepend="," property="unionpayuser">
+		       UNIONPAYUSER = #unionpayuser#
+		       </isNotEmpty>
+		       <isNotEmpty prepend="," property="unionpaycode">
+		       UNIONPAYCODE = #unionpaycode#
+		       </isNotEmpty>
+		       , UNIONRETCODE = #posResCode#
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	<!-- Change by LiFeng [OR_HUB_201112_1021]自助终端-银联对账BUG[BUG转需求] 20120104 End -->
+	
+	<update id="updateCardChargeLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmddhh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, STATUS = #status#, 
+		   	   DESCRIPTION = #description#, UNIONRETCODE = #posResCode#  
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- add by xkf57421 for XQ[2011]_10_082 end -->
+	
+	
+	  <!--  yKF73963 （2012-11-09） OR_HUB_201209_706  电子渠道-抽奖平台-抽奖接口改造  begin-->
+	<select id="getActidsByType1" resultClass="sheExtractprizeRuleVO" parameterClass="sheExtractprizeRuleVO">
+		select step,actid from SH_EXTRACTPRIZE_RULE r where r.rectype=#rectype# and r.status=1 
+	</select>
+	<!-- a yKF73963 （2012-11-09） OR_HUB_201209_706  电子渠道-抽奖平台-抽奖接口改造  end -->
+	
+	<!-- add begin wWX217192 2015-05-21 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+	<update id="updateChargeLogForCash" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG SET STATUS = #status#, DESCRIPTION = #description#, DEALNUM = #dealnum#, UNIONRETCODE = #posResCode#
+			<isNotEmpty prepend="," property="terminalSeq">
+	           TERMINALSEQ = #terminalSeq#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="," property="recdate">
+	           RECDATE = to_date(#recdate#, 'yyyymmddhh24:mi:ss')
+	        </isNotEmpty>
+	        <!-- <isNotEmpty prepend="," property="fee">
+	           FEE = #fee#
+	        </isNotEmpty> -->
+	        <isNotEmpty prepend="," property="cashMoney">
+	           CASHMONEY = CASHMONEY || #cashMoney# || '~',
+	           FEE = FEE + #cashMoney# * 100
+	        </isNotEmpty>
+		WHERE CHARGELOGOID = #chargeLogOID# AND ORGID = #orgID# AND REGION = #region#
+	</update>
+	<!-- add end wWX217192 2015-05-21 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+
+</sqlMap>

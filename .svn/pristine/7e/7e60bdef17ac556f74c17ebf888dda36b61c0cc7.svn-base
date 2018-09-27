@@ -1,0 +1,50 @@
+package com.customize.sd.selfsvc.usim.service;
+
+import com.customize.sd.selfsvc.common.service.BaseServiceSDImpl;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+
+/**
+ * 提示换USIM卡 service接口实现类
+ * <功能详细描述>
+ * @author qWX279398
+ * @version  [版本号, Dec 13, 2015]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class CheckUSIMServiceImpl extends BaseServiceSDImpl implements CheckUSIMService
+{ 
+	public  void changeUSIMCard(String curMenuId, String servnumber)
+	{
+		// 组装报文头信息
+		MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, this.getTermInfo().getOperid(), this.getTermInfo().getTermid(), 
+				"", MsgHeaderPO.ROUTETYPE_TELNUM, servnumber);
+		
+		// 调用接口
+		ReturnWrap rw = getSelfSvcCallSD().changeUSIMCard(msgHeader);
+		
+		// 调用接口成功执行代码
+	    if (rw.getStatus() == SSReturnCode.SUCCESS)
+	    {
+	        CTagSet cTagSet = (CTagSet)rw.getReturnObject();
+	        
+	        // 已更换USIM卡
+	        if ("0".equals(cTagSet.GetValue("rulesValue")))
+	        {
+	        	insertRecLog(Constants.VALUECARD_CHARGE, "", "", Constants.RECSTATUS_SUCCESS, "调用校验是否为USIM卡接口成功,用户已更换USIM卡");
+	        	throw new ReceptionException("已更换USIM卡！");
+	        }
+	    }
+	    
+	    //调用失败
+	    else
+	    {
+	    	insertRecLog(Constants.VALUECARD_CHARGE, "", "", Constants.RECSTATUS_FALID, "调用校验是否为USIM卡接口失败");
+	    	throw new ReceptionException("调用接口失败！");
+	    }    
+	}
+}

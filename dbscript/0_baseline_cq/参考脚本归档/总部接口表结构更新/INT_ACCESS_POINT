@@ -1,0 +1,44 @@
+-- Create table
+create table INT_ACCESS_POINT
+(
+  ACCESSID    VARCHAR2(32) not null,
+  PROTOCOLID  VARCHAR2(64) not null,
+  ACCESSNAME  VARCHAR2(64) not null,
+  DEFCHANID   VARCHAR2(32) not null,
+  AUTHMODE    NUMBER(1) default 0 not null,
+  ROUTEFLAG   NUMBER(1) default 0 not null,
+  ROUTEFIELD  VARCHAR2(64),
+  ROUTESCRIPT VARCHAR2(512),
+  EFFTIME     DATE default Sysdate not null,
+  EXPTIME     DATE,
+  REMARK      VARCHAR2(256),
+  LOGLEVEL    NUMBER(2) default 0 not null
+);
+
+-- Add comments to the columns 
+comment on column INT_ACCESS_POINT.ACCESSID
+  is '接入点ID';
+comment on column INT_ACCESS_POINT.PROTOCOLID
+  is '协议ID';
+comment on column INT_ACCESS_POINT.ACCESSNAME
+  is '接入点名称';
+comment on column INT_ACCESS_POINT.DEFCHANID
+  is '缺省受理渠道';
+comment on column INT_ACCESS_POINT.AUTHMODE
+  is '认证方式  0无认证 1仅认证用户/密码 2仅认证ip 3同时认证用户与ip地址';
+comment on column INT_ACCESS_POINT.ROUTEFLAG
+  is '路由标志; -1 强制转发; 0 不进行路由 1:根据电话号码路由 2:根据区号路由 3:$telnum|$region 优先号码转发 ,如果电话号码为空根据区号进行转发';
+comment on column INT_ACCESS_POINT.ROUTEFIELD
+  is '转发依据字段';
+comment on column INT_ACCESS_POINT.ROUTESCRIPT
+  is '转发控制脚本';
+comment on column INT_ACCESS_POINT.EFFTIME
+  is '生效时间';
+comment on column INT_ACCESS_POINT.EXPTIME
+  is '失效时间';
+comment on column INT_ACCESS_POINT.REMARK
+  is '说明';
+comment on column INT_ACCESS_POINT.LOGLEVEL
+  is '日志级别 0：错误日志 1:指标日志 2:TRACE日志 3DEBUG日志';
+-- Create/Recreate indexes 
+create unique index INX_INT_ACCESS_POINT_KF on INT_ACCESS_POINT (ACCESSID);

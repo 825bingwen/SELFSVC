@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 已开通服务(产品展示)查询 -->
+	<package name="favourableInfo" extends="struts-common" namespace="/favourableInfo">
+	    
+		<!-- 已开通服务(产品展示)查询 -->
+		<action name="qryFavourableInfo" class="qryFavourableInfoAction" method="qryFavourableInfo">
+		    <result name="qryFavourableInfo">/jsp/customize/hub/favourableInfo/qryFavourableInfo.jsp</result>
+		</action>
+	</package>
+</struts>

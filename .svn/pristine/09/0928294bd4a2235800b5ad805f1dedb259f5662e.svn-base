@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- 预约选号 -->	
+	<bean id="chooseTelBean" parent="baseBean" class="com.customize.sd.selfsvc.bean.ChooseTelBean" scope="prototype"></bean>
+	<bean id="chooseTelAction" parent="baseAction" class="com.customize.sd.selfsvc.chooseTel.action.ChooseTelAction" scope="prototype">
+		<property name="chooseTelBean">
+			<ref local="chooseTelBean" />
+		</property>
+		<property name="chooseTelService">
+			<ref local="chooseTelService" />
+		</property>
+	</bean>
+	
+	<!--预约选号 service -->
+   	<bean id="chooseTelService" parent="baseTransactionProxy" scope="prototype">
+   		<property name="target" ref="chooseTelServiceImpl"></property>
+   	</bean>
+   	
+	<!-- 预约选号serviceImpl -->
+	<bean id="chooseTelServiceImpl" class="com.customize.sd.selfsvc.chooseTel.service.ChooseTelServiceImpl" scope="prototype">
+	    <property name="chooseTelDaoImpl" ref="chooseTelDaoImpl"></property>
+	</bean>  
+	
+	<!-- 预约选号DaoImpl -->
+	<bean id="chooseTelDaoImpl" parent="baseDao" class="com.customize.sd.selfsvc.chooseTel.dao.ChooseTelDaoImpl" scope="prototype"></bean>
+	 	
+</beans>

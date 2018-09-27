@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="recommend4G">
+    <!-- 预存有礼PO -->
+    <typeAlias alias="recommend4GPO" type="com.customize.sd.selfsvc.recommend4G.model.Recommend4GPO"/>
+    
+    <!-- 查询手机列表信息 -->
+    <select id="qryPhoneList" resultClass="recommend4GPO" parameterClass="recommend4GPO">
+        SELECT A.PHONEID,A.PHONENAME,A.MESSAGE,A.PHONEPRICE,A.VALIDDATE,A.EXPIREDATE,A.PHONEADOBE,A.DESCADOBE,A.SORTORDER
+		FROM SH_PHONE_INFO A
+		WHERE A.RECOMMEND = 1
+		AND <![CDATA[A.VALIDDATE <= sysdate]]>
+        AND <![CDATA[A.EXPIREDATE >= sysdate ]]>
+        <isNotEmpty prepend="AND" property="region"> 
+            A.REGION in (#region#, 999)
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="orgid"> 
+            A.ORGID in ($orgid$)
+        </isNotEmpty>
+		ORDER BY A.SORTORDER
+    </select>
+</sqlMap>

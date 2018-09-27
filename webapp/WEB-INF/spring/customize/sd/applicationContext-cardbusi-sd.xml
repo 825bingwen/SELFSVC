@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+    
+	<!-- 在线开户Action -->
+	<bean id="cardInstallAction" parent="baseAction" class="com.customize.sd.selfsvc.cardbusi.action.CardInstallAction" 
+		scope="prototype">
+	    <property name="cardBusiService" ref="cardBusiService"></property>
+	    <property name="cardInstallBean" ref="cardInstallBean"></property>
+	    <property name="feeChargeService" ref="feeChargeService"></property>
+	</bean>
+	
+	<!-- 在线开户Bean -->
+	<bean id="cardInstallBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.CardInstallBean"></bean>
+
+	<!-- 在线开户service -->
+	<bean id="cardBusiService" parent="baseTransactionProxy">
+	    <property name="target" ref="cardBusiServiceImpl"></property>
+	</bean>
+	
+	<!-- 在线开户serviceImpl -->
+	<bean id="cardBusiServiceImpl" class="com.customize.sd.selfsvc.cardbusi.service.CardBusiServiceImpl">
+	    <property name="cardBusiDaoImpl" ref="cardBusiDaoImpl"></property>
+	</bean>
+	
+	<!-- 在线开户DaoImpl -->
+	<bean id="cardBusiDaoImpl" parent="baseDao" class="com.customize.sd.selfsvc.cardbusi.dao.CardBusiDaoImpl"></bean>
+	
+	<!-- 补卡Action-->
+	<bean id="reissueCardAction" parent="baseAction" class="com.customize.sd.selfsvc.cardbusi.action.ReissueCardAction" 
+		scope="prototype">
+	    <property name="cardBusiService" ref="cardBusiService"/>
+	    <property name="cardInstallBean" ref="cardInstallBean"/>
+	    <property name="reissueCardBean" ref="reissueCardBean"/>
+	    <property name="feeChargeService" ref="feeChargeService"></property>
+	</bean>
+	
+	<!-- 补卡接口调用bean -->
+	<bean id="reissueCardBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.ReissueCardBean">
+		<property name="userLoginBean" ref="userLoginBean" />
+	</bean>
+	
+</beans>

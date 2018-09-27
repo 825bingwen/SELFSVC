@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="service" extends="struts-common">		
+		<!-- 移动服务办理 -->
+		<action name="serviceFunc" class="receptionAction" method="initFunctionList">
+			<result name="funclist">/jsp/customize/cq/service/serviceIndex.jsp</result>
+		</action>
+		
+		<!-- begin add by z90080209 20111110 呼叫转移 -->
+		<action name="transferType" class="callTransferActionCQ" method="selectType">
+			<result name="transferType">/jsp/customize/cq/service/callTransfer/transferType.jsp</result>
+		</action>
+		
+		<action name="inputNumber" class="callTransferActionCQ" method="inputNumber">
+			<result name="inputNumber">/jsp/customize/cq/service/callTransfer/inputNumber.jsp</result>
+		</action>
+		
+		<action name="callTransfer" class="callTransferActionCQ" method="commitReception">
+			<result name="success">/jsp/customize/cq/service/serviceSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- end add by z90080209 20111110 呼叫转移 -->
+		
+		<!-- begin add by z90080209 20111116 活动介绍 -->
+		<action name="busiInfo" class="busiInfoAction" method="busiInfoMain">
+			<result name="busiInfoMain">/jsp/customize/cq/busiInfo/busiInfoMain.jsp</result>
+		</action>
+		<!-- end add by z90080209 20111116 活动介绍 -->
+		
+		<!-- begin add by z90080209 20111116 发票重打 -->
+		<action name="recPrintInvoice" class="printInvoice" method="queryInvoice">
+		    <result name="invoiceList">/jsp/customize/cq/service/printInvoice/invoiceList.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<action name="invoicePrint" class="printInvoice" method="invoicePrint">
+		    <result name="success">/jsp/customize/cq/service/serviceSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- end add by z90080209 20111116 发票重打 -->
+	</package>	
+</struts>

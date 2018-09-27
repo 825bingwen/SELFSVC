@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="GB2312"?>
+<config>
+    <system>
+        <!-- http协议设置 -->
+        <HTTP_ENCODE>GBK</HTTP_ENCODE>
+        <XmlEncode>GBK</XmlEncode>
+        <HTTP_URLEncoder>UTF-8</HTTP_URLEncoder>
+        <HTTP_TIMEOUT>60</HTTP_TIMEOUT>
+        <HTTP_MSGHEAD><![CDATA[$xmldata=;xmldata=;$xml=;xml=]]></HTTP_MSGHEAD>
+        <SNPASS>boss1:boss1</SNPASS>
+
+        <!-- 服务调用设置 -->
+        <MW_ENV>1</MW_ENV>
+        <!-- 跨区业务字符串调用方式 strIntID;strIntCmd -->
+        <StringCallConifg>INTERFACE;IntIBOSS</StringCallConifg>
+        <!-- 接口编码默认值 -->
+        <DefaultIntID>INTERFACE</DefaultIntID>
+        <!-- 接口请求命令字默认值 -->
+        <DefaultIntCmd>IntNGMain</DefaultIntCmd>
+        <!-- 接入渠道默认值 -->
+        <DefaultAccessType>5</DefaultAccessType>
+        <!-- 统一接触标识默认值 -->
+        <DefaultUniContactFlag>2</DefaultUniContactFlag>
+
+        <!-- 数据库字符集设置 -->
+        <ISGBK>1</ISGBK><!-- 是否中文环境 -->
+
+        <!-- 省属性设置-->
+        <pCode>250</pCode><!--省代码-->
+        <AGENT_CODE>2501</AGENT_CODE><!--省BOSS代码-->
+        <NATIVE_SN_CODE>2500</NATIVE_SN_CODE><!--省节点机代码-->
+        <DefaultRegion>999</DefaultRegion><!--默认地市编码-->
+        <DefaultOperID>99998044</DefaultOperID><!--默认操作员编码-->
+        <DefaultOperOrgID>998044</DefaultOperOrgID><!--默认操作员单位编码-->
+
+        <!-- 号段表加载设置 -->
+        <TELNUM_INFO_SYNC_DURATION>300</TELNUM_INFO_SYNC_DURATION><!--号段信息重新加载间隔时间-->
+        <USE_H1H2H3>0</USE_H1H2H3><!--是否使用H1H2H3作为好段表-->
+        <USE_BELONGINFO>2</USE_BELONGINFO><!--使用BELONGINFO作为号段表-->
+        <H1H2H3_FLAG>('0','1')</H1H2H3_FLAG><!-- 可以不定义 -->
+        <BELONGINFO_FLAG>('0','1','2')</BELONGINFO_FLAG><!-- 可以不定义 -->
+        <!-- 号段表加载设置 -->
+
+        <!-- 二次登陆相关配置 -->
+        <!-- 1：采用二次登陆 0：不采用二次登陆 默认0 -->
+        <secondLogOn>1</secondLogOn>
+        <!-- 二次登陆类型 默认为0 -->
+        <!-- 0：使用logon/hbmobile固定值 -->
+        <!-- 1：通过环境变量SECURITY_SECOND_LOGON_USER\SECURITY_SECOND_LOGON_PASS指定 -->
+        <!-- 2：通过java虚拟机-D参数指定(-DSECURITY_SECOND_LOGON_USER=? -DSECURITY_SECOND_LOGON_PASS=?) -->
+        <!-- 3：使用本配置文件中配置 -->
+        <secondLogOnType>0</secondLogOnType>
+        <!-- 环境变量或者系统参数或者配置文件中配置的用户名密码是否是密文 0：不是 1：是 默认0 -->
+        <secondLogOnEncrypt>0</secondLogOnEncrypt>
+        <secondLogOnUser>logon</secondLogOnUser>
+        <secondLogOnPass>hbmobile</secondLogOnPass>
+        <!-- 二次登陆相关配置 -->
+    </system>
+    
+    <apacheDataSource>
+        <jdbcDriver>oracle.jdbc.driver.OracleDriver</jdbcDriver>
+        <!--poolDriver>org.apache.commons.dbcp.PoolingDriver</poolDriver-->
+        <!-- 数据库连接池设置 -->
+        <initpoolsize>1</initpoolsize><!--数据库连接池默认启动的连接个数-->
+        <maxpoolsize>5</maxpoolsize><!--数据库连接最大的连接个数-->
+        
+        <defaultDB>jdbc:oracle:thin:yy0a/123456@192.168.10.212:1521:sdboss</defaultDB>
+        <bizDB>
+            <defaultUrl>
+                <poolID>yy0a</poolID>
+                <poolDesc>jdbc:oracle:thin:yy0a/123456@192.168.10.212:1521:sdboss</poolDesc>
+            </defaultUrl>
+        </bizDB>
+    </apacheDataSource>
+
+    <jndiDataSource>
+        <defaultJndi>jdbc/ibossPool1;jdbc/ibossPool2</defaultJndi>
+        <jndiConfig>
+            <defaultUrl>
+                <poolID>tbcs1</poolID>
+                <poolDesc>jdbc/ibossPool1</poolDesc>
+            </defaultUrl>
+            <defaultUrl>
+                <poolID>tbcs2</poolID>
+                <poolDesc>jdbc/ibossPool1</poolDesc>
+            </defaultUrl>
+        </jndiConfig>
+        <jndiBCVConfig>
+            <defaultUrl>
+                <poolID>tbcs1</poolID>
+                <poolDesc>jdbc/ibossBCVPool1</poolDesc>
+            </defaultUrl>
+        </jndiBCVConfig>
+    </jndiDataSource>
+</config>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="struts-common" extends="struts-default" namespace="common">
+		
+		<interceptors>
+		
+			<!-- 异常处理拦截器类 -->
+		    <interceptor name="errorInterceptor" class="com.gmcc.boss.selfsvc.common.interceptor.ErrorInterceptor"></interceptor>
+		    
+		    <!-- 定义异常处理拦截器栈 -->
+		    <interceptor-stack name="commonStack">
+		        <interceptor-ref name="defaultStack"></interceptor-ref>
+		        <interceptor-ref name="errorInterceptor"></interceptor-ref>
+		    </interceptor-stack>
+		    
+		</interceptors>
+		
+		<!-- 设置默认拦截器栈 -->
+		<default-interceptor-ref name="commonStack"></default-interceptor-ref>
+		
+		<!-- 全局错误页面 -->
+		<global-results>
+		    <result name="error">/commonError.jsp</result>
+		    <result name="success">/commonSuccess.jsp</result>
+		</global-results>
+		
+		<!-- 异常处理转向 -->
+		<global-exception-mappings>
+		    <exception-mapping result="error" exception="java.lang.Exception"></exception-mapping>
+		</global-exception-mappings>
+		
+		<!-- add begin m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+		<!-- 湖北用户满意度调查 -->
+		<action name="surveyUserSatfy" class="baseAction" method="surveyUserSatfy">
+		</action>
+		<!-- add end m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+	</package>
+	
+</struts>

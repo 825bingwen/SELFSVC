@@ -1,0 +1,754 @@
+/*
+ * 文件名：SelfSvcCall.java
+ * 版权：CopyRight 2010-2015 Huawei Technologies Co., Ltd.All Righs Reserved.
+ * 描述：接口调用类
+ * 修改人：g00140516
+ * 修改时间：2010-11-30
+ * 修改内容：新增
+ * 
+ */
+package com.gmcc.boss.selfsvc.call;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.axiom.om.OMElement;
+import org.dom4j.Document;
+
+import com.customize.sd.selfsvc.po.NcodePO;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.quickpublish.model.MultiProdCommitPO;
+
+/**
+ * 接口调用类
+ * 
+ * @author g00140516
+ * 
+ */
+public interface SelfSvcCall
+{
+    /**
+     * 添加家庭网成员
+     * 
+     * @param map 参数
+     * @return [返回类型说明]
+     * @exception/throws [违例类型] [违例说明]
+     * @see [类、类#方法、类#成员]
+     * @depreced
+     * @remark create kWX211786 May 23, 2014 版本号 需求/BUG编号：OR_huawei_201404_1115_山东_家庭网成员添加功能
+    */
+    public ReturnWrap addFamilyMem(Map<String, String>map);
+    /**
+     * 查询家庭网成员
+     * 
+     * @param map 参数
+     * @return [返回类型说明]
+     * @exception/throws [违例类型] [违例说明]
+     * @see [类、类#方法、类#成员]
+     * @depreced
+     * @remark create kWX211786 May 23, 2014 版本号 需求/BUG编号：OR_huawei_201404_1115_山东_家庭网成员添加功能
+    */
+    public ReturnWrap queryFamilyMemService(Map<String, String> map);
+	/**
+     * 服务密码验证
+     * 
+     * @param map
+     * @return  ReturnWrap
+     * @remark create by hWX5316476 2014-05-13 OR_huawei_201405_235  自助终端接入EBUS一阶段_获取用户信息
+     */
+    public ReturnWrap checkUserPassword(Map<String,String> map);
+    
+    /**
+     * 获取用户信息
+     * 
+     * @param map
+     * @return
+     * @remark create by hWX5316476 2014-05-13 OR_huawei_201405_235  自助终端接入EBUS一阶段_获取用户信息
+     */
+    public ReturnWrap getUserInfoHub(Map<String,String> map);
+    
+    /**
+     * 使用手机号码、服务密码进行身份认证
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap getUserInfoWithPwd(Map map);
+    
+    /**
+     * 无密码登录
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap getUserInfo(Map map);
+    
+    /**
+     * 月初扣款查询 <功能详细描述>
+     * 
+     * @param map
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap queryMonthDeduct(Map map);
+   
+    
+    
+    /**
+     * 向用户发送随机密码短信
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap sendSMS(Map map);
+    
+    /**
+     * 详单查询
+     * 
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    public ReturnWrap queryCDRList(Map map);
+    
+    /** 
+     * 详单查询权限验证_湖北
+     * 
+     * @param msgHeader 报文头信息
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap checkQueryAuth(MsgHeaderPO msgHeader);
+    
+    /**
+     * 本机品牌资费及已开通功能
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap qryFavourable(Map map);
+    
+    /**
+     * PUK码查询
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap queryPUK(Map map);
+    
+    /**
+     * 本机状态查询
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap queryCurrentStatus(Map map);
+    
+    /**
+     * 号码归属地查询
+     */
+    public ReturnWrap queryUserRegionReq(Map map);
+    
+    /**
+     * 受理历史查询
+     */
+    public ReturnWrap qryAllServiceHistory(Map map);
+    
+    /**
+     * 查询预定号码
+     */
+    public ReturnWrap qryChooseTel(Map map);
+    
+    /**
+     * 预定号码
+     */
+    public ReturnWrap chooseTel(Map map);
+    
+    
+    /**
+     * 缴费历史查询
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap qryChargeHistory(Map map);
+    
+    /**
+     * 积分查询
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap queryScoreValue(Map map);
+    
+    /**
+     * 积分明细查询
+     * @param map
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap queryScoreDetailHis(Map map);
+    
+    /**
+     * 山东版的积分兑换历史查询
+     * @param map
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap queryScoreChangeHis(Map map);
+    
+    /**
+     * 湖北版的积分兑换历史查询
+     * @param map
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap queryScorePrizeHis(Map map);
+    
+    
+    /**
+     * 余额提醒值查询
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap qryBalanceNotice(Map map);
+    
+    /**
+     * 获取余额提醒字典表数据
+     */
+    public ReturnWrap getDictItem(Map map);
+    
+    /**
+     * 余额提醒值设置
+     */
+    public ReturnWrap setBalanceNotice(Map map);
+    
+    /**
+     * 根据nocde(新)查询产品,优惠的资费描述信息
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap queryFeeMessage(Map map);
+    
+    /**
+     * 产品受理通用接口
+     * @param msgHeader 消息头
+     * @param nCode ncode
+     * @param operType 操作类型
+     * @param effectType 生效方式
+     * @param param 附加属性串
+     * @return
+     * @remark modify by lWX431760 2017-09-29 OR_huawei_201706_781_【山东移动接口迁移专题】-自助终端新业务办理(同组业务)
+     */
+    public ReturnWrap recCommonServNK(MsgHeaderPO msgHeader, String nCode, String operType, String effectType, String param);
+    
+    /**
+     * 产品受理通用接口
+     * @param msgHeader 消息头
+     * @param nCode ncode
+     * @param operType 操作类型
+     * @param effectType 生效方式
+     * @param param 附加属性串
+     * @return
+     * @remark modify by jWX216858 2014-11-12 OR_huawei_201410_872_HUB_开机早知道流水线部分EBUS改造
+     */
+    public ReturnWrap recCommonServ(MsgHeaderPO msgHeader, String nCode, String operType, String effectType, String param);
+    
+    /**
+     * 查询同组业务用户订购信息
+     * <功能详细描述>
+     * @param msgHeader
+     * @param nCode
+     * @param operType
+     * @param effectType
+     * @param param
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by lWX431760 2017-09-28 OR_huawei_201706_781_【山东移动接口迁移专题】-自助终端新业务办理(同组业务)
+     */
+    public ReturnWrap recCommonProductQry (MsgHeaderPO msgHeader, String nCode);
+    
+    /**
+     * 停开机业务处理
+     */
+    public ReturnWrap stopOpenSubs(Map map);
+    
+    /**
+     * 密码修改
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap recChangePassword(Map map);
+    
+    /**
+     * 呼叫转移开通、取消
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap commitCallTransferNo(Map map);
+    
+    /**
+     * 业务统一查询接口
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap queryService(Map map);
+    
+    /**
+     * 业务统一退订接口
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap cancelService(Map map);
+    
+    /**
+     * 手机支付主账户信息查询
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap qryCmpayAccount(Map map);
+    
+    /**
+     * 手机支付主账户充值
+     * 
+     * @param map
+     * @return
+     * @see
+     */
+    public ReturnWrap recMainFee(Map map);
+    
+    /**
+     * 密码重置校验身份证号
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap checkIDCard(Map map);
+    
+    /**
+     * 密码重置
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap resetPassword(Map map);
+    
+	/**
+     * 充值卡充值
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap cardPayCommit(Map map);
+     
+    /**
+     * 查询用户是否已开通手机邮箱
+     * @param map
+     * @return
+     */
+    public ReturnWrap qrymailBox(Map map);
+    
+    /**
+     *  定制139免费邮箱
+     * @param map
+     * @return
+     */
+    public ReturnWrap add139Mail(Map map);
+    
+    /**
+     * 订购SP业务
+     * 
+     * @param map 入参
+     * @return 订购结果
+     * @see 
+     * @remark create g00140516 2011/11/05 R003C11L11n01 BUG_HUB_201111_24
+     */
+    public ReturnWrap orderSPService(Map map);
+    
+    /**
+     * 通过socket接口查询详单记录
+     * 
+     * @param map 入参
+     * @return
+     * @see 
+     * @remark create g00140516 2011/12/09 R003C11L12n01 详单查询实现socket协议
+     */
+    public ReturnWrap queryCDRListBySocket(Map map);  
+    
+    /** 
+     * NG3.5帐详单改造之详单查询
+     * 
+     * @param msgHeader 报文头信息
+     * @param month 查询月份
+     * @param cdrType 详单类型
+     * @param feeType 费用类型
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     * @remark create g00140516 2012/02/09 R003C12L01n01 OR_HUB_201201_981
+     */
+    public ReturnWrap queryDetailedRecords2012(MsgHeaderPO msgHeader, String month,
+        String cdrType, String feeType);
+    
+    /**
+     * NG3.5帐详单改造之查询客户信息
+     * 
+     * @param map
+     * @return
+     * @throws Exception
+     * @remark create g00140516 2012/02/13 R003C12L02n01 
+     */
+    public ReturnWrap queryCustomerInfo(Map<String, String>  map);
+    
+    /**
+     * NG3.5帐详单改造之详单查询
+     * 
+     * @param map
+     * @return
+     * @throws Exception
+     * @remark create g00140516 2012/02/13 R003C12L02n01 
+     */
+    public ReturnWrap queryDetailedRecordsSD2012(Map<String, String>  map);
+    
+    /**
+     * 验证是否为初始密码
+     * @param map
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create YKF38827 2012/02/24 R003C12L02n01  OR_NX_201112_87
+     */
+    public ReturnWrap valiIsfirstpwd(Map<String, String>  map);
+    
+    /**
+     * 宁夏新版详单查询
+     * 
+     * @param map
+     * @return
+     * @see 
+     * @remark create g00140516 2012/03/14 R003C12L03n01 OR_NX_201203_128
+     */
+    public ReturnWrap queryDetailedRecordsNX2012(Map<String, String>  map);
+    
+    /**
+     * 湖北专用，查询业务受理状态
+     * 
+     * @param msgHeader 消息头
+     * @param nCode
+     * @param operType，操作类型，开通或者取消
+     * @return
+     * @se
+     * @remark modify by jWX216858 2014-11-12 OR_huawei_201410_872_HUB_开机早知道流水线部分EBUS改造
+     */
+    public ReturnWrap qryRecStatusHub(MsgHeaderPO msgHeader, String nCode, String operType);
+    
+    /** 
+     * 产品快速发布-用户已订购产品信息查询
+     * 
+     * @param msgHeader 报文头信息
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     * @remark: modify zKF69263 2014/09/11 R003C14L09n01 OR_huawei_201407_41 自助终端接入EBUS二阶段_产品快速发布
+     */
+    public ReturnWrap qryHasProds(MsgHeaderPO msgHeader);
+    
+    /** 
+     * 产品快速发布-查询产品附加属性
+     * 
+     * @param msgHeader 报文头信息
+     * @param qryType 查询类型 0：NCODE 1：产品包下产品
+     * @param nCode nCode
+     * @param operType PCOpRec:开通  PCOpMod:修改 PCOpDel:关闭 
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     * @remark: modify zKF69263 2014/09/11 R003C14L09n01 OR_huawei_201407_41 自助终端接入EBUS二阶段_产品快速发布
+     */
+    public ReturnWrap qryAddAttr(MsgHeaderPO msgHeader, String qryType, String nCode, String operType);
+    
+    /** 
+     * 产品快速发布-产品受理
+     * 
+     * @param msgHeader 报文头信息
+     * @param multiProdCommitPO MultiProdCommitPO
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     * @remark: modify zKF69263 2014/09/11 R003C14L09n01 OR_huawei_201407_41 自助终端接入EBUS二阶段_产品快速发布
+     */
+    public ReturnWrap prodRec(MsgHeaderPO msgHeader, MultiProdCommitPO multiProdCommitPO);
+    
+    /** 
+     * 产品快速发布-查询产品包下子产品
+     * 
+     * @param msgHeader 报文头信息
+     * @param nCode 产品包编码、模板ID
+     * @param type 类型：2 产品包 3 模板
+     * @param optType 操作类型
+     * @return ReturnWrap
+     * @see [类、类#方法、类#成员]
+     * @remark: modify zKF69263 2014/09/11 R003C14L09n01 OR_huawei_201407_41 自助终端接入EBUS二阶段_产品快速发布
+     */
+    public ReturnWrap qrySubProds(MsgHeaderPO msgHeader, String nCode, String type, String optType);
+    
+    /**
+     * 根据ncode查询特别提示信息
+     * @param paramMap
+     * @return
+     * @remark create g00140516 2012/09/17 R003C12L09n01 OR_HUB_201207_1089
+     */
+    public ReturnWrap qryNcodeTips(Map<String, String> paramMap);
+    
+    /**
+     * 根据对象编码查询特别提示信息
+     * @param paramMap
+     * @param prods
+     * @return
+     * @remark create g00140516 2012/09/17 R003C12L09n01 OR_HUB_201207_1089
+     */
+    public ReturnWrap qryObjectTips(Map<String, String> paramMap, List<Map<String, String>> prods);
+    
+    /**
+     * 查询需要预约号码（山东）
+     * @param paramMap
+     * @return
+     * @remark create cKF76106 2013/01/23 R003C13L01n01 OR_SD_201301_279
+     */
+    public ReturnWrap qryChooseTelSD(Map map);
+
+    /**
+     * 话费总额查询
+     * @param map
+     * @return
+     * @remark create g00140516 2013/02/22 R003C13L02n01 OR_NX_201302_600
+     */
+    public ReturnWrap qryCurrBillFee(Map<String, String> map);
+    
+    /**
+     * 检查详单打印是否超出次数限制
+     * 
+     * @param map
+     * @return
+     * @see 
+     * @remark create cKF76106 2013/03/26 R003C13L03n01 OR_NX_201301_222
+     */
+    public ReturnWrap queryPrintCdr(Map<String, String>  map);
+    
+    
+    /**
+     * 更新详单打印次数
+     * 
+     * @param map
+     * @return
+     * @see 
+     * @remark create cKF76106 2013/03/26 R003C13L03n01 OR_NX_201301_222
+     */
+    public ReturnWrap writePrintCdrLog(Map<String, String>  map);
+    
+    /**
+     * 向用户发送随机密码短信(湖北)
+     * 
+     * @param map
+     * @return
+     * @see
+     * @remark create cKF76106 2013/07/24 R003C13L07n24 OR_HUB_201307_20
+     */
+    public ReturnWrap sendSmsHub(Map<String, String> map);
+	
+    /**
+     * 校验手机号是否已实名制登记
+     * 
+     * @param map
+     * @return
+     */
+    public ReturnWrap realNameCheck(Map map);
+    
+    /**
+     * 是否是弱密码的校验
+     * 
+     * @param map
+     * @return ReturnWrap
+     * @remark create by hWX5316476 2014/2/18 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求
+     */
+    public ReturnWrap  resetPwdNew(Map map);
+    
+    /**
+     * 详单邮件下发接口（山东）
+     * 
+     * @param map
+     * @return ReturnWrap
+     * @remark create by sWX219697 2014-04-29 OR_SD_201404_105_山东_关于启动139邮箱详单投递项目的函
+     */
+    public ReturnWrap sendRecordsMail(Map<String,String> map);
+    
+    /**
+     * <判断用户是否开通积分计划（山东）>
+     * <功能详细描述>
+     * @param map
+     * @return ReturnWrap
+     * @remark create by sWX219697 2014-05-12 OR_SD_201404_777_山东_网厅、自助终端、掌厅__全渠道积分查询及兑换功能
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap qryIsScoreOpen(Map<String,String> map);
+    
+    /**
+     * 家庭网取消业务接口
+     * 
+     * @param map
+     * @return 接口处理结果
+     * @remark add begin wWX217192 on 20140603 for OR_huawei_201405_875
+     */
+    public ReturnWrap deleteFamilyMem(Map<String, String> map);
+    
+    /**
+     * 积分发放查询（山东）
+     * @param header 报文头信息
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return
+     * @remark create by jWX216858 2014-10-20 R003C10LG1001 OR_SD_201407_498_山东移动促销回馈积分查询方案支撑需求
+     */
+    public ReturnWrap qryPayMentScoreSD(MsgHeaderPO header, String startDate, String endDate);
+
+    /**
+     * 积分查询（山东）
+     * @param header 报文头信息
+     * @return
+     * @remark create by jWX216858 2014-10-20 R003C10LG1001 OR_SD_201407_498_山东移动促销回馈积分查询方案支撑需求
+     */
+    public ReturnWrap qryScoreValueSD(MsgHeaderPO header);
+    
+    /**
+     * 删除家庭网成员
+     * @param header 请求报文头
+     * @param memTelnum 成员手机号
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public ReturnWrap delMemByTelnum(MsgHeaderPO header, String memTelnum);
+    
+    /**
+	 * 查询可预约号码列表
+	 * @param requestMsg
+	 * @return
+	 * @remark create by wWX217192 2015-03-10 OR_SD_201411_988_SD_关于自助终端选号规则优化的需求
+	 */
+	public String queryNumResp(OMElement requestMsg);
+	
+	/**
+	 * 暂选号码
+	 * @param requestMsg
+	 * @return
+	 * @remark create by wWX217192 2015-03-10 OR_SD_201411_988_SD_关于自助终端选号规则优化的需求
+	 */
+	public String pickNumResp(OMElement requestMsg);
+	
+	/**
+	 * 预约号码
+	 * @param requestMsg
+	 * @return
+	 * @remark create by wWX217192 2015-03-10 OR_SD_201411_988_SD_关于自助终端选号规则优化的需求
+	 */
+	public String bookNumResp(OMElement requestMsg);
+	
+	/**
+	 * 查询客户应缴总金额
+	 * @param msgHeader
+	 * @param orgid
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by hWX5316476 2015-3-24 OR_NX_201501_1030_宁夏_关于跨区服务业务支撑系统改造的通知
+	 */
+	public ReturnWrap qryPayAmount(MsgHeaderPO msgHeader, String orgid);
+
+	/**
+	 * 异地缴费
+	 * <功能详细描述>
+	 * @param msgHeader
+	 * @param seq 规则操作流水号
+	 * @param actualPayAmount 实际缴费金额（厘）
+	 * @param orgid 组织机构编码
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by hWX5316476 2015-3-24 OR_NX_201501_1030_宁夏_关于跨区服务业务支撑系统改造的通知
+	 */
+	public ReturnWrap nonlocalCharge(MsgHeaderPO msgHeader, String seq, String actualPayAmount, String orgid);
+	
+	/**
+	 * 山东梦网订购业务
+	 * @param header
+	 * @param spid
+	 * @param bizid
+	 * @return
+	 * @remark create by wWX217192 2015-04-02 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求
+	 */
+	public ReturnWrap orderSP(MsgHeaderPO header, String spid, String bizid);
+	
+    /**
+     * <有价卡校验>
+     * <功能详细描述>
+     * @param msgHeader 消息头
+     * @param paramMap 消息体
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by sWX219697 2015-05-11 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造
+     */
+    public ReturnWrap authValueCard(MsgHeaderPO msgHeader, Map<String, String> paramMap);
+    
+    /**
+     * <有价卡充值>
+     * <功能详细描述>
+     * @param msgHeader 消息头
+     * @param valueCardPwd 有价卡密码
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by sWX219697 2015-05-11 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造
+     */
+    public ReturnWrap valueCardCharge(MsgHeaderPO msgHeader, String valueCardPwd);
+    
+    /**
+	 * 湖北有价卡购买
+	 * @param valueCardVO
+	 * @param paramMap
+	 * @return
+	 * @remark create by wWX217192 2015-05-13 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造
+	 */
+	public ReturnWrap getValueCards(MsgHeaderPO header, Map<String, String> inParam);
+	
+	/**
+	 * <山东积分兑换电子券>
+	 * <功能详细描述>
+	 * @param header
+	 * @param doc 
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by sWX219697 2015-5-29 14:44:35 OR_SD_201505_61自助终端上增加积分兑换电子券
+	 */
+	public ReturnWrap scoreExchange(MsgHeaderPO header, Document doc);
+	
+    /**
+     * <短信发送app下载地址>
+     * <功能详细描述>
+     * @param header
+     * @param doc
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by jWX216858 2015-7-7 OR_SD_201506_152_山东_在自助终端增加“热门APP应用”下载
+     */
+    public ReturnWrap sendAddress(MsgHeaderPO header, Document doc);
+    
+    // 获取4G卡类型 modify begin liutao 2016-07-30 OR_HUB_201603_1191  自助终端显示内容优化需求（张德伟）
+    public ReturnWrap getIs4GCard(MsgHeaderPO msgHeader);
+
+    //获取积分余额 modify begin liutao 2016-07-30 OR_HUB_201603_1191  自助终端显示内容优化需求（张德伟）
+    ReturnWrap getAvailIntegralEbus(MsgHeaderPO msgHeader);
+}

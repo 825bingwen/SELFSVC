@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+<!-- 自助终端实现卡号消售 add by yKF73963 begin -->
+<bean id="choSerNOUserAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.prodInstall.action.ChoSerNOUserAction">
+	<property name="choSerNuAOUserBean" ref="choSerNuAOUserBean"></property>
+	<property name="prodInstallHubService" ref="prodInstallHubService"></property>
+</bean>
+<bean id="choSerNuAOUserBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.ChoSerNuAOUserBean" ></bean>
+<!-- 自助终端实现卡号消售 add by xkf57421 end -->
+	<!-- 自助终端实现卡号消售 add by yKF73963 begin -->
+	<bean id="prodInstallDaoImpl" parent="baseDao" class="com.customize.hub.selfsvc.prodInstall.dao.ProdInstallDaoImpl"></bean>
+	
+	<bean id="prodInstallHubServiceImpl" class="com.customize.hub.selfsvc.prodInstall.service.ProdInstallServiceHubImpl">
+	    <property name="prodInstallDaoImpl" ref="prodInstallDaoImpl"></property>
+	</bean>
+	
+	<bean id="prodInstallHubService" parent="baseTransactionProxy">
+	    <property name="target" ref="prodInstallHubServiceImpl"></property>
+	</bean>
+	
+	
+	<bean id="installFeeHubBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.InstallFeeHubBean" ></bean>
+	
+	<bean id="installFeeHubAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.prodInstall.action.InstallFeeHubAction">
+		<property name="installFeeHubBean" ref="installFeeHubBean"></property>
+		<property name="prodInstallHubService" ref="prodInstallHubService"></property>
+		<property name="feeChargeService" ref="feeChargeService"></property>
+	</bean>
+	<!-- 自助终端实现卡号消售 add by xkf57421 end -->
+</beans>

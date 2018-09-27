@@ -1,0 +1,158 @@
+<project name="SelfSvc" default="dist" basedir=".">
+
+	<property name="src" value="../../src"/>
+   	
+    <property name="webapp" value="../../webapp"/>
+	
+	<property name="css" value="${webapp}/css"/>
+	
+	<property name="WEB-INF" value="${webapp}/WEB-INF" />
+	
+	<property name="spring" value="${WEB-INF}/spring" />
+    
+    <property name="lib" value="${WEB-INF}/lib"/>
+    
+    <!-- add begin lWX431760 2018-03-27 R005C20LG2801 OR_HUB_201802_516_自助终端缴费机安全问题整改-->
+    <property name="hublib" value="./lib"/>
+    <!-- add end lWX431760 2018-03-27 R005C20LG2801 OR_HUB_201802_516_自助终端缴费机安全问题整改-->
+    	
+    <property name="dist" value="${WEB-INF}/classes/"/>
+	
+	<property name="images" value="${webapp}/images"/>
+     
+    <property name="SelfSvcWar" value="../../selfsvc.war"/>
+	
+	<property name="yuicompressor.path" value="${WEB-INF}/lib/yuicompressor-2.4.7.jar"/>
+
+    <target name="init">
+            <tstamp>
+                    <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss aa" />
+            </tstamp>
+            <echo message="build time : ${build.time}" />
+            <concat destfile="${webapp}/build.log">build time : ${build.time}</concat>
+    </target>
+    
+    <target name="clean" depends="init">
+        <delete dir="${dist}"/>
+        <delete file="${SelfSvcWar}"/>
+    </target>
+    
+    <target name="prepare" depends="clean">
+        <mkdir dir="${dist}"/>
+    	
+    	<copy tofile="${src}/com/gmcc/boss/selfsvc/common/Constants.java" overwrite="true">
+    		<fileset file="Constants.java"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/selfsvc.properties" overwrite="true">
+    	    <fileset file="selfsvc.properties"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/sql-map-config.xml" overwrite="true">
+    	   	<fileset file="sql-map-config.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/struts.xml" overwrite="true">
+    	   	<fileset file="struts.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/struts.xml" overwrite="true">
+    	   <fileset file="struts.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${WEB-INF}/web.xml" overwrite="true">
+    	    <fileset file="web.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${spring}/applicationContext-base.xml" overwrite="true">
+    	    <fileset file="applicationContext-base.xml"></fileset>
+    	</copy>
+    	
+    	<!-- modify by WX217192 2015-1-26 17:49:31 OR_HUB_201408_620_自助终端界面改版优化-->
+    	<!-- 复制newAdd.css-->
+    	<copy tofile="${css}/newAdd.css" overwrite="true">
+    	    <fileset file="newAdd.css"></fileset>
+    	</copy>
+    	    	
+    	<!-- 复制style.css至 webapp下-->
+    	<copy tofile="${css}/style.css" overwrite="true">
+    	    <fileset file="style.css"></fileset>
+    	</copy>
+    	
+    	<!-- 复制reset.css至 webapp下-->
+    	<copy tofile="${css}/reset.css" overwrite="true">
+    	    <fileset file="reset.css"></fileset>
+    	</copy>
+    	
+    	<!-- 删除webapp/images文件夹下的文件及文件夹 -->
+    	<delete verbose="true" includeemptydirs="true">
+	    	<fileset dir="${images}">
+	    		<include name="**/*"/>
+	    	</fileset>
+    	</delete>
+    	
+    	<!--将build下images复制到webapp/images下-->
+		<copy todir="${images}" overwrite="true">
+				<fileset dir="images">
+					<include name="**/*" />
+				</fileset>
+		</copy>
+    	
+    </target>
+  
+    <target name="compile" depends="prepare"> 
+        <javac encoding="GBK" srcdir="${src}" destdir="${dist}" debug="true" debuglevel="lines,vars,source"> 
+            <classpath>
+                <!-- modify begin lWX431760 2018-03-27 R005C20LG2801 OR_HUB_201802_516_自助终端缴费机安全问题整改-->
+                <fileset dir="${hublib}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                    <exclude name="**/ognl-3.0.6.jar"/>
+                    <exclude name="**/struts2-core-2.3.15.1.jar"/>
+                    <exclude name="**/struts2-spring-plugin-2.3.15.1.jar"/>
+                    <exclude name="**/xwork-core-2.3.15.1.jar"/>
+                    <exclude name="**/freemarker-2.3.16"/>
+                </fileset>
+                <!-- modify end lWX431760 2018-03-27 R005C20LG2801 OR_HUB_201802_516_自助终端缴费机安全问题整改-->
+            </classpath>
+        </javac>
+        <copy todir="${dist}">
+            <fileset dir="${src}">
+                <exclude name="**/*.java"/>
+                <exclude name="**/vssver.scc"/>
+                <exclude name="**/CVS/**"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="resources" depends="compile">
+        <jar jarfile="${SelfSvcWar}">
+        	<fileset dir="${webapp}">
+        		<exclude name="ssResources/**/*.*" />
+        	</fileset>
+        </jar>
+    </target>
+	
+	<!-- 压缩css -->
+    <target name="minify-css" depends="resources">
+        <apply executable="java" verbose="true" dest="${webapp}" failonerror="true" append="false" parallel="false" force="true">
+            <fileset dir="${webapp}">
+            	<include name="**/css/*.css" />
+            </fileset>
+            <arg line="-jar"/>
+            <arg path="${yuicompressor.path}"/>
+            <arg value="--type"/>
+            <arg value="css"/>
+            <arg value="-o"/>
+            <targetfile/>
+            <mapper type="glob" from="*.css" to="*.css"/>
+        </apply>
+    </target>
+
+    <target name="dist" depends="minify-css">
+        <jar jarfile="${SelfSvcWar}" basedir="${webapp}"/>
+    </target>
+    
+</project>

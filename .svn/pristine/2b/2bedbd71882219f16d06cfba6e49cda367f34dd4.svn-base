@@ -1,0 +1,8 @@
+insert into pc_prod_ncode_map (OID, NCODE, ORGID, OPTYPE, RELATYPE, OBJTYPE, TEMPLETID, PACKPRODID, ADDPRODID, PRIVID, EFFECTTYPE, DELENDTYPE, CREATEDATE, STATUS, STATUSDATE, RULEID, MAINPRODFILTER, MAINPRODID, ISPOSTPONE, SERVID, ISCHKRECRADIO)
+values (88001190510657, 'SERV07TOTEL', 'CQ.CQ', 'PCOpQry', 'PCIntRelaNormal', 'PCIntObjProd', '', '', 'SERV07TOTEL', '', 'Type_Immediate', 'Type_Immediate', to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), 1, to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), '', 1, '', 0, '', 0);
+
+insert into pc_prod_ncode_map (OID, NCODE, ORGID, OPTYPE, RELATYPE, OBJTYPE, TEMPLETID, PACKPRODID, ADDPRODID, PRIVID, EFFECTTYPE, DELENDTYPE, CREATEDATE, STATUS, STATUSDATE, RULEID, MAINPRODFILTER, MAINPRODID, ISPOSTPONE, SERVID, ISCHKRECRADIO)
+values (88001190510658, 'Z01TOTEL', 'CQ.CQ', 'PCOpQry', 'PCIntRelaNormal', 'PCIntObjProd', '', '', 'Z01TOTEL', '', 'Type_Immediate', 'Type_Immediate', to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), 1, to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), '', 1, '', 0, '', 0);
+
+insert into pc_prod_ncode_map (OID, NCODE, ORGID, OPTYPE, RELATYPE, OBJTYPE, TEMPLETID, PACKPRODID, ADDPRODID, PRIVID, EFFECTTYPE, DELENDTYPE, CREATEDATE, STATUS, STATUSDATE, RULEID, MAINPRODFILTER, MAINPRODID, ISPOSTPONE, SERVID, ISCHKRECRADIO)
+values (88001190510659, 'Z02TOTEL', 'CQ.CQ', 'PCOpQry', 'PCIntRelaNormal', 'PCIntObjProd', '', '', 'Z02TOTEL', '', 'Type_Immediate', 'Type_Immediate', to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), 1, to_date('08-03-2008 17:37:39', 'dd-mm-yyyy hh24:mi:ss'), '', 1, '', 0, '', 0);

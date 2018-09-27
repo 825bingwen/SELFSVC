@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 服务信息查询 -->
+	<package name="comboInfo" extends="struts-common" namespace="/comboInfo">
+	    
+		<!-- 套餐信息查询 -->
+		
+		<action name="selectTaoCanMonth" class="qryComboInfoAction" method="selectTaoCanMonth">
+		    <result name="selectBillMonth">/jsp/customize/hub/qryComboInfo/selectTaoCanMonth.jsp</result>
+		</action>
+		
+		<action name="qryComboInfo" class="qryComboInfoAction" method="qryComboInfo">
+		    <result name="queryTcService">/jsp/customize/hub/qryComboInfo/qryTcService.jsp</result>
+		</action>
+			<!-- 手机网龄查询 -->
+		<action name="qryNetAge" class="qryCurrentStatusAction1" method="qryNetAge">
+		    <result name="qryNetAge">/jsp/customize/hub/selfqry/monthlyReturn/netAgeShow.jsp</result>
+		</action>
+		<!-- 分月返还到账情况查询 Add by LiFeng [XQ[2011]_06_020]电子渠道分月返还到账情况查询需求【重点需求】 20110913 Begin -->
+		<action name="qryMonthlyReturnInit" class="monthlyReturnAction" method="qryInit">
+		    <result name="success">/jsp/customize/hub/selfqry/monthlyReturn/monthlyReturnInit.jsp</result>
+		</action>
+		<action name="qryMonthlyReturnInfo" class="monthlyReturnAction" method="qryMonthlyReturnInfo">
+		    <result name="success">/jsp/customize/hub/selfqry/monthlyReturn/monthlyReturnList.jsp</result>
+		</action>
+		<!-- 分月返还到账情况查询 Add by LiFeng [XQ[2011]_06_020]电子渠道分月返还到账情况查询需求【重点需求】 20110913 Begin -->
+	</package>
+</struts>

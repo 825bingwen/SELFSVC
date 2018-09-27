@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 服务信息查询 -->
+	<package name="mailBillSend" extends="struts-common" namespace="/mailBillSend">
+	    
+		<!-- 账/详单139邮箱定制 用户定制状态查询 -->
+		<action name="mailBillSend" class="mailBillSendAction" method="qryBillMailInfo">
+			<result name="qryResults">/jsp/customize/cq/mailBillSend/qryResults.jsp</result>
+		</action>
+		<!-- 账/详单139邮箱定制 定制邮箱变更为139邮箱 -->
+		<action name="changeToBillMail" class="mailBillSendAction" method="changeBillOrDetailMail">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- 账/详单139邮箱定制 开通139邮箱账/详单寄送 -->
+		<action name="openBillOrDetailMail" class="mailBillSendAction" method="openBillOrDetailMail">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+	</package>
+</struts>

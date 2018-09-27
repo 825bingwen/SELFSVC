@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.objectFactory" value="spring"/>
+	<constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+	<include file="struts-default.xml"></include>
+	<include file="struts/struts-common.xml"></include>
+	<include file="struts/struts-privilege.xml"></include>
+	<include file="struts/struts-feeservice.xml"></include>
+	<include file="struts/struts-login.xml"></include>
+	<include file="struts/struts-media.xml"></include>
+	<include file="struts/struts-charge.xml"></include>
+	<include file="struts/struts-serviceInfo.xml"></include>
+	<include file="struts/struts-baseService.xml"></include>
+	<include file="struts/struts-reception.xml"></include>
+	<include file="struts/struts-managerOperation.xml"></include>
+	<include file="struts/struts-mpaycharge.xml"></include>
+	<include file="struts/customize/cq/struts-charge-cq.xml"></include>
+	<include file="struts/customize/cq/struts-chooseTel-cq.xml"></include>
+	<include file="struts/customize/cq/struts-monthFee-cq.xml"></include>
+	<include file="struts/customize/cq/struts-mailBillSend-cq.xml"></include>
+	<include file="struts/customize/cq/struts-qryComboInfo-cq.xml"></include>
+	<include file="struts/customize/cq/struts-feeBalance-cq.xml"></include>
+	<include file="struts/customize/cq/struts-billSend-cq.xml"></include>
+	<include file="struts/customize/cq/struts-qryPersionInfo-cq.xml"></include>
+	<include file="struts/customize/cq/struts-privAccept-cq.xml"></include>
+	<include file="struts/customize/cq/struts-prodChange-cq.xml"></include>
+	<include file="struts/customize/cq/struts-prodOrder-cq.xml"></include>
+	<include file="struts/customize/cq/struts-scoreExchange-cq.xml"></include>
+	<include file="struts/customize/cq/struts-service-cq.xml"></include>
+</struts>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="SELFSVC"
+  id="myeclipse.1155284208812"
+  context-root="/SELFSVC"
+  j2ee-spec="1.4"
+  archive="SELFSVC.war">
+  <attributes>
+    <attribute name="webrootdir" value="/SELFSVC" />
+  </attributes>
+</project-module>
+

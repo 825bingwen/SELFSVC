@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+encoding//src/com/customize/nx/selfsvc/feeservice/action/DetailedRecordsNXAction.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/bean/DetailedRecordsBean.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/call/IntMsgUtil.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/call/SelfSvcCallImpl.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/common/Constants.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/common/ConstantsBase.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/feeservice/service/DetailedRecordsService.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/feeservice/service/DetailedRecordsServiceImpl.java=GBK
+encoding//src/com/gmcc/boss/selfsvc/util/AccountUtil.java=GBK
+encoding//webapp/js/pluginscript/musterPrinter.js=GBK

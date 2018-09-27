@@ -1,0 +1,923 @@
+/*
+ * 文件名：UserLoginBean.java
+ * 版权：CopyRight 2010-2015 Huawei Technologies Co., Ltd.All Righs Reserved.
+ * 描述：用户登录自助终端Bean
+ * 修改人：g00140516
+ * 修改时间：2010-11-30
+ * 修改内容：新增
+ * 
+ */
+package com.gmcc.boss.selfsvc.bean;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.call.IntMsgUtil;
+import com.gmcc.boss.selfsvc.common.BaseBeanImpl;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.resdata.model.RegionInfoPO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * 
+ * 用户身份认证
+ * 
+ * 
+ * @author g00140516
+ * @version 1.0，2010-12-16
+ * @see [相关类/方法]
+ * @since [产品/模块版本]
+ */
+public class UserLoginBean extends BaseBeanImpl
+{
+    private static Log logger = LogFactory.getLog(UserLoginBean.class);
+    
+    /**
+     * 使用手机号码、服务密码进行身份验证，获取用户信息  湖北EBUS改造
+     * 
+     * @param servnumber，手机号码
+     * @param password，服务密码
+     * @param termInfo，终端机信息
+     * @return 
+     * @remark create by hWX5316476 2014-05-13  OR_huawei_201405_235  自助终端接入EBUS一阶段_获取用户信息
+     */
+    public Map getUserInfoWithPwdHub(String servnumber, String password, TerminalInfoPO termInfo)
+    {
+        Map<String,String> paramMap = new HashMap<String,String>();
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("password", password);
+        paramMap.put("curOper", termInfo.getOperid());
+        paramMap.put("atsvNum", termInfo.getTermid());
+
+        // 调用接口验证服务密码
+        ReturnWrap rw1 = selfSvcCall.checkUserPassword(paramMap);
+        Map<String,Object> map = new HashMap<String,Object>();
+        if(rw1 == null)
+        {
+        	return map;
+        }
+        else if(rw1.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("errcode", rw1.getErrcode());
+            map.put("returnMsp", rw1.getReturnMsg());
+        	return map;
+        }
+    
+        return getUserInfoHub(servnumber,termInfo);
+    }
+    
+    /**
+     * 使用手机号码、随机密码进行身份验证(无密码登录),获取用户信息 湖北EBUS改造
+     * 
+     * @param servnumber，手机号码
+     * @param password，服务密码(此处为空)
+     * @param termInfo，终端机信息
+     * @return
+     * @remark create by hWX5316476 2014-05-13  OR_huawei_201405_235  自助终端接入EBUS一阶段_获取用户信息
+     */
+    public Map getUserInfoHub(String servnumber, TerminalInfoPO termInfo)
+    {
+    	
+    	Map<String,String> paramMap = new HashMap<String,String> ();
+        paramMap.put("curMenuId","");
+    	paramMap.put("touchoid", "");
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("password", "");
+        paramMap.put("curOper", termInfo.getOperid());
+        paramMap.put("atsvNum", termInfo.getTermid());
+
+        Map<String,Object> map = new HashMap<String,Object>();
+        
+    	// 调用接口获取用户积分
+        ReturnWrap rw2 = selfSvcCall.queryScoreValue(paramMap);
+        
+        if(rw2 == null)
+        {
+        	return map;
+        }
+        else if(rw2.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("errcode", rw2.getErrcode());
+            map.put("returnMsp", rw2.getReturnMsg());
+        	return map;
+        }
+        
+        // 调用接口获取用户信息
+        ReturnWrap rw3 = selfSvcCall.getUserInfoHub(paramMap);
+        
+        if(rw3 == null)
+        {
+        	return map;
+        }
+        else if(rw3.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("errcode", rw3.getErrcode());
+            map.put("returnMsp", rw3.getReturnMsg());
+        	return map;
+        }
+        
+        // 调用积分信息查询接口出参
+        String scoreInfoStr = ((CTagSet)rw2.getReturnObject()).GetValue("scoreinfo");
+        
+        // 将积分信息字符串拆分为数组
+        String[] scoreinfoList = scoreInfoStr.split("~");
+        
+        // 调用用户信息查询接口出参
+        CTagSet cout = (CTagSet)rw3.getReturnObject();
+        
+        NserCustomerSimp customerSimp = new NserCustomerSimp();
+        String region = cout.GetValue("region");
+       
+        region = (null == region) ? "" : region;
+        
+        customerSimp.setRegionID(region);
+        String regionName = cout.GetValue("regionname");
+        
+        // 根据region获取地区名称
+        if ((regionName == null || "".equals(regionName)) && !"".equals(region))
+        {
+            List regions = (List) PublicCache.getInstance().getCachedData(Constants.REGION_INFO);
+            if (regions != null)
+            {
+                RegionInfoPO regionInfo = null;
+                for (int i = 0; i < regions.size(); i++)
+                {
+                    regionInfo = (RegionInfoPO) regions.get(i);
+                    
+                    if (region.equalsIgnoreCase(regionInfo.getRegion()))
+                    {
+                        regionName = regionInfo.getRegionname();
+                        break;
+                    }
+                }
+            }                
+        }
+
+        // begin zKF66389 findbus清零
+        // 获取品牌id
+        String brandID = cout.GetValue("brand");
+        String brandName = "";
+        
+        // 新改造的用户信息查询接口只返回给品牌id，不返回品牌名称
+        brandID = (null == brandID) ? "" : brandID;
+        
+        if("BrandMzone".equals(brandID))
+    	{
+    		brandName = "动感地带";
+    	}
+    	else if("BrandGotone".equals(brandID))
+    	{
+    		brandName = "全球通";
+    	}
+    	else
+    	{
+    		brandID = "BrandSzx";
+    		brandName = "神州行";
+    	}
+        // end zKF66389 findbus清零
+        
+        // 将对应用户信息放入用户信息对象
+        customerSimp.setVerifyCode((String) paramMap.get("verifyCode"));
+        customerSimp.setServNumber((String)paramMap.get("telnumber"));            
+        customerSimp.setCustomerName(cout.GetValue("subname") == null ? "" : cout.GetValue("subname"));
+        customerSimp.setRegionName(regionName == null ? "" : regionName);
+        customerSimp.setProductID(cout.GetValue("prodid") == null ? "" : cout.GetValue("prodid")); 
+        customerSimp.setBrandName(brandName);
+        
+        //modify begin kWX211786 2014-7-16 NGBOSS ChongGouXuNi需求编号:OR_huawei_201407_373_静态检查_自助终端
+        customerSimp.setBrandID(brandID);
+        //modify end kWX211786 2014-7-16 NGBOSS ChongGouXuNi需求编号:OR_huawei_201407_373_静态检查_自助终端
+        
+        customerSimp.setVipType(cout.GetValue("vipType") == null ? "" : cout.GetValue("viptype"));
+        customerSimp.setLoginType("");
+        customerSimp.setFeeFlag("");
+        customerSimp.setContactId("");
+        customerSimp.setNetType(cout.GetValue("nettype") == null ? "" : cout.GetValue("nettype"));
+        customerSimp.setLoginMark("1000");
+        customerSimp.setStatus(cout.GetValue("status") == null ? "" : cout.GetValue("status"));
+        
+        // 返回的subage入网时间
+        customerSimp.setOnlineTime(cout.GetValue("subage") == null ? "" : cout.GetValue("subage"));
+        
+        // 根据入网时间计算网龄
+        customerSimp.setSubage(getSubage(cout.GetValue("subage")));
+        customerSimp.setSubsID(cout.GetValue("subsid") == null ? "" : cout.GetValue("subsid"));
+        customerSimp.setSmallregion(cout.GetValue("smallregion") == null ? "" : cout.GetValue("smallregion"));
+       
+        customerSimp.setSubscore(scoreinfoList.length > 1 ? scoreinfoList[1]:"");
+        
+        // add begin hWX5316476 2014-8-18 OR_huawei_201408_680 [携号转网]-自助终端优化需求(切换为EBUS协议)
+        // 湖北入网类型sbsnTransTelOut：跨运营商携出；sbsnTransTelIn：跨运营商携入
+        customerSimp.setSignType(null == cout.GetValue("signType") ? "" : cout.GetValue("signType"));
+        // add begin hWX5316476 2014-8-18 OR_huawei_201408_680 [携号转网]-自助终端优化需求(切换为EBUS协议)
+        
+        map.put("customerSimp", customerSimp);
+        return map;
+    }
+    
+    /**
+     * 使用手机号码、服务密码进行身份验证，获取用户信息
+     * 
+     * @param servnumber，手机号码
+     * @param password，服务密码
+     * @param termInfo，终端机信息
+     * @return 用户信息，如果返回null，说明身份验证失败
+     */
+    public Map getUserInfoWithPwd(String servnumber, String password, TerminalInfoPO termInfo)
+    {
+    	// 湖北接入EBUS开关开启
+    	if(IntMsgUtil.isTransEBUS("Atsv_Qry_UserInfo_Hub"))
+    	{
+    		return getUserInfoWithPwdHub(servnumber,password,termInfo);
+    	}
+    	
+        Map paramMap = new HashMap();
+        paramMap.put("telnum", servnumber);
+        paramMap.put("password", password);
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.getUserInfoWithPwd(paramMap);
+        Map map = new HashMap();
+        // begin zKF66389 2015-09-15 9月份findbugs修改
+        //if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS && null != rw.getReturnObject())
+        if (rw.getStatus() == SSReturnCode.SUCCESS && null != rw.getReturnObject())
+        {
+            CTagSet cout = (CTagSet)rw.getReturnObject();
+            
+            NserCustomerSimp customerSimp = new NserCustomerSimp();
+            
+            // add begin g00140516 2012/02/26 R003C12L02n01 OR_huawei_201112_953
+            customerSimp.setVerifyCode((String) paramMap.get("verifyCode"));
+            // add end g00140516 2012/02/26 R003C12L02n01 OR_huawei_201112_953
+            
+            customerSimp.setServNumber((String)paramMap.get("telnum"));            
+            customerSimp.setCustomerName(cout.GetValue("subname") == null ? "" : cout.GetValue("subname"));
+            
+            String region = cout.GetValue("region");
+            if (region == null)
+            {
+                region = "";            
+            }
+            
+            customerSimp.setRegionID(region);
+            
+            //宁夏仅返回region，不返回regionName
+            String regionName = cout.GetValue("regionname");
+            if ((regionName == null || "".equals(regionName)) && !"".equals(region))
+            {
+                List regions = (List) PublicCache.getInstance().getCachedData(Constants.REGION_INFO);
+                if (regions != null)
+                {
+                    RegionInfoPO regionInfo = null;
+                    for (int i = 0; i < regions.size(); i++)
+                    {
+                        regionInfo = (RegionInfoPO) regions.get(i);
+                        
+                        if (region.equalsIgnoreCase(regionInfo.getRegion()))
+                        {
+                            regionName = regionInfo.getRegionname();
+                            break;
+                        }
+                    }
+                }                
+            }
+            customerSimp.setRegionName(regionName == null ? "" : regionName);
+            
+            customerSimp.setProductID(cout.GetValue("productid") == null ? "" : cout.GetValue("productid"));            
+            customerSimp.setBrandName(cout.GetValue("productname") == null ? "" : cout.GetValue("productname"));
+            customerSimp.setBrandID(cout.GetValue("productgroup") == null ? "" : cout.GetValue("productgroup"));
+            customerSimp.setVipType(cout.GetValue("viptype") == null ? "" : cout.GetValue("viptype"));
+            customerSimp.setLoginType(cout.GetValue("logintype") == null ? "" : cout.GetValue("logintype"));
+            customerSimp.setFeeFlag(cout.GetValue("feeflag") == null ? "" : cout.GetValue("feeflag"));
+            customerSimp.setContactId(cout.GetValue("contactid") == null ? "" : cout.GetValue("contactid"));
+            customerSimp.setNetType(cout.GetValue("nettype") == null ? "" : cout.GetValue("nettype"));
+            customerSimp.setLoginMark("1000");
+            customerSimp.setStatus(cout.GetValue("status") == null ? "" : cout.GetValue("status"));
+            //add begin l00190940 2011/10/18 OR_HUB_201108_1001
+            // 修改接口，返回的subage其实是入网时间 modify by lKF60882 2012-06-07
+            customerSimp.setOnlineTime(cout.GetValue("subage") == null ? "" : cout.GetValue("subage"));
+            customerSimp.setSubscore(cout.GetValue("subscore") == null ? "" : cout.GetValue("subscore"));
+            //add end l00190940 2011/10/18 OR_HUB_201108_1001
+            
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 begin
+            customerSimp.setSubage(getSubage(cout.GetValue("subage")));
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 end
+            
+            // add begin g00140516 2012/08/06 R003C12L08n01 OR_NX_201206_794
+            customerSimp.setSubsID(cout.GetValue("subsid") == null ? "" : cout.GetValue("subsid"));
+            // add end g00140516 2012/08/06 R003C12L08n01 OR_NX_201206_794
+            
+            // add begion yKF28472 OR_huawei_201305_474
+            customerSimp.setSmallregion(cout.GetValue("smallregion") == null ? "" : cout.GetValue("smallregion"));
+            // add end yKF28472 OR_huawei_201305_474
+            
+            //add begin sWX219697 2014-6-30 14:54:22 OR_HUB_201406_1115_湖北跨运营商携号转网
+            //湖北入网类型sbsnTransTelOut：跨运营商携出；sbsnTransTelIn：跨运营商携入
+            customerSimp.setSignType(null == cout.GetValue("signtype") ? "" : cout.GetValue("signtype"));
+            //add end sWX219697 2014-6-30 14:54:22 OR_HUB_201406_1115_湖北跨运营商携号转网
+            
+            map.put("customerSimp", customerSimp);
+            return map;
+        }
+        else
+        {
+            // add begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            map.put("errcode", rw.getErrcode());
+            // add begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            
+            map.put("returnMsp", rw.getReturnMsg());
+        	return map;
+        }
+    }
+    
+    /**
+     * 使用手机号码、随机密码进行身份验证(无密码登录)
+     * 
+     * @param servnumber，手机号码
+     * @param password，服务密码(此处为空)
+     * @param termInfo，终端机信息
+     * @return 用户信息，如果返回null，说明身份验证失败
+     */
+    public Map getUserInfo(String servnumber, TerminalInfoPO termInfo)
+    {
+    	// 湖北接入EBUS开关开启
+    	if(IntMsgUtil.isTransEBUS("Atsv_Qry_UserInfo_Hub"))
+    	{
+    		return getUserInfoHub(servnumber, termInfo);
+    	}
+    	
+        Map paramMap = new HashMap();
+        paramMap.put("telnum", servnumber);
+        paramMap.put("password", "");
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.getUserInfo(paramMap);
+        Map map = new HashMap();
+        // begin zKF66389 2015-09-15 9月份findbugs修改
+        //if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        if (rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet cout = (CTagSet)rw.getReturnObject();
+            
+            NserCustomerSimp customerSimp = new NserCustomerSimp();
+            
+            // add begin g00140516 2012/02/26 R003C12L02n01 OR_huawei_201112_953
+            customerSimp.setVerifyCode((String) cout.GetValue("verifyCode"));
+            // add end g00140516 2012/02/26 R003C12L02n01 OR_huawei_201112_953
+            
+            customerSimp.setServNumber((String)paramMap.get("telnum"));            
+            customerSimp.setCustomerName(cout.GetValue("subname") == null ? "" : cout.GetValue("subname"));
+            
+            String region = cout.GetValue("region");
+            if (region == null)
+            {
+                region = "";            
+            }
+            
+            customerSimp.setRegionID(region);
+            
+            //宁夏仅返回region，不返回regionName
+            String regionName = cout.GetValue("regionname");
+            if ((regionName == null || "".equals(regionName)) && !"".equals(region))
+            {
+                List regions = (List) PublicCache.getInstance().getCachedData(Constants.REGION_INFO);
+                if (regions != null)
+                {
+                    RegionInfoPO regionInfo = null;
+                    for (int i = 0; i < regions.size(); i++)
+                    {
+                        regionInfo = (RegionInfoPO) regions.get(i);
+                        
+                        if (region.equalsIgnoreCase(regionInfo.getRegion()))
+                        {
+                            regionName = regionInfo.getRegionname();
+                            break;
+                        }
+                    }
+                }                
+            }
+            customerSimp.setRegionName(regionName == null ? "" : regionName);
+            
+            customerSimp.setProductID(cout.GetValue("productid") == null ? "" : cout.GetValue("productid"));            
+            customerSimp.setBrandName(cout.GetValue("productname") == null ? "" : cout.GetValue("productname"));
+            customerSimp.setBrandID(cout.GetValue("productgroup") == null ? "" : cout.GetValue("productgroup"));
+            customerSimp.setVipType(cout.GetValue("viptype") == null ? "" : cout.GetValue("viptype"));
+            customerSimp.setLoginType(cout.GetValue("logintype") == null ? "" : cout.GetValue("logintype"));
+            customerSimp.setFeeFlag(cout.GetValue("feeflag") == null ? "" : cout.GetValue("feeflag"));
+            customerSimp.setContactId(cout.GetValue("contactid") == null ? "" : cout.GetValue("contactid"));
+            customerSimp.setNetType(cout.GetValue("nettype") == null ? "" : cout.GetValue("nettype"));
+            customerSimp.setLoginMark("1000");
+            customerSimp.setStatus(cout.GetValue("status") == null ? "" : cout.GetValue("status"));
+            //add begin l00190940 2011/10/18 OR_HUB_201108_1001
+            // 修改接口，返回的subage其实是入网时间 modify by lKF60882 2012-06-07
+            customerSimp.setOnlineTime(cout.GetValue("subage") == null ? "" : cout.GetValue("subage"));
+            customerSimp.setSubscore(cout.GetValue("subscore") == null ? "" : cout.GetValue("subscore"));
+            //add end l00190940 2011/10/18 OR_HUB_201108_1001
+            
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 begin
+            customerSimp.setSubage(getSubage(cout.GetValue("subage")));
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 end
+            
+            // add begin g00140516 2012/08/06 R003C12L08n01 OR_NX_201206_794
+            customerSimp.setSubsID(cout.GetValue("subsid") == null ? "" : cout.GetValue("subsid"));
+            // add end g00140516 2012/08/06 R003C12L08n01 OR_NX_201206_794
+            
+            // add begion yKF28472 OR_huawei_201305_474
+            customerSimp.setSmallregion(cout.GetValue("smallregion") == null ? "" : cout.GetValue("smallregion"));
+            // add end yKF28472 OR_huawei_201305_474
+            
+            //add begin sWX219697 2014-6-30 14:54:22 OR_HUB_201406_1115_湖北跨运营商携号转网
+            //湖北入网类型sbsnTransTelOut：跨运营商携出；sbsnTransTelIn：跨运营商携入
+            customerSimp.setSignType(null == cout.GetValue("signtype") ? "" : cout.GetValue("signtype"));
+            //add end sWX219697 2014-6-30 14:54:22 OR_HUB_201406_1115_湖北跨运营商携号转网
+            
+            map.put("customerSimp", customerSimp);
+            return map;
+        }
+        else
+        {
+            //add begin CKF76106 2012/09/02 R003C12L08n01 OR_HUB_201207_875
+            map.put("errcode", rw.getErrcode());
+            //add end CKF76106 2012/09/02 R003C12L08n01 OR_HUB_201207_875
+            
+            map.put("returnMsp", rw.getReturnMsg());
+        	return map;
+        }
+    }
+    
+    /**
+     * 向用户发送随机密码短信
+     * 
+     * @param customerSimp，用户信息
+     * @param termInfo，终端机信息
+     * @param shortMessage，短信内容
+     * @param curMenuId，当前菜单
+     * @return
+     * @see
+     */
+    public boolean sendRandomPwd(NserCustomerSimp customerSimp, TerminalInfoPO termInfo, String shortMessage,
+            String curMenuId)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", customerSimp.getServNumber());
+        paramMap.put("smsContent", shortMessage);
+        paramMap.put("priority", "5");
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", customerSimp.getContactId());
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.sendSMS(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 向用户发送随机密码短信
+     * 
+     * @param customerSimp，用户信息
+     * @param termInfo，终端机信息
+     * @param shortMessage，短信内容
+     * @param curMenuId，当前菜单
+     * @return
+     * @see
+     */
+    public Map sendRandomPwdByMap(NserCustomerSimp customerSimp, TerminalInfoPO termInfo, String shortMessage,
+            String curMenuId)
+    {
+    	// 返回时用到
+    	Map returnMap = new HashMap();
+    	
+    	// 参数
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", customerSimp.getServNumber());
+        paramMap.put("smsContent", shortMessage);
+        paramMap.put("priority", "5");
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", customerSimp.getContactId());
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.sendSMS(paramMap);
+        // begin zKF66389 2015-09-15 9月份findbugs修改
+        //if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        if (rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+        	returnMap.put("returnMsp", "");
+        }
+        else
+        {
+        	returnMap.put("returnMsp", rw.getReturnMsg());
+        }
+        
+        return returnMap;
+    }
+    
+    /**
+     * 使用手机号码、身份证号进行认证
+     * 
+     * @param termInfo 终端信息
+     * @param idNo 身份证号
+     * @param servnumber 服务号码
+     * @param curMenuId 菜单ID
+     * @return
+     * @see 
+     */
+    public Map checkIDCard(TerminalInfoPO termInfo, String idNo, String servnumber, String curMenuId)
+    {
+        Map<String,String> paramMap = new HashMap<String,String>();
+        paramMap.put("operid", termInfo.getOperid());
+        paramMap.put("termid", termInfo.getTermid());
+        paramMap.put("menuid", curMenuId);
+        paramMap.put("telnum", servnumber);
+        paramMap.put("touchoid", "");
+        paramMap.put("IDCard", idNo);
+        
+        ReturnWrap rw=selfSvcCall.checkIDCard(paramMap);
+        Map map = new HashMap();
+        // begin zKF66389 2015-09-15 9月份findbugs修改
+        //if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        if (rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet cout = (CTagSet)rw.getReturnObject();
+            
+            // add begin hWX5316476 2014-7-11 Bug_70053  身份证认证空指针异常
+            // 湖北不开启特性参数，即没有出参，未免报空指针，山东开启特性参数，有出参
+            cout = (null == cout)? new CTagSet():cout;
+            // add end  hWX5316476 2014-7-11 Bug_70053 身份证认证空指针异常
+            
+            NserCustomerSimp customerSimp = new NserCustomerSimp();
+            customerSimp.setServNumber((String)paramMap.get("telnum"));            
+            customerSimp.setCustomerName(cout.GetValue("subname") == null ? "" : cout.GetValue("subname"));
+            
+            String region = cout.GetValue("region");
+            if (region == null)
+            {
+                region = "";            
+            }
+            
+            customerSimp.setRegionID(region);
+            
+            //宁夏仅返回region，不返回regionName
+            String regionName = cout.GetValue("regionname");
+            if ((regionName == null || "".equals(regionName)) && !"".equals(region))
+            {
+                List regions = (List) PublicCache.getInstance().getCachedData(Constants.REGION_INFO);
+                if (regions != null)
+                {
+                    RegionInfoPO regionInfo = null;
+                    for (int i = 0; i < regions.size(); i++)
+                    {
+                        regionInfo = (RegionInfoPO) regions.get(i);
+                        
+                        if (region.equalsIgnoreCase(regionInfo.getRegion()))
+                        {
+                            regionName = regionInfo.getRegionname();
+                            break;
+                        }
+                    }
+                }                
+            }
+            customerSimp.setRegionName(regionName == null ? "" : regionName);
+            
+            customerSimp.setProductID(cout.GetValue("productid") == null ? "" : cout.GetValue("productid"));            
+            customerSimp.setBrandName(cout.GetValue("productname") == null ? "" : cout.GetValue("productname"));
+            customerSimp.setBrandID(cout.GetValue("productgroup") == null ? "" : cout.GetValue("productgroup"));
+            customerSimp.setVipType(cout.GetValue("viptype") == null ? "" : cout.GetValue("viptype"));
+            customerSimp.setLoginType(cout.GetValue("logintype") == null ? "" : cout.GetValue("logintype"));
+            customerSimp.setFeeFlag(cout.GetValue("feeflag") == null ? "" : cout.GetValue("feeflag"));
+            customerSimp.setContactId(cout.GetValue("contactid") == null ? "" : cout.GetValue("contactid"));
+            customerSimp.setNetType(cout.GetValue("nettype") == null ? "" : cout.GetValue("nettype"));
+            customerSimp.setLoginMark("0010");
+            customerSimp.setStatus(cout.GetValue("status") == null ? "" : cout.GetValue("status"));
+            //add begin l00190940 2011/10/18 OR_HUB_201108_1001
+            // 修改接口，返回的subage其实是入网时间 modify by lKF60882 2012-06-07
+            customerSimp.setOnlineTime(cout.GetValue("subage") == null ? "" : cout.GetValue("subage"));
+            customerSimp.setSubscore(cout.GetValue("subscore") == null ? "" : cout.GetValue("subscore"));
+            //add end l00190940 2011/10/18 OR_HUB_201108_1001
+            
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 begin
+            customerSimp.setSubage(getSubage(cout.GetValue("subage")));
+            // 根据入网时间计算网龄 add by lKF60882 2012-06-07 end
+            
+            map.put("customerSimp", customerSimp);
+            return map;
+        }
+        else
+        {
+            // add begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            map.put("errcode", rw.getErrcode());
+            // add end g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            
+            map.put("returnMsp", rw.getReturnMsg());
+        	return map;
+        }
+    }
+    
+    /**
+     * CRM统一认证接口
+     * 
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号码
+     * @param curMenuId 当前菜单
+     * @param oldPasswd 旧密码
+     * @return 100:成功 102:该用户密码为缺省密码，不允许做业务，请用本机修改密码! 119:您的密码是初始密码，不允许办理业务，请重新设置密码!
+     */
+    @SuppressWarnings("unchecked")
+    public Map checkPassword(TerminalInfoPO termInfo, String servnumber, String curMenuId, String oldPasswd)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", "");
+        paramMap.put("subcmdid", "0");// 0：密码校验 1：密码修改 2：密码重置，不校验oldpwd
+        paramMap.put("oldpwd", oldPasswd);
+        paramMap.put("newpwd", "");
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        Map returnMap = new HashMap();
+        ReturnWrap rw = selfSvcCall.resetPassword(paramMap);
+        if (rw != null)
+        {
+        	returnMap.put("errcode", rw.getErrcode());// 返回码
+        	returnMap.put("returnMsg", rw.getReturnMsg());// 返回信息
+        	returnMap.put("status", rw.getStatus());// 状态
+            return returnMap;
+        }
+        return null;
+    }
+    
+    /**
+     * 密码修改
+     * 
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号码
+     * @param curMenuId 当前菜单
+     * @param oldPasswd 旧密码
+     * @param newPasswd 新密码
+     * @return 100:成功 102:该用户密码为缺省密码，不允许做业务，请用本机修改密码! 119:您的密码是初始密码，不允许办理业务，请重新设置密码!
+     */
+    @SuppressWarnings("unchecked")
+    public Map editPassword(TerminalInfoPO termInfo, String servnumber, String curMenuId, String oldPasswd, String newPasswd)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", "");
+        paramMap.put("subcmdid", "1");// 0：密码校验 1：密码修改 2：密码重置，不校验oldpwd
+        paramMap.put("oldpwd", oldPasswd);
+        paramMap.put("newpwd", newPasswd);
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        Map returnMap = new HashMap();
+        ReturnWrap rw = selfSvcCall.resetPassword(paramMap);
+        if (rw != null)
+        {
+        	returnMap.put("errcode", rw.getErrcode());// 返回码
+        	returnMap.put("returnMsg", rw.getReturnMsg());// 返回信息
+        	returnMap.put("status", rw.getStatus());// 状态
+            return returnMap;
+        }
+        return null;
+    }
+    
+    /**
+     * 验证是否为初始密码登陆
+     * @param termInfo 终端机信息
+     * @param curMenuId 当前菜单
+     * @param servnumber 手机号码     
+     * @return 0、100:为初始密码，其他：不是初始密码!    
+     * @remark create YKF38827 2012/02/24 R003C12L02n01  OR_NX_201112_87
+     */
+    @SuppressWarnings("unchecked")
+    public boolean valiIsfirstpwd(TerminalInfoPO termInfo,  String curMenuId ,String servnumber)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnum", servnumber);      
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", "");
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        ReturnWrap rw = selfSvcCall.valiIsfirstpwd(paramMap);
+        if (rw != null&&1==rw.getStatus())
+        {           
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * 根据入网时间计算网龄
+     * @param onlineTime 入网时间，格式为yyyy-MM-dd
+     * @remark create lKF60882 2012-6-7
+     */
+    public String getSubage(String onlineTime)
+    {
+        String subage = "";
+        try
+        {
+            if(null == onlineTime || "".equals(onlineTime))
+            {
+                return "";
+            }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String start = onlineTime.replaceAll("-", "");
+            String end = sdf.format(new Date());
+            
+            Date startDate = sdf.parse(start);
+            Date endDate = sdf.parse(end);
+            
+            HashMap<String, Integer> yearMonthMap = CommonUtil.getYearsMonths(startDate, endDate);
+            if (null != yearMonthMap)
+            {
+                // 若年份不为0，则显示
+                if (0 < yearMonthMap.get("years"))
+                {
+                    subage = yearMonthMap.get("years") + "年";
+                }
+                // 若月份不为0，则显示
+                if (0 < yearMonthMap.get("months"))
+                {
+                    subage += yearMonthMap.get("months") + "月";
+                }
+            }
+            
+            return subage;
+        }
+        catch (ParseException e)
+        {
+            logger.error("根据入网时间计算网龄失败：", e);
+            return "";
+        }
+    }
+    
+    /**
+     * 向用户发送随机密码短信(根据SA_DB_SMTEMPLATE中配置的模板编号)
+     * 
+     * @param termInfo
+     * @param smsparam
+     * @param servnumber
+     * @param templateno
+     * @param curMenuId
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create cKF76106 2013/07/24 R003C13L07n24 OR_HUB_201307_20
+     */
+    @SuppressWarnings("unchecked")
+    public boolean sendRandomPwdHub(TerminalInfoPO termInfo, String smsparam, String servnumber, String templateno, String curMenuId)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("smsparam", smsparam);
+        paramMap.put("templateno", templateno);
+        paramMap.put("priority", "5");
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", "");
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.sendSmsHub(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+	
+	/* 校验手机号是否已实名制登记
+     * 
+     * @param servnumber，手机号码
+     * @param termInfo，终端机信息
+     * @return 1 ---已实名制登记 0 ---未登记
+     */
+    public String realNameCheck(String servnumber, TerminalInfoPO termInfo)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnum", servnumber);
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = selfSvcCall.realNameCheck(paramMap);
+        Map map = new HashMap();
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet cout = (CTagSet)rw.getReturnObject();
+            String ret = cout.GetValue("ret");// 1 ---已实名制登记 0 ---未登记
+            return ret;
+        }
+        
+        return "2";
+    }
+
+    /**
+     * 是否是弱密码的校验（宁夏）
+     * 
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号
+     * @param password 密码
+     * @return String 
+     * @remark create by hWX5316476 2014/2/18 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求
+     */
+    public Map weakPwdCheck(TerminalInfoPO termInfo,String servnumber, String password,String curMenuId)
+    {
+    	Map paramMap = new HashMap();
+    	
+    	// 手机号
+    	paramMap.put("telnum",servnumber);
+    	
+    	// 拨打号码(可以不传) 手机号
+    	paramMap.put("callernum","");
+    	
+    	// 是否拨打本机  0本机，1非本机
+    	paramMap.put("flag", "0");
+    	
+    	// 接口命令字  0 服务密码验证 
+    	paramMap.put("subcmdid","0");
+    	
+    	// 老密码
+    	paramMap.put("old_passwd", password);
+    	
+    	// 新密码
+    	paramMap.put("new_passwd","");
+    	
+    	// 认证方式 AuthCheckB :服务密码认证 
+    	paramMap.put("chktype", "AuthCheckB");
+    	
+    	// newpwdcount 新密码位数校验，校验是否符合传入位数，传0或不传则不校验。
+    	paramMap.put("newpwdcount","0");
+    	
+    	// 终端ID
+    	paramMap.put("termid", termInfo.getTermid());
+    	
+    	// 当前菜单ID
+    	paramMap.put("menuid", curMenuId);
+    	
+    	// 触摸ID
+    	paramMap.put("touchoid", "");
+    	
+    	// 操作员ID
+    	paramMap.put("operid", termInfo.getOperid());
+    	
+    	// 调用重置密码（新）接口，检验是否为弱密码
+    	ReturnWrap rw = selfSvcCall.resetPwdNew(paramMap);
+    	
+    	Map map = new HashMap();
+
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet cout = (CTagSet)rw.getReturnObject();
+            
+            // 设置返回结果
+            map.put("returnObj", cout);
+            
+            // 设置弱密码校验返回标志 remindflag 2：是弱密码
+            map.put("remindflag", cout.GetValue("remindflag"));
+            
+            // 设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            
+            // 错误码
+            map.put("errcode", rw.getErrcode());
+            
+            return map;
+        }
+        else if(rw != null)
+        {
+        	
+        	System.out.println(rw.getErrcode()+"  "+rw.getReturnMsg());
+        	
+        	// 设置返回信息
+        	map.put("returnMsg", rw.getReturnMsg());
+        	
+        	//　错误码
+        	map.put("errcode", rw.getErrcode());
+        	
+        	return map;
+        }
+        
+        return null;
+    }
+}

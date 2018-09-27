@@ -1,0 +1,2 @@
+struts.i18n.encoding=GBK
+struts.multipart.maxSize=104857600

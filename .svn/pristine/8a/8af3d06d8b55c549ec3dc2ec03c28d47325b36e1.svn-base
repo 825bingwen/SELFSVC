@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="chooseTel" extends="struts-common" namespace="/chooseTel">		
+
+		<!-- 选择规则页面 -->
+		<action name="selectRule" class="chooseTelAction" method="selectRule">
+		    <result name="selectRule">/jsp/customize/nx/chooseTel/selectRule.jsp</result>
+		</action>
+		
+		<!-- 根据规则输入号码页面 -->
+		<action name="inputTelNumByRule" class="chooseTelAction" method="inputTelNumByRule">
+		    <result name="inputTelNumByRule">/jsp/customize/nx/chooseTel/inputTelNumByRule.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="telNumResult" class="chooseTelAction" method="telNumResult">
+		    <result name="telNumResult">/jsp/customize/nx/chooseTel/telNumResult.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 选择证件类型页面 -->
+		<action name="selectCertType" class="chooseTelAction" method="selectCertType">
+		    <result name="selectCertType">/jsp/customize/nx/chooseTel/selectCertType.jsp</result>
+		    <result name="inputCertid">/jsp/customize/nx/chooseTel/inputCertid.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 输入证件号码页面 -->
+		<action name="inputCertid" class="chooseTelAction" method="inputCertid">
+		    <result name="inputCertid">/jsp/customize/nx/chooseTel/inputCertid.jsp</result>
+		</action>
+		
+		<!-- 号码列表页面 -->
+		<action name="makeSureTel" class="chooseTelAction" method="makeSureTel">
+		    <result name="makeSureTel">/jsp/customize/nx/chooseTel/makeSureTel.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 转到输入发送手机号码页面 -->
+		<action name="inputSendNum" class="chooseTelAction" method="inputSendNum">
+		    <result name="inputSendNum">/jsp/customize/nx/chooseTel/inputSendNum.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 发送短信完成页面 -->
+		<action name="sendNumFinish" class="chooseTelAction" method="sendNumFinish">
+		    <result name="sendNumFinish">/jsp/customize/nx/chooseTel/sendNumFinish.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+				
+	</package>	
+</struts>

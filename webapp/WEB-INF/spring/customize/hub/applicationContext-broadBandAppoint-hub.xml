@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 宽带预约Action -->
+	<bean id="broadBandAppointAction" parent="baseAction" class="com.customize.hub.selfsvc.broadBandAppoint.action.BroadBandAppointAction" scope="prototype">
+	    <property name="broadBandAppointService" ref="broadBandAppointService"></property>
+	</bean>
+	
+	<!-- 宽带预约service -->
+	<bean id="broadBandAppointService" parent="baseTransactionProxy">
+	    <property name="target" ref="broadBandAppointServiceImpl"></property>
+	</bean>
+	
+	<!-- 宽带预约serviceImpl -->
+	<bean id="broadBandAppointServiceImpl" parent="baseServiceHub" class="com.customize.hub.selfsvc.broadBandAppoint.service.BroadBandAppointServiceImpl">
+	</bean>
+</beans>

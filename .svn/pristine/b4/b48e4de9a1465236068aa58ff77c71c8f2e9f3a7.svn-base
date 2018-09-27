@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="prodOrder" >
+  <!-- 结果对象 -->
+	<typeAlias alias="prodOrderPO" type="com.customize.cq.selfsvc.prodOrder.model.ProdOrderPO" />
+	
+	<!-- 根据客户品牌查询可用增值产品 -->
+	<select id="qryProdOrderList" parameterClass="java.util.Map" resultClass="prodOrderPO">
+		SELECT * FROM SH_PROD_NCODE M WHERE M.BRANDS LIKE #brands# AND M.STATUS = 1 ORDER BY GROUPCOLOR, NAME
+	</select>
+</sqlMap>

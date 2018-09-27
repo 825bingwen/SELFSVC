@@ -1,0 +1,225 @@
+/*
+ * 文 件 名:  NonlocalChargeServiceImpl.java
+ * 版    权:  Huawei Technologies Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
+ * 描    述:  <山东异地缴费service实现类>
+ * 修 改 人:  jWX216858
+ * 修改时间:  Apr 27, 2015
+ * 跟踪单号:  <跟踪单号>
+ * 修改单号:  <修改单号>
+ * 修改内容:  <修改内容>
+ */
+package com.customize.sd.selfsvc.charge.service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.customize.sd.selfsvc.common.service.BaseServiceSDImpl;
+import com.customize.sd.selfsvc.common.service.IFeeServiceSD;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO;
+import com.gmcc.boss.selfsvc.charge.service.ChargeService;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+import com.gmcc.boss.selfsvc.util.DateUtil;
+
+/**
+ * <山东异地缴费service实现类>
+ * <功能详细描述>
+ * 
+ * @author  jWX216858
+ * @version  [版本号, Apr 27, 2015]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本 OR_SD_201503_949_自助终端新增跨省缴费功能的支撑]
+ */
+@Service
+@Transactional(noRollbackFor=ReceptionException.class)
+public class NonlocalChargeServiceImpl extends BaseServiceSDImpl implements INonlocalChargeService 
+{
+	/**
+     * 日志
+     */
+    private static Log logger = LogFactory.getLog(NonlocalChargeServiceImpl.class);
+    
+    @Autowired
+    @Qualifier("chargeService")
+	private ChargeService chargeService;
+    
+    /**
+     * 山东缴费日志
+     */
+    @Autowired
+    private transient IFeeServiceSD feeServiceSDImpl;
+    
+    /**
+	 * 客户应缴费用总额查询
+	 * 
+	 * @param servNumber 手机号码
+	 * @param curMenuId 当前菜单
+	 * @return
+     * @see [类、类#方法、类#成员]
+	 */
+    @Override
+	public CardChargeLogVO qryfeeChargeAccount(String servNumber, String curMenuId)
+    {
+    	CardChargeLogVO chargeLogVO = new CardChargeLogVO();
+    	
+    	// 获取终端机信息
+    	TerminalInfoPO termInfo = this.getTermInfo();
+    	
+    	// 充值缴费方式列表
+        List<MenuInfoPO> usableTypes = CommonUtil.qryUsablePayTypes(termInfo.getTermgrpid(), curMenuId);
+        
+        logger.info("当前，话费充值的可选方式有" + usableTypes.size() + "种");
+        
+        if (usableTypes.size() == 0)
+        {
+            logger.error("没有可用的充值方式");
+            
+            // 记录日志
+            this.insertRecLogTelnum(servNumber, Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_FALID, "没有可用的充值方式");
+            throw new ReceptionException("对不起，暂时没有可用的充值方式，请返回执行其他操作。");
+        }
+    	
+    	// 组装报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(), "",
+            MsgHeaderPO.ROUTETYPE_TELNUM, servNumber);
+
+        // 调用接口查询客户应缴总金额
+        ReturnWrap rw = selfSvcCall.qryPayAmount(msgHeader, termInfo.getOrgid());
+        
+        // 调用接口失败返回错误信息
+        if (SSReturnCode.ERROR == rw.getStatus())
+        {
+            String retMsg = rw.getReturnMsg();
+            if(StringUtils.isEmpty(retMsg))
+            {
+                retMsg = "对不起，查询客户账户信息失败！";
+            }
+            
+            // 记录错误日志
+            this.insertRecLogTelnum(servNumber, Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_FALID, retMsg);
+
+            throw new ReceptionException(retMsg);
+        }
+        
+        CTagSet ctagSet = (CTagSet)rw.getReturnObject();
+        
+        if(StringUtils.isEmpty(ctagSet.GetValue("ProvinceCode")))
+        {
+        	// 记录错误日志
+            this.insertRecLogTelnum(servNumber, Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_FALID, "对不起，没有查询到对应的账户信息！");
+
+            throw new ReceptionException("对不起，没有查询到对应的账户信息！");
+        }
+        
+        // 手机号码归属省份编码
+        String provinceCode = ctagSet.GetValue("ProvinceCode").substring(0,3);
+        
+        // 当前省份编码
+        String currProvinceCode = CommonUtil.getParamValue(Constants.SH_CURRPROVINCE_CODE);
+        
+        if(currProvinceCode.equals(provinceCode))
+        {
+        	// 记录错误日志
+            this.insertRecLogTelnum(servNumber, Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_FALID, "对不起，该菜单属于跨省异地交费，您的手机号码属于本省，请到其它对应菜单进行交费。");
+
+            throw new ReceptionException("对不起，该菜单属于跨省异地交费，您的手机号码属于本省，请到充值交费菜单进行交费。");
+        }
+        
+        // 省份编码
+        chargeLogVO.setProvinceCode(provinceCode);
+        
+        // 客户姓名
+        chargeLogVO.setCustName(ctagSet.GetValue("CustName"));
+        
+        // 应交费用
+        chargeLogVO.setYingjiaoFee(CommonUtil.fenToYuan(CommonUtil.liToFen(ctagSet.GetValue("PayAmount"), BigDecimal.ROUND_UP)));
+        
+        // 预存总余额
+        chargeLogVO.setBalance(CommonUtil.fenToYuan(CommonUtil.liToFen(ctagSet.GetValue("Balance"), BigDecimal.ROUND_DOWN)));
+        
+        // 手机号码
+        chargeLogVO.setServnumber(servNumber);
+        
+        // 可用充值方式列表
+        chargeLogVO.setUsableTypes(usableTypes);
+        
+		return chargeLogVO;
+	}
+    
+    /**
+	 * 山东省外异地缴费提交
+	 * 
+	 * @param chargeLogVO 缴费信息
+	 * @param curMenuId 当前菜单id
+	 * @param unionRetCode 银联返回错误码
+	 * @return
+     * @see [类、类#方法、类#成员]
+	 */
+    public CardChargeLogVO chargeCommit(CardChargeLogVO chargeLogVO, String curMenuId, String unionRetCode)
+    {
+    	// 设置交费状态
+        chargeLogVO.setStatus(Constants.PAYSUCCESS_CHARGEERROR);
+        
+        // 获取规则跨区交费的交易流水号
+        String dealNum = chargeService.getNonlocalChargeSeq();
+    	
+        // 设置缴费交易流水
+        chargeLogVO.setDealnum(dealNum);
+        
+        // 交易时间
+        chargeLogVO.setDealTime(DateUtil.getCurrentDateTime());
+        
+        // 组装报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, getTermInfo().getOperid(), getTermInfo().getTermid(), "",
+            MsgHeaderPO.ROUTETYPE_TELNUM, chargeLogVO.getServnumber());
+    
+        // 调用接口查询客户应缴总金额
+        ReturnWrap rw = selfSvcCall.nonlocalCharge(
+        		msgHeader, 
+        		dealNum, 
+        		CommonUtil.fenToLi(CommonUtil.yuanToFen(chargeLogVO.gettMoney())), 
+        		getTermInfo().getOrgid());
+       
+        // 调用接口失败返回错误信息
+        if (SSReturnCode.ERROR == rw.getStatus())
+        {
+            String retMsg = rw.getReturnMsg();
+            if(StringUtils.isEmpty(retMsg))
+            {
+                retMsg = "对不起，跨省异地缴费操作失败！";
+            }
+            
+            // 更新缴费日志
+            feeServiceSDImpl.updateChargeLog(chargeLogVO, retMsg, unionRetCode, Constants.PAYSUCCESS_CHARGEERROR);
+            
+            // 记录错误日志
+            this.insertRecLogTelnum(chargeLogVO.getServnumber(), Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_FALID, retMsg);
+
+            throw new ReceptionException(retMsg);
+        }
+        
+        // 更新缴费日志
+        feeServiceSDImpl.updateChargeLog(chargeLogVO, "跨省异地缴费成功", unionRetCode, Constants.CHARGE_SUCCESS);
+        
+        // 记录成功日志
+        this.insertRecLogTelnum(chargeLogVO.getServnumber(), Constants.BUSITYPE_NONLOCAL_CHARGE, "0", "0", Constants.RECSTATUS_SUCCESS, "跨省异地缴费成功");
+        
+        return chargeLogVO;
+    }
+    
+}

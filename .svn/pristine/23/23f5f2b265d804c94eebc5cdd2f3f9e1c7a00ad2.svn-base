@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="chooseTel" extends="struts-common" namespace="/chooseTel">		
+
+		<!-- 选择自助选号主页面 -->
+		<action name="selectRegion" class="chooseTelAction" method="phoneListMain">
+		    <result name="phoneListMain">/jsp/customize/hub/chooseTel/phoneListMain.jsp</result>
+		    <result name="phoneListMainNew">/jsp/customize/hub/chooseTel/phoneListMainNew.jsp</result>
+		</action>
+		
+		<!-- 输入身份证号码页面 -->
+		<action name="inputIdCard" class="chooseTelAction" method="inputIdCard">
+		    <result name="inputIdCard">/jsp/customize/hub/chooseTel/inputIdCard.jsp</result>
+		</action>
+		
+		<!-- 身份证预定成功页面 -->
+		<action name="idCardFinish" class="chooseTelAction" method="idCardFinish">
+		    <result name="idCardFinish">/jsp/customize/hub/chooseTel/idCardFinish.jsp</result>
+		</action>
+		
+		<!-- 验证码预定成功页面 -->
+		<action name="validateFinish" class="chooseTelAction" method="validateFinish">
+		    <result name="validateFinish">/jsp/customize/hub/chooseTel/validateFinish.jsp</result>
+		</action>
+		
+		<!-- 按尾号搜索页面 -->
+		<action name="phoneSearchByFinalNbr" class="chooseTelAction" method="phoneSearchByFinalNbr">
+		    <result name="phoneSearch">/jsp/customize/hub/chooseTel/phoneSearch.jsp</result>
+		</action>
+		
+		<!-- 网号搜索首页面 -->
+		<action name="phoneSearchByNetNbr" class="chooseTelAction" method="phoneSearchByNetNbr">
+		    <result name="phoneSearchByNetNbr">/jsp/customize/hub/chooseTel/netNbrSearch.jsp</result>
+		</action>
+		
+		<!-- 网号搜索结果页面 -->
+		<action name="netNbrSearchResult" class="chooseTelAction" method="netNbrSearchResult">
+		    <result name="netNbrSearchResult">/jsp/customize/hub/chooseTel/netNbrSearchResult.jsp</result>
+		</action>
+		
+		<!-- 网段搜索首页面 -->
+		<action name="phoneSearchByNetValue" class="chooseTelAction" method="phoneSearchByNetValue">
+		    <result name="phoneSearchByNetValue">/jsp/customize/hub/chooseTel/netValueSearch.jsp</result>
+		</action>
+		
+		<!-- 网段搜索结果页面 -->
+		<action name="netValueSearchResult" class="chooseTelAction" method="netValueSearchResult">
+		    <result name="netValueSearchResult">/jsp/customize/hub/chooseTel/netValueSearchResult.jsp</result>
+		</action>
+		
+		<!-- 检查身份证号码 -->
+		<action name="checkIdCard" class="chooseTelAction" method="checkIdCard"/>
+		
+		<!-- add by xkf57421 for ZG[2011]_11_006 begin  -->
+		<action name="toSelectRegion" class="chooseTelAction" method="loadingMain">
+		    <result name="loadingPhoneList">/jsp/customize/hub/chooseTel/loadingPhoneList.jsp</result>
+		</action>
+		<!-- add by xkf57421 for ZG[2011]_11_006 end  -->
+		
+		<action name="qryTelnumsWithType" class="chooseTelAction" method="qryTelnumsWithType">
+			<result name="goodTypePage">/jsp/customize/hub/chooseTel/goodTypes.jsp</result>
+			<result name="loveTypePage">/jsp/customize/hub/chooseTel/loveTelnums.jsp</result>
+			<result name="phoneListMainNew">/jsp/customize/hub/chooseTel/phoneListMainNew.jsp</result>
+			<result name="specifiedPatternNumPage">/jsp/customize/hub/chooseTel/specifiedPatternNums.jsp</result>
+		</action>		
+		
+		<action name="qryLuckyNums" class="chooseTelAction" method="qryLuckyNums">
+			<result name="resultPage">/jsp/customize/hub/chooseTel/luckyNums.jsp</result>
+		</action>
+		
+		<action name="qryLoverNums" class="chooseTelAction" method="qryLoverNums">
+			<result name="loveTypePage">/jsp/customize/hub/chooseTel/loveTelnums.jsp</result>
+		</action>
+				
+		<action name="qrySpecifiedPatternNums" class="chooseTelAction" method="qrySpecifiedPatternNums">
+			<result name="specifiedPatternNumPage">/jsp/customize/hub/chooseTel/specifiedPatternNums.jsp</result>
+		</action>
+	</package>	
+</struts>

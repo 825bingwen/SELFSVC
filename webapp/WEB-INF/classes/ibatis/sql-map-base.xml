@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="base">
+
+	<!-- 参数对象 -->
+	<typeAlias alias="selfSvcLogVO" type="com.gmcc.boss.selfsvc.common.model.SelfSvcLogVO" />
+	<typeAlias alias="dictItemPO" type="com.gmcc.boss.selfsvc.resdata.model.DictItemPO" />
+	<!-- add begin m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+	<typeAlias alias="userSatfyVO" type="com.gmcc.boss.selfsvc.common.model.UserSatfyVO" />
+	<!-- add end m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+	
+	<!--modify begin g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	<insert id="insertRecLog" parameterClass="selfSvcLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="oid">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		insert into sh_rec_log
+		(oid,region,termid,recformnum,tourchoid,servnumber,busitype,recfee,discount,operid,orgid,recdate,recstatus,recstatusdesc,brandid, RECTEL)
+		values 
+		(#oid#,#region#,#termid#,#recformnum#,#tourchoid#,#servnumber#,#busitype#,#recfee#,#discount#,#operid#,#orgid#,sysdate,#recstatus#,#recstatusdesc#,#brandID#, #rectel#)
+	</insert>
+	<!--modify end g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	
+	<!--modify begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	<select id="getDictItemByGrp" parameterClass="String" resultClass="dictItemPO">
+		SELECT * FROM SH_DICT_ITEM M WHERE M.GROUPID = #groupid# ORDER BY SORTORDER
+	</select>
+	<!--modify end g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	
+	<!-- add begin m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+	<insert id="insertUSatfy" parameterClass="userSatfyVO">
+	    insert into sh_service_evaluation
+	    (assessor,totalqoe,qoe,channel,createdate)
+	    values
+	    (#userNo#,#userTotScore#,#userSpeciScore#,#userFavorEC#,sysdate)
+	</insert>
+	<!-- add end m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032 -->
+	
+</sqlMap>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="hotAppDownload">
+    <typeAlias alias="appInfoPO" type="com.customize.sd.selfsvc.hotAPPDownload.model.APPInfoPO" />
+    
+    <!-- 获取所有App应用 -->
+    <select id="qryAppInfoList" resultClass="appInfoPO">
+    SELECT M.DICTNAME APPTYPENAME, A.APPID, A.APPNAME, A.APPTYPE, A.SHORTADDRESS, A.APPICON, A.APPTWOCODE, A.SORTORDER
+    FROM SH_APP_INFO A, SH_DICT_ITEM M
+    WHERE A.STATUS = 1 AND A.APPTYPE = M.DICTID AND M.GROUPID = 'appGroup'
+    ORDER BY A.APPTYPE, A.SORTORDER
+    </select>
+    
+    <!-- 获取App描述信息 -->
+    <select id="getAppInfo" resultClass="appInfoPO" parameterClass="java.lang.String">
+    SELECT A.APPID, A.APPNAME, A.APPDESC, A.SHORTADDRESS, A.APPICON, A.APPTWOCODE FROM SH_APP_INFO A WHERE A.APPID = #appId#
+    </select>
+</sqlMap>

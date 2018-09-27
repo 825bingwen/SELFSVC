@@ -1,0 +1,21 @@
+<xml id="invoiceXml" version="1.0" encoding="GBK">
+	<root>
+		<entry index="INVOICE_0" itemname="invoice0">
+			<totalmoney><![CDATA[实收现金@@99.00]]></totalmoney>
+			<paynumno><![CDATA[135176988576]]></paynumno>
+			<agreementleftbal_Z><![CDATA[@]]></agreementleftbal_Z>
+			<printDate><![CDATA[20110609]]></printDate>
+			<telnumber><![CDATA[15864500526]]></telnumber>
+			<invoicefeedx><![CDATA[欢迎选用中国移动通信！]]></invoicefeedx>
+			<leftmoney><![CDATA[可用余额@@30799.29]]></leftmoney>
+			<username><![CDATA[帐7115176988576]]></username>
+			<overdraft><![CDATA[其中信用额度@@0.00]]></overdraft>
+			<printtime><![CDATA[打印发票时间@@16:47:40]]></printtime>
+			<invoicefee><![CDATA[99.00元]]></invoicefee>
+			<agreementleftbal><![CDATA[@]]></agreementleftbal>
+			<invoicefeehj><![CDATA[预存话费@99.00]]></invoicefeehj>
+			<formnum><![CDATA[711110609957987385]]></formnum>
+			<InvoiceNote><![CDATA[费用详情，请登录www.hb.10086.cn查询]]></InvoiceNote>
+		</entry>
+	</root>
+</xml>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="prodInstall" extends="struts-common" namespace="/prodInstall">		
+
+		<!-- 异常页面 -->
+		<action name="installError" class="prodInstallNxAction" method="installError">
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 入网协议 -->
+		<action name="agreement" class="prodInstallNxAction" method="agreement">
+		    <result name="agreement">/jsp/customize/nx/prodInstall/agreement.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 读取身份证 -->
+		<action name="readCert" class="prodInstallNxAction" method="readCert">
+		    <result name="readCert">/jsp/customize/nx/prodInstall/readCert.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 身份证展现 -->
+		<action name="certShow" class="prodInstallNxAction" method="certShow">
+		    <result name="certShow">/jsp/customize/nx/prodInstall/certShow.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 产品选择 -->
+		<action name="selectProd" class="prodInstallNxAction" method="selectProd">
+		    <result name="selectProd">/jsp/customize/nx/prodInstall/selectProd.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 选号规则 -->
+		<action name="selectRule" class="prodInstallNxAction" method="selectRule">
+		    <result name="selectRule">/jsp/customize/nx/prodInstall/selectRule.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 号码前缀后缀输入页面 -->
+		<action name="inputTelnumByRule" class="prodInstallNxAction" method="inputTelnumByRule">
+		    <result name="inputTelnumByRule">/jsp/customize/nx/prodInstall/inputTelnumByRule.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 手机号码查询列表 -->
+		<action name="telnumResult" class="prodInstallNxAction" method="telnumResult">
+		    <result name="telnumResult">/jsp/customize/nx/prodInstall/telnumResult.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 号码资源占选 -->
+		<action name="telnumTmpPick" class="prodInstallNxAction" method="telnumTmpPick"></action>
+		
+		<!-- 校验空白卡资源是否可用 -->
+		<action name="chkBlankNo" class="prodInstallNxAction" method="chkBlankNo"></action>
+		
+		<!-- 空白卡资源暂选 -->
+		<action name="blankCardTmpPick" class="prodInstallNxAction" method="blankCardTmpPick"></action>
+		
+		<!-- 号卡校验 -->
+		<action name="chkTelSimcard" class="prodInstallNxAction" method="chkTelSimcard"></action>
+		
+		<!-- 设置服务密码页面 -->
+		<action name="setPasswd" class="prodInstallNxAction" method="setPasswd">
+		    <result name="setPasswd">/jsp/customize/nx/prodInstall/setPasswd.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 记录写卡日志 -->
+		<action name="makeErrLog" class="prodInstallNxAction" method="makeErrLog">
+			<result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 更新开户日志 -->
+		<action name="updateInstallLogNotes" class="prodInstallNxAction" method="updateInstallLogNotes">
+		</action>
+		
+		<!-- 费用确认页面 -->
+		<action name="feeConfirm" class="prodInstallNxAction" method="feeConfirm">
+		    <result name="feeConfirm">/jsp/customize/nx/prodInstall/feeConfirm.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 选择缴费类型 -->
+		<action name="selectPayType" class="prodInstallNxAction" method="selectPayType">
+		    <result name="selectPayType">/jsp/customize/nx/prodInstall/selectPayType.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 转向投币页面 -->
+		<action name="cashCharge" class="prodInstallNxAction" method="cashCharge">
+		    <result name="cashCharge">/jsp/customize/nx/prodInstall/cashCharge.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 现金缴费开户 -->
+		<action name="installCashCommit" class="prodInstallNxAction" method="installCashCommit">
+		    <result name="printInvoice">/jsp/customize/nx/prodInstall/installCashCommit.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 转向读银行卡页面 -->
+		<action name="toReadCard" class="prodInstallNxAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/nx/prodInstall/toReadCard.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 进入银联卡密码输入页面 -->
+		<action name="inputPwd" class="prodInstallNxAction" method="inputCardPwd">
+		    <result name="inputPwd">/jsp/customize/nx/prodInstall/inputPwd.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 转向确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="prodInstallNxAction" method="toMakeSure">
+		    <result name="toMakeSure">/jsp/customize/nx/prodInstall/toMakeSure.jsp</result>
+		    <result name="makeSure_ylpwd">/jsp/customize/nx/prodInstall/toMakeSure_ylpwd.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费开户 -->
+		<action name="installCardCommit" class="prodInstallNxAction" method="installCardCommit">
+		    <result name="installCardCommit">/jsp/customize/nx/prodInstall/installCashCommit.jsp</result>
+		    <result name="installError">/jsp/customize/nx/prodInstall/installError.jsp</result>
+		</action>
+
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="prodInstallNxAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="prodInstallNxAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 校验现金缴费是否可用 -->
+		<action name="checkTime" class="prodInstallNxAction" method="checkTime">			
+		</action>
+	</package>	
+</struts>

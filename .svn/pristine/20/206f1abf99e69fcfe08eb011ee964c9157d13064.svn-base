@@ -1,0 +1,26 @@
+package com.customize.sd.selfsvc.usim.service;
+
+import java.util.Map;
+
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+
+/**
+ * 提示换USIM卡 service接口
+ * <功能详细描述>
+ * 
+ * @author qWX279398
+ * @version  [版本号, Dec 10, 2010]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public interface CheckUSIMService {
+	
+	/**
+     * USIM卡更换信息
+     * @param termInfo 终端机信息
+     * @param curMenuId 菜单id
+     * @param servnumber 手机号码
+     * @return
+     */
+    public void changeUSIMCard(String curMenuId, String servnumber);
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 无附加属性的业务的办理，如主叫显示、手机上网、移动全时通 -->
+	<bean id="receptionBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ReceptionBean" scope="prototype"></bean>
+	<bean id="privilegeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.privilege.action.PrivilegeAction" scope="prototype">
+		<property name="receptionBean">
+			<ref local="receptionBean" />
+		</property>
+		<property name="privilegeService" ref="privilegeService">
+		</property>
+	</bean>
+	
+	<!--add begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	<bean id="privilegeGroupAction" parent="baseAction" class="com.gmcc.boss.selfsvc.privilege.action.PrivilegeGroupAction" scope="prototype">
+		<property name="receptionBean">
+			<ref local="receptionBean" />
+		</property>
+	</bean>
+	<!--add end g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	
+	<!-- add begin hWX5316476 2015-4-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+	<bean id="privilegeDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.privilege.dao.PrivilegeDaoImpl">
+	</bean>
+	<!-- add end hWX5316476 2015-4-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+
+	<!-- add begin wWX217192 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求 -->
+	<bean id="privilegeServiceImpl" parent="baseService" class="com.gmcc.boss.selfsvc.privilege.service.PrivilegeServiceImpl">
+		<!-- add begin hWX5316476 2015-4-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+		<property name="privilegeDaoImpl" ref="privilegeDaoImpl"></property>
+		<!-- add end hWX5316476 2015-4-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+	</bean>
+	
+	<bean id="privilegeService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="privilegeServiceImpl"/>
+		</property>
+	</bean>
+	<!-- add end wWX217192 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求 -->
+	
+</beans>

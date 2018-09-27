@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="bankhuakou" extends="struts-common" namespace="/bankhuakou">		
+		
+		<action name="qryChargeType" class="bankHuakouAction" method="qryChargeType">
+			<result name="addPage">/jsp/customize/nx/bankHuaKou/bankInfo.jsp</result>
+			<result name="delPage">/jsp/customize/nx/bankHuaKou/bindInfo.jsp</result>			
+		</action>
+		
+		<action name="confirmBankInfo" class="bankHuakouAction" method="confirmBankInfo">
+			<result name="confirmPage">/jsp/customize/nx/bankHuaKou/confirmPage.jsp</result>			
+		</action>
+		
+		<action name="selectHuakouInfo" class="bankHuakouAction" method="selectHuakouInfo">
+			<result name="huakouInfo">/jsp/customize/nx/bankHuaKou/huakouInfo.jsp</result>
+		</action>
+		
+		<action name="addBindInfo" class="bankHuakouAction" method="addBindInfo">
+		</action>
+		
+		<action name="cancelBindInfo" class="bankHuakouAction" method="cancelBindInfo">
+		</action>
+	</package>
+</struts>

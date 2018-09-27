@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="nonlocalCharge" extends="struts-common" namespace="/nonlocalCharge">		
+		<!-- 跨省异地交费 -->
+		<action name="inputNumberPage" class="nonlocalChargeAction" method="inputNumberPage">
+		    <result name="success">/jsp/customize/nx/nonlocalCharge/inputNumberPage.jsp</result>
+		</action>
+		
+		<!-- 查询客户应缴费用 -->
+		<action name="qryPayAmount" class="nonlocalChargeAction" method="qryPayAmount">
+		    <result name="success">/jsp/customize/nx/nonlocalCharge/payAmountInfo.jsp</result>
+		    <result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 现金支付交费页面 -->
+		<action name="cashCharge" class="nonlocalChargeAction" method="cashCharge">
+			<result name="success">/jsp/customize/nx/nonlocalCharge/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 跨省异地现金交费提交 -->
+		<action name="cashChargeCommit" class="nonlocalChargeAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/nx/nonlocalCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/nx/nonlocalCharge/cashErrorPage.jsp</result>
+		    <result name="repeatError">/jsp/customize/nx/nonlocalCharge/repeatFeeCharge.jsp</result>
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="nonlocalChargeAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/nx/nonlocalCharge/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡金额选择页面 -->
+		<action name="cardCharge" class="nonlocalChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/nx/nonlocalCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- 银行卡免责声明页面 -->
+		<action name="dutyInfo" class="nonlocalChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/nx/nonlocalCharge/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 金额输入页面-->
+		<action name="toInputMoney" class="nonlocalChargeAction" method="toInputMoney">
+		    <result name="toInputMoney">/jsp/customize/nx/nonlocalCharge/inputMoney.jsp</result>
+		</action> 
+		
+		<!-- 选择金额页面 -->
+		<action name="selectOtherFee" class="nonlocalChargeAction" method="selectOtherFee">
+			<result name="success">/jsp/customize/nx/nonlocalCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="nonlocalChargeAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/nx/nonlocalCharge/readCard.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="nonlocalChargeAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/nx/nonlocalCharge/makeSure.jsp</result>
+		    <result name="makeSure_ylpwd">/jsp/customize/nx/nonlocalCharge/makeSure_ylpwd.jsp</result>
+		</action>
+		
+		<!-- 银联卡密码输入页面 -->
+		<action name="inputCardPwd" class="nonlocalChargeAction" method="inputCardPwd">
+			<result name="inputPwd">/jsp/customize/nx/nonlocalCharge/cardPassword.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addCardChargeLog" class="nonlocalChargeAction" method="addCardChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志-->
+		<action name="updateCardChargeLog" class="nonlocalChargeAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 银联卡缴费异常处理-->
+		<action name="goCardError" class="nonlocalChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/nx/nonlocalCharge/cardErrorPage.jsp</result>
+		</action> 
+
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="nonlocalChargeAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/nx/nonlocalCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/nx/nonlocalCharge/cardErrorPage.jsp</result>
+		</action>
+	</package>	
+</struts>

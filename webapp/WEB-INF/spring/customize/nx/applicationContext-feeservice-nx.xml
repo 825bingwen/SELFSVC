@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 账户余额查询 -->
+	<bean id="feeBalanceAction" parent="baseAction" class="com.customize.nx.selfsvc.feeservice.action.FeeBalanceAction" scope="prototype">
+	    <property name="feeBalanceBean"><ref bean="feeBalanceBean"/></property>
+	</bean>
+
+	<bean id="feeBalanceBean" parent="baseBeanNX" class="com.customize.nx.selfsvc.bean.FeeBalanceBean" ></bean>
+	
+	<!--月账单查询 -->
+	<bean id="monthBillAction" parent="baseAction" class="com.customize.nx.selfsvc.monthbill.action.MonthBillAction" scope="prototype">
+	   <property name="monthBillBean" ref="monthBillBean"></property>
+	</bean>
+	
+	<bean id="monthBillBean" parent="baseBeanNX" class="com.customize.nx.selfsvc.bean.MonthBillBean"></bean>
+	
+</beans>

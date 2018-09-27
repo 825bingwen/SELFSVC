@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- add begin wWX217192 2015-04-27 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+	<bean id="valueCardAction" parent="baseAction" class="com.gmcc.boss.selfsvc.valueCard.action.ValueCardAction" scope="prototype">
+		<property name="valueCardService" ref="valueCardService"></property>
+		<property name="feeService" ref="feeService"></property>
+	</bean>
+	
+	<bean id="valueCardServiceImpl" parent="baseService" class="com.gmcc.boss.selfsvc.valueCard.service.ValueCardServiceImpl">
+		<property name="valueCardDao" ref="valueCardDao"></property>
+		<property name="selfSvcCallHub" ref="selfSvcCallHub"></property>
+		<property name="feeChargeService" ref="feeChargeService"></property>
+		<property name="feeService" ref="feeService"></property>
+	</bean>
+	
+	<bean id="valueCardService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="valueCardServiceImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="valueCardDao" parent="baseDao" class="com.gmcc.boss.selfsvc.valueCard.dao.ValueCardDaoImpl">
+	</bean>
+	<!-- add end wWX217192 2015-04-27 OR_HUB_201503_1068_HUB_关于配合集团《关于下发__电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造 -->
+	
+	<!-- add begin sWX219697 2015-5-11 OR_HUB_201503_1068_HUB_有价卡充值 -->
+	<bean id="valueCardChargeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.valueCard.action.ValueCardChargeAction" scope="prototype">
+		<property name="valueCardService" ref="valueCardService"></property>
+	</bean>
+	<!-- add end sWX219697 2015-5-11 OR_HUB_201503_1068_HUB_有价卡充值 -->
+	
+</beans>

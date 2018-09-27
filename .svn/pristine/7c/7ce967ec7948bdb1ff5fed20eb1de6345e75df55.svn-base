@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="broadBandPay">
+
+	<typeAlias alias="feeErrorInfo_" type="com.customize.hub.selfsvc.charge.model.CashFeeErrorInfoVO"/>
+	
+	<typeAlias alias="cardChargeLog_" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	
+	<typeAlias alias="wbandVO" type="com.customize.hub.selfsvc.broadBandPay.model.WBandVO"/>
+	
+	<!-- 插入sh_charge_log数据 -->
+	<insert id="insertChargeLog" parameterClass="cardChargeLog_">
+	    insert into sh_charge_log(chargelogoid,region,termid,operid,servnumber,paytype,fee,unionpayuser,unionpaycode,busitype,cardnumber, 
+	                              batchnum,authorizationcode,businessreferencenum,unionpaytime,vouchernum,unionpayfee,terminalseq,recdate, 
+	                              status,description,dealnum,accepttype,SERVREGION,ORGID,POSNUM,BATCHNUMBEFOREKOUKUAN,RECTYPE,BANKNO)
+				           values(#chargeLogOID#,#region#,#termID#,#operID#,#servnumber#,#payType#,#fee#,#unionpayuser#,#unionpaycode#,#busiType#,
+					              #cardnumber#,#batchnum#,#authorizationcode#,#businessreferencenum#,to_date(#unionpaytime#, 'yyyymmddhh24:mi:ss'),
+					              #vouchernum#,#unionpayfee#,#terminalSeq#,to_date(#recdate#, 'yyyymmddhh24:mi:ss'),#status#,#description#,
+					              #dealnum#,#acceptType#,#servRegion#,#orgID#,#posNum#,#batchNumBeforeKoukuan#,#recType#,#bankno#)
+	</insert>
+	
+	<!-- 自助终端-重复缴费控制 -->
+	<insert id="insertFeeErrorLog" parameterClass="feeErrorInfo_">
+        insert into sh_log_feeerror(terminalseq, termid, region, operid, orgid, servnumber, paytype, fee, status, recdate, createdate, description)
+         values (#terminalSeq#, #termid#, #region#, #operID#, #orgID#, #servnumber#, #payType#, #fee#, #status#, to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'), sysdate, #description#)
+	</insert>
+
+	<!-- 更新缴费数据  -->
+	<update id="updateChargeLog" parameterClass="cardChargeLog_">
+		UPDATE SH_CHARGE_LOG
+		   SET STATUS       = #status#,
+		       DESCRIPTION  = #description#,
+		       DEALNUM      = #dealnum#,
+		       UNIONRETCODE = #posResCode#,
+		       BATCHNUM     = BATCHNUMBEFOREKOUKUAN,
+		       UNIONPAYUSER = #unionpayuser#,
+		       UNIONPAYCODE = #unionpaycode#
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- 更新缴费数据 -->
+	<update id="updateCardChargeLog" parameterClass="cardChargeLog_">
+		UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, 
+		   	   UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmddhh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, STATUS = #status#, 
+		   	   DESCRIPTION = #description#, UNIONRETCODE = #posResCode#  
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- 查询宽带产品列表 -->
+	<select id="qryWBankList" resultClass="wbandVO" parameterClass="java.lang.String">
+		select t.mainprodid,t.ncode,t.prodname,t.detaildesc,t.fee/100 fee
+		from SH_WBAND_PRODCFG  t
+		WHERE t.mainprodid =  #mainProdId#
+	</select>
+</sqlMap>

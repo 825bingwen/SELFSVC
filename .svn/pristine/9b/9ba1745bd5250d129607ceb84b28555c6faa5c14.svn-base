@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 预存有礼 -->
+    <package name="prestoredReward" extends="struts-common" namespace="/prestoredReward">
+        <!-- 活动列表 -->
+        <action name="qryActivitiesList" class="prestoredRewardAction" method="qryActivitiesList">
+            <result name="qryActivitiesList">
+                /jsp/customize/sd/prestoredReward/qryActivitiesList.jsp
+            </result>
+            <result name="error">/commonError.jsp</result> 
+        </action>
+        
+        <!-- 查询档次描述，跳转到协议页面 -->
+        <action name="queryActLevelDesc" class="prestoredRewardAction" method="queryActLevelDesc">
+            <result name="queryActLevelDesc">
+                /jsp/customize/sd/prestoredReward/actLevelDesc.jsp
+            </result>
+            <result name="error">/commonError.jsp</result> 
+        </action>
+        <action name="checkTime" class="prestoredRewardAction" method="checkTime">
+        </action>
+        <!-- 选择支付方式页面 -->
+        <action name="selectPayType" class="prestoredRewardAction" method="selectPayType">
+            <result name="selectPayType">
+                /jsp/customize/sd/prestoredReward/selectPayType.jsp
+            </result>
+            <result name="error">/commonError.jsp</result>
+        </action>
+        
+        <!-- 现金交费投钞页面 -->
+        <action name="cashCharge" class="prestoredRewardAction" method="cashCharge">
+            <result name="success">/jsp/customize/sd/prestoredReward/cash/cashChargePage.jsp</result>
+        </action>
+        
+        <!-- 现金交费提交 -->
+        <action name="cashFinish" class="prestoredRewardAction" method="cashFinish">
+            <result name="success">/jsp/customize/sd/prestoredReward/finish.jsp</result>
+            <result name="error">/jsp/customize/sd/prestoredReward/cash/cashErrorPage.jsp</result>
+        </action>
+        
+        <!-- 现金交费异常 -->
+        <action name="cashError" class="prestoredRewardAction" method="cashError">
+            <result name="cashError">/jsp/customize/sd/prestoredReward/cash/cashErrorPage.jsp</result>
+        </action>
+        
+        <!-- 银联卡交费读卡页面 -->
+        <action name="cardCharge" class="prestoredRewardAction" method="cardCharge">
+            <result name="success">/jsp/customize/sd/prestoredReward/card/readCard.jsp</result>
+        </action>
+        
+        <!-- 转到银联卡提交 -->
+        <action name="cardFinish" class="prestoredRewardAction" method="cardFinish">
+            <result name="success">/jsp/customize/sd/prestoredReward/finish.jsp</result>
+            <result name="error">/jsp/customize/sd/prestoredReward/card/cardErrorPage.jsp</result>
+        </action>
+        
+        <!-- 银联卡交费异常 -->
+        <action name="cardError" class="prestoredRewardAction" method="cardError">
+            <result name="success">/jsp/customize/sd/prestoredReward/card/cardErrorPage.jsp</result>
+        </action>
+        
+    </package>
+    
+</struts>

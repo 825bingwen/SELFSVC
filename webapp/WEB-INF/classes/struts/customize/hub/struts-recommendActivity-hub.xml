@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 新营销推荐活动 -->
+	<package name="recommendActivity" extends="struts-common" namespace="/recommendActivity">		
+		
+		<!-- 推荐业务列表展示 -->
+		<action name="qryRecommendActList" class="recommendActivityAction" method="qryRecommendActList">
+		    <result name="qryRecommendActList">/jsp/customize/hub/recommendActivity/recommendActList.jsp</result>
+		    <result name="continueHandle">/jsp/customize/hub/recommendActivity/continueHandle.jsp</result>
+		</action>
+		
+		<!-- 暂不办理，继续办理原业务 -->
+		<action name="continueHandle" class="recommendActivityAction" method="continueHandle">
+		    <result name="continueHandle">/jsp/customize/hub/recommendActivity/continueHandle.jsp</result>
+		</action>
+		
+		<!-- 转向服务密码认证页面 -->
+		<action name="chkServPwdPage" class="recommendActivityAction" method="chkServPwdPage">
+			<result name="chkServPwdPage">/jsp/customize/hub/recommendActivity/chkServPwdPage.jsp</result> 
+		</action>
+		
+		<!-- 转向随机密码认证页面 -->
+		<action name="chkRamdomPwdPage" class="recommendActivityAction" method="chkRamdomPwdPage">
+			<result name="chkRamdomPwdPage">/jsp/customize/hub/recommendActivity/chkRamdomPwdPage.jsp</result>
+		</action>
+	</package>	
+</struts>

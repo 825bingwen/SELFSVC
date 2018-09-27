@@ -1,0 +1,13 @@
+call ant -buildfile build.xml
+IF ERRORLEVEL 1 GOTO CMDERROR
+GOTO SUCCESS
+:CMDERROR
+echo WAR±‡“Î¥ÌŒÛ
+EXIT /B 1
+GOTO ALLEND
+
+:SUCCESS
+echo WAR±‡“Î≥…π¶
+EXIT /B 0
+GOTO ALLEND
+:ALLEND

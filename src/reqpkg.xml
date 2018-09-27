@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="GBK" ?>
+<Envelope>
+	<Header>
+		<request_head>
+			<menuid/>
+			<process_code/>
+			<verify_code/>
+			<req_time/>
+			<req_seq/>
+			<unicontact/>
+			<testflag/>
+			<route>
+				<route_type/>
+				<route_value/>
+			</route>
+			<channelinfo>
+				<operatorid/>
+				<channelid/>
+				<unitid/>
+			</channelinfo>
+		</request_head>
+	</Header>
+	<Body>
+  </Body>
+</Envelope>

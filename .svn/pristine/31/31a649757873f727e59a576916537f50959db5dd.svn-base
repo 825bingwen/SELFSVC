@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+	<constant name="struts.objectFactory" value="spring"/>
+	<constant name="struts.messages.upload.error.InvalidContentTypeException" value="exception"></constant>
+	<include file="struts-default.xml"></include>
+	<include file="struts/struts-common.xml"></include>
+	<include file="struts/struts-privilege.xml"></include>
+	<include file="struts/struts-feeservice.xml"></include>
+	<include file="struts/struts-login.xml"></include>
+	<include file="struts/struts-media.xml"></include>
+	<include file="struts/struts-charge.xml"></include>
+	<include file="struts/struts-serviceInfo.xml"></include>
+	<include file="struts/struts-baseService.xml"></include>
+	<include file="struts/struts-reception.xml"></include>
+	<include file="struts/struts-managerOperation.xml"></include>
+	<include file="struts/struts-mpaycharge.xml"></include>
+	<include file="struts/customize/nx/struts-feeservice-nx.xml"></include>
+	<include file="struts/customize/nx/struts-charge-nx.xml"></include>
+	<include file="struts/customize/nx/struts-chooseTel-nx.xml"></include>
+	<include file="struts/customize/nx/struts-qryPackageInfo-nx.xml"></include>
+	<include file="struts/customize/nx/struts-cdrquery-nx.xml"></include>
+	<!--modify begin g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	<include file="struts/customize/nx/struts-rectelInfo-nx.xml"></include>
+	<!--modify end g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	<!--modify begin g00140516 2012/07/06 R003C12L07n01 OR_NX_201205_649 -->
+	<include file="struts/customize/nx/struts-sprec-nx.xml"></include>
+	<!--modify end g00140516 2012/07/06 R003C12L07n01 OR_NX_201205_649 -->
+	<!--modify begin g00140516 2012/09/05 R003C12L07n01 OR_NX_201206_794 -->
+	<include file="struts/customize/nx/struts-bankHuakou-nx.xml"></include>
+	<!--modify begin g00140516 2012/09/05 R003C12L07n01 OR_NX_201206_794 -->
+	<include file="struts/customize/nx/struts-prodChange-nx.xml"></include>
+	<!-- add begin zWX176560 2013/8/21 OR_NX_201308_595--> 
+	<include file="struts/customize/nx/struts-qryUserScoreInfoByType-nx.xml"></include>
+	<!-- add begin zWX176560 2013/8/21 OR_NX_201308_595-->
+	
+	<include file="struts/customize/nx/struts-prodInstall-nx.xml"></include>
+	<include file="struts/customize/nx/struts-invoice-nx.xml"></include>
+	<!-- add begin hWX53164376 2015-3-23 OR_NX_201501_1030 -->
+	<include file="struts/customize/nx/struts-nonlocalCharge-nx.xml"></include>
+	<!-- add end hWX53164376 2015-3-23 OR_NX_201501_1030  -->
+</struts>

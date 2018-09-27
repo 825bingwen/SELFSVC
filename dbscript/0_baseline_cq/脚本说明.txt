@@ -1,0 +1,17 @@
+svn\AS_BOSS_DOC_SVN\资源线文档\06.开发部\09.接口渠道组\电子渠道组文档库\自助终端\DDL基线脚本
+
+目录的脚本中,少了以下三个脚本,请帮忙确认下
+107_SS_DML_NGSH_initdata_20110722.sql
+--这是DML，所以肯定不会放在DDL基线脚本目录下，在DML基线脚本下。
+203_SS_DDL_NGSH_createTable_20110722.sql
+--这个脚本是给开发人员用的，与《NG自助终端同义词_NGSH_DDL.sql 》矛盾，所以在此目录下把这个脚本给删了。
+--这个脚本用于创建SH_INFO_REGIONLIST、SH_INFO_OPERATOR、SH_ORGANIZATION、SH_ORGANIZATION_CHILD这四张表
+--而在现场搭建环境时，SH_INFO_REGIONLIST、SH_INFO_OPERATOR、SH_ORGANIZATION、SH_ORGANIZATION_CHILD这四张
+--表通过《NG自助终端同义词_NGSH_DDL.sql 》创建同义词。所以，这个脚本无用。
+207_SS_DML_NGSH_initdata_20110722.sql
+--这个是初始化SH_INFO_REGIONLIST、SH_INFO_OPERATOR、SH_ORGANIZATION、SH_ORGANIZATION_CHILD这四张表的
+--DML脚本。因为现场直接创建的同义词，所以这个脚本也没用了
+
+同时
+106_SS_DDL_NGSH_createProcedure.sql文件中多了PROC_SH_UPDATEALARMINFO2过程
+--这个是后来增加的，应该有。

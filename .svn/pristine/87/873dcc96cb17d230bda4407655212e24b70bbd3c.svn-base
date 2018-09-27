@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 发票打印Action -->
+	<bean id="invoicePrintAction" parent="baseAction" class="com.customize.hub.selfsvc.invoice.action.InvoicePrintHubAction" scope="prototype">
+	    <property name="invoicePrintService" ref="invoicePrintService"></property>
+	    <property name="invoicePrintBean" ref="invoicePrintBean"></property>
+	</bean>
+	<!-- 发票打印service -->
+	<bean id="invoicePrintService" parent="baseTransactionProxy">
+	    <property name="target" ref="invoicePrintServiceImpl"></property>
+	</bean>
+	
+	<!-- 发票打印serviceImpl -->
+	<bean id="invoicePrintServiceImpl" class="com.customize.hub.selfsvc.invoice.service.InvoicePrintHubServiceImpl">
+	    <property name="invoicePrintDaoImpl" ref="invoicePrintDaoImpl"></property>
+	</bean>
+	
+	<!-- 发票打印DaoImpl -->
+	<bean id="invoicePrintDaoImpl" parent="baseDao" class="com.customize.hub.selfsvc.invoice.dao.InvoicePrintDaoHubImpl"></bean>
+	
+	<!-- 发票打印Bean -->
+	<bean id="invoicePrintBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.InvoicePrintBean"></bean>
+
+    <!-- 月结发票 -->
+    <!-- 发票打印Action -->
+    <bean id="monInvoPrintAction" parent="baseAction" class="com.customize.hub.selfsvc.invoice.action.MonInvoicePrintHubAction">
+        <property name="monInvoPrintBean" ref="monInvoPrintBean"></property>
+    </bean>
+    
+    <!-- 发票打印Bean -->
+    <bean id="monInvoPrintBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.InvoicePrintBean"></bean>
+    
+</beans>

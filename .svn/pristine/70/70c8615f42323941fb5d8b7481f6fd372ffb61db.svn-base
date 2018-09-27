@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ResData">
+	<typeAlias alias="resDataPO" type="com.gmcc.boss.selfsvc.resdata.model.ResDataPO" />
+	<typeAlias alias="menuInfoPO" type="com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO" />
+	<typeAlias alias="regionInfoPO" type="com.gmcc.boss.selfsvc.resdata.model.RegionInfoPO" />
+	<typeAlias alias="dictItemPO" type="com.gmcc.boss.selfsvc.resdata.model.DictItemPO" />
+	
+	<resultMap class="menuInfoPO" id="menuInfoPOMap">
+	
+		<result column="TERMGRPID"      property="termgrpid" />                                                
+		<result column="MENUID"      property="menuid" />                                              
+		<result column="MENUNAME"    property="menuname" />
+		<result column="MENULEVEL"   property="menulevel" />                                          
+		<result column="PARENTID"    property="parentid" />                                            
+		<result column="GUIOBJ"      property="guiobj" />                                             
+		<result column="TIPTEXT"     property="tiptext" />
+		<result column="BUSIDETAIL"  property="busidetail" />                                            
+		<result column="SORTORDER"   property="sortorder" />                                           
+		<result column="IMGPATH"     property="imgpath" />
+		<result column="REGION"      property="region" />                                             
+		<result column="BRANDID"     property="brandID" />                                           
+		<result column="AUTHCODE"    property="authcode" />
+		<result column="CREATEDATE"  property="createdate" jdbcType="DATE" javaType="java.util.Date"/> 
+		<result column="STATUS"      property="status" />                                          
+		<result column="STATUSDATE"  property="statusdate" jdbcType="DATE" javaType="java.util.Date"/>
+		<result column="POSITION"    property="position" />
+		<result column="IMGPATH2"    property="imgpath2" />
+		<result column="ISCALL"    property="iscall" />
+		<!--add begin g00140516 2011/10/25 R003C11L10n01 功能增加温馨提示字段 -->
+		<result column="ADDITIONALINFO" property="additionalInfo" />
+		<!--add end g00140516 2011/10/25 R003C11L10n01 功能增加温馨提示字段 -->
+		<!--add begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+		<result column="EFFECTTYPE" property="effectType" />
+		<!--add end g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+		<!-- add begin m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+		<result column="AVAILABLEAUTHCODE" property="availableAuthCode" />
+		<!-- add end m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+		
+		<!-- add begin sWX219697 2014-9-15 15:01:35  OR_SD_201409_556_自助终端营销功能优化-->
+		<result column="ISSSCODE" property="iSSSCode"/>
+		<!-- add end sWX219697 2014-9-15 15:01:35  OR_SD_201409_556_自助终端营销功能优化-->
+		
+	</resultMap>
+	<select id="getAllResDataList" resultClass="resDataPO">
+		SELECT '' AS RESTYPE, B.PARAMID AS RESKEY, B.PARAMVALUE AS RESVAL
+		  FROM SH_PARAM A, SH_PARAM_VALUE B
+		 WHERE A.PARAMID = B.PARAMID AND A.STATUS = 1 AND B.STATUS = 1
+         ORDER BY A.PARAMID
+	</select>
+	<!--modify begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	<!-- modify begin m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+	<!-- modify begin sWX219697 2014-9-15 10:43:16 OR_SD_201409_556_自助终端营销功能优化 添加PRODID -->
+	<select id="getAllMenuInfo" resultMap="menuInfoPOMap">
+	  select * from 
+	  (
+	  SELECT A.TERMGRPID,B.MENUID, B.MENUNAME, B.PARENTID, B.GUIOBJ, B.TIPTEXT, 
+		     B.SORTORDER, B.CREATEDATE, B.STATUS, B.STATUSDATE, B.IMGPATH, B.REGION, B.BRANDID, 
+		     B.AUTHCODE, B.MENULEVEL, B.BUSIDETAIL, B.POSITION, B.IMGPATH2, B.ADDITIONALINFO ,
+		     B.ISCALL, B.EFFECTTYPE, B.AVAILABLEAUTHCODE, B.ISSSCODE
+			    FROM SH_GROUP_MENU A,SH_MENU_ITEM B,SH_GROUP_INFO C
+			   WHERE A.TERMGRPID = C.TERMGROUPID
+		     AND A.MENUID = B.MENUID
+		     AND A.STATUS = 1
+		     AND B.STATUS = 1
+		     AND C.STATUS = 1
+	   ORDER BY A.TERMGRPID,B.MENULEVEL, B.SORTORDER
+	   ) a
+	   union all 
+	   select '10000000000000' TERMGRPID,spcode || '-' || operatorcode menuid, operatorname menuname,'sp' parentid,linkurl guiobj,'' tiptext,1 sortorder,
+       sysdate createdate, 1 status, sysdate statusdate, imgpath, 999 region, 'ALL' brandid, authcode, 2 menulevel, '' busidetail,
+       '' position, imgpath imgpath2, '' additionalinfo , 0 iscall, '' EFFECTTYPE, AVAILABLEAUTHCODE, '' ISSSCODE
+       from sh_pc_dsmp_spbizinfo 
+       where menutype = 'hot'
+	</select>
+	<!-- modify end sWX219697 2014-9-15 10:43:16 OR_SD_201409_556_自助终端营销功能优化 添加PRODID -->
+	<!-- modify end m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+	<!--modify end  g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+	
+	<select id="getAllRegionInfo" resultClass="regionInfoPO">		
+		SELECT REGION, REGIONNAME, ORGID, CITY_ID
+		  FROM SH_INFO_REGIONLIST
+	     ORDER BY CITY_ID
+	</select>
+	<select id="getDictItems" resultClass="dictItemPO">
+	SELECT DICTID, DICTNAME, GROUPID, SORTORDER, DESCRIPTION
+      FROM SH_DICT_ITEM
+     WHERE STATUS = 1
+     ORDER BY GROUPID, SORTORDER
+	</select>
+	
+	<!--add begin g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	<select id="getRectelInfo" resultClass="hashmap">
+		SELECT TERMID, TELNUMBER
+  	      FROM SH_INFO_RECTEL
+	</select>
+	<!--add end g00140516 2012/07/03 R003C12L07n01 OR_NX_201206_310 -->
+	
+	<!-- Add begin wWX217192 2014-10-10 V200R003C10LG1001 OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求 -->
+	<!-- 按品牌搜索相应的业务 -->
+	<select id="qryMinChildNode" resultClass="menuInfoPO" parameterClass="menuInfoPO">
+		SELECT M.MENUID,M.MENUNAME,M.PARENTID,M.GUIOBJ,M.TIPTEXT,M.SORTORDER,M.CREATEDATE,M.STATUS,M.STATUSDATE,
+			M.IMGPATH,M.REGION,M.BRANDID,M.AUTHCODE,M.MENULEVEL,M.BUSIDETAIL,M.POSITION,M.IMGPATH2,M.ADDITIONALINFO,
+  			M.MENUTYPE 
+  		 FROM SH_GROUP_MENU G,(SELECT T.MENUID,T.MENUNAME,T.PARENTID,T.GUIOBJ,T.TIPTEXT,T.SORTORDER,T.CREATEDATE,
+ 			T.STATUS,T.STATUSDATE,T.IMGPATH,T.REGION,T.BRANDID,T.AUTHCODE,T.MENULEVEL,T.BUSIDETAIL,T.POSITION,
+ 			T.IMGPATH2,T.ADDITIONALINFO,T.MENUTYPE,T.MENUFLAG 
+ 		 FROM SH_MENU_ITEM T WHERE T.MENUFLAG IS NULL OR T.MENUFLAG = '1' START WITH T.MENUID='rec' CONNECT BY T.PARENTID= PRIOR T.MENUID) M 
+ 		 WHERE M.MENUID=G.MENUID 
+ 		 AND G.STATUS =1
+		 AND M.STATUS = 1
+ 		<isNotNull prepend="AND" property="brandID"> 
+				(M.BRANDID = 'ALL' OR M.BRANDID=#brandID#) 
+		</isNotNull>
+		<isNotNull prepend="AND" property="termgrpid"> 
+				G.TERMGRPID=#termgrpid#
+		</isNotNull>
+ 		AND NOT EXISTS (SELECT 1 FROM SH_MENU_ITEM I WHERE (I.MENUFLAG IS NULL OR I.MENUFLAG = '1') AND I.PARENTID = 'rec' AND I.PARENTID=M.MENUID)
+	</select>
+	
+	<!-- 按分类搜索相应的业务 -->
+	<select id="qryGroupsChildNode" resultClass="menuInfoPO" parameterClass="menuInfoPO">	
+		SELECT M.MENUID,M.MENUNAME,M.PARENTID,M.GUIOBJ,M.TIPTEXT,M.SORTORDER,M.CREATEDATE,M.STATUS,M.STATUSDATE,
+		      M.IMGPATH,M.REGION,M.BRANDID,M.AUTHCODE,M.MENULEVEL,M.BUSIDETAIL,M.POSITION,M.IMGPATH2,M.ADDITIONALINFO,
+		  			M.MENUTYPE, M.TYPE
+		FROM SH_GROUP_MENU A, (SELECT T.MENUID,T.MENUNAME,T.PARENTID,T.GUIOBJ,T.TIPTEXT,T.SORTORDER,T.CREATEDATE,
+		       T.STATUS,T.STATUSDATE,T.IMGPATH,T.REGION,T.BRANDID,T.AUTHCODE,T.MENULEVEL,T.BUSIDETAIL,T.POSITION,
+		       T.IMGPATH2,T.ADDITIONALINFO,T.MENUTYPE,T.MENUFLAG, T.TYPE
+		 		   FROM SH_MENU_ITEM T WHERE T.MENUFLAG IS NULL OR T.MENUFLAG = '1'
+		 		   START WITH T.MENUID='rec' CONNECT BY T.PARENTID= PRIOR T.MENUID) M 
+		WHERE A.MENUID = M.MENUID
+		AND A.STATUS =1
+		AND M.STATUS = 1
+		<isNotNull prepend="AND" property="type">
+			(M.TYPE = #type# OR M.TYPE IS NULL OR M.TYPE = '')
+		</isNotNull>
+		<isNotNull prepend="AND" property="termgrpid"> 
+			A.TERMGRPID = #termgrpid#
+		</isNotNull>
+		AND NOT EXISTS (SELECT 1 FROM SH_MENU_ITEM I WHERE (I.MENUFLAG IS NULL OR I.MENUFLAG = '1') AND I.PARENTID=M.MENUID)
+	</select>
+	<!-- Add end wWX217192 2014-10-10 V200R003C10LG1001 OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求 -->
+	
+</sqlMap>

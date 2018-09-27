@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 绑定银行卡Action -->
+	<bean id="bindBankCardAction" parent="baseAction" class="com.customize.sd.selfsvc.serviceinfo.action.BindBankCardAction" scope="prototype">
+	    <property name="bindBankCardBean" ref="bindBankCardBean"></property>
+	    <property name="userLoginBean" ref="userLoginBean"></property>
+	    <property name="bindBankCardService" ref="bindBankCardService"></property>
+	</bean>
+	
+	<!-- 绑定银行卡Bean -->
+	<bean id="bindBankCardBean" parent="baseBeanSD" class="com.customize.sd.selfsvc.bean.BindBankCardBean">
+	</bean>
+
+	<!-- add begin sWX19697 2014-10-7 11:50:05 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 -->
+	<!-- 银行信息展示service -->
+	<bean id="bindBankCardService" parent="baseTransactionProxy">
+	    <property name="target" ref="bindBankCardServiceImpl"></property>
+	</bean>
+	
+	<!-- 银行信息展示serviceImpl -->
+	<bean id="bindBankCardServiceImpl" class="com.customize.sd.selfsvc.serviceinfo.service.BindBankCardServiceImpl">
+	    <property name="bindBankCardDaoImpl" ref="bindBankCardDaoImpl"></property>
+	</bean>
+	
+	<!-- 银行信息展示DaoImpl -->
+	<bean id="bindBankCardDaoImpl" parent="baseDao" class="com.customize.sd.selfsvc.serviceinfo.dao.BindBankCardDaoImpl">
+	</bean>
+	<!-- add end sWX19697 2014-10-7 11:50:11 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求 -->
+	
+</beans>

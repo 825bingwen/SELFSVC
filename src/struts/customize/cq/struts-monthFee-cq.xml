@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 山东月账单查询 -->
+	<package name="monthFee" extends="struts-common" namespace="/monthFee">
+	    
+		<!-- 当前月账单查询 -->
+		<action name="currMonthFee" class="monthFeeAction" method="qryCurrentMonthBill">
+			<result name="qryCurrentMonthBill">/jsp/customize/cq/monthfee/currMonthBill.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- 月账单查询 -->
+		<action name="monthFee" class="monthFeeAction" method="qryMonthBill">
+			<result name="qryMonthBill">/jsp/customize/cq/monthfee/monthBill.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 账单寄送 -->
+		<action name="sendmail" class="monthFeeAction" method="sendmail"></action>
+		
+		<!-- 开通139手机邮箱 -->
+		<action name="provideMailService" class="monthFeeAction" method="provideMailService"></action>
+		
+		<!-- 消费分析图 -->
+		<action name="billPieChart" class="monthFeeAction" method="billPieChart"></action>
+	</package>
+</struts>

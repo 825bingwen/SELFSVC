@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="busiAcceptTime">
+	<typeAlias alias="busiAcceptTimePO" type="com.gmcc.boss.selfsvc.busiAcceptTime.model.BusiAcceptTimePO" />
+	<insert id="insertBusiAcceptTime" parameterClass="busiAcceptTimePO">
+	INSERT INTO SH_TERM_ACCEPTTIME(ID,OPERID,TERMID,BUSINESSID,ROUTETYPE,SERVNUM,REGION,STARTTIME,ENDTIME,ACCEPTTIME,STATUS)
+	VALUES
+	(seq_sh_recoid.Nextval,#operId#,#termId#,#businessId#,#routeType#,#servnum#,#region#,to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss'),to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss'),#acceptTime#,#status#)
+	</insert> 
+</sqlMap>

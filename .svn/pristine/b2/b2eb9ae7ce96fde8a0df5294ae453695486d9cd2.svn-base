@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="quickpublish">
+<typeAlias alias="prodConfigPO" type="com.gmcc.boss.selfsvc.quickpublish.model.ProdConfigPO"/>
+<typeAlias alias="prodTypePO" type="com.gmcc.boss.selfsvc.quickpublish.model.ProdTypePO"/>
+
+
+<!-- 获取产品列表 -->
+<select id="getProdList" parameterClass="prodConfigPO" resultClass="prodConfigPO">
+SELECT NCODE,
+       AREACODE,
+       BRAND,
+       CHANNEL,
+       MAINPROD,
+       OPERTYPE,
+       PRODTYPE,
+       VERSION,
+       HAVEAPDATTR,
+       STARTDATE,
+       ENDDATE,
+       STATUS,
+       DEALDESC,
+       FEEDESC,
+       DESCRIPTION,
+       ISREC,
+       REMINDER,
+       STATUSDATE,
+       IMGPATH,
+       PRODNAME,
+       EFFECTTYPE,
+       TYPEID
+  FROM SH_PROD_CONFIG  
+ WHERE STATUS = 1  AND STARTDATE &lt;= sysdate AND ENDDATE &gt;= sysdate
+    
+	<dynamic>
+		<isNotEmpty prepend="AND" property="isRec">
+			ISREC = 1
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="brand">
+			BRAND IN (#brand#, 'ALL')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="areaCode">
+			(AREACODE = to_number(#areaCode#) or AREACODE = 999)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="mainProd">
+			MAINPROD IN (#mainProd#, 'ALL')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="ncode">
+			NCODE = #ncode#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="typeID">
+			TYPEID = #typeID#
+		</isNotEmpty>
+		
+	</dynamic>
+</select>
+
+<select id="getProdTypeList"  resultClass="prodTypePO">
+	SELECT TYPEID, TYPENAME ,TYPEDESC FROM SH_PROD_TYPE
+</select>
+</sqlMap>

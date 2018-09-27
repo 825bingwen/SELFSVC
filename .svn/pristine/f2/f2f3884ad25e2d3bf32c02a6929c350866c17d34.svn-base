@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="broadBandPay" extends="struts-common" namespace="/broadBandPay">
+	
+		<!-- 宽带(现金)交费 -->
+		
+		<!-- 宽带交费_输入手机号码 -->
+		<action name="broadBandPay" class="broadBandPayAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/customize/hub/broadBandPay/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 宽带交费_输入手机号码 -->
+		<action name="qryWBankList" class="broadBandPayAction" method="qryWBankList">
+			<result name="success">/jsp/customize/hub/broadBandPay/wbankList.jsp</result>
+			<result name="failed">/jsp/customize/hub/broadBandPay/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 宽带交费_支付方式） -->
+		<action name="qryPayType" class="broadBandPayAction" method="qryPayType">
+		    <result name="success">/jsp/customize/hub/broadBandPay/accountInfo.jsp</result>
+		    <result name="failed">/commonError.jsp</result>
+		    <result name="inputNumber">/jsp/customize/hub/broadBandPay/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 充值投币 -->
+		<action name="cashbroadBand" class="broadBandPayAction" method="cashbroadBand">
+		    <result name="cashChargePage">/jsp/customize/hub/broadBandPay/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币提交 -->
+		<action name="cashChargeCommit" class="broadBandPayAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/hub/broadBandPay/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/broadBandPay/cash/cashErrorPage.jsp</result>
+		    <result name="repeatError">/jsp/customize/hub/broadBandPay/repeatFeeCharge.jsp</result>
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="broadBandPayAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/hub/broadBandPay/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		
+		<!-- 宽带(现金)交费 -->
+		
+		<!-- 话费充值银行卡免责声明页面 -->
+		<action name="cardbroadBand" class="broadBandPayAction" method="cardbroadBand">
+		    <result name="dutyInfo">/jsp/customize/hub/broadBandPay/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="broadBandPayAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/hub/broadBandPay/card/readCard.jsp</result>
+		</action>	
+		
+		<!-- 银联卡密码输入页面 -->
+		<action name="inputCardPwd" class="broadBandPayAction" method="inputCardPwd">
+			<result name="inputPwd">/jsp/customize/hub/broadBandPay/card/cardPassword.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="broadBandPayAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/hub/broadBandPay/card/makeSure.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="broadBandPayAction" method="addChargeLog"></action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="broadBandPayAction" method="updateCardChargeLog"></action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="broadBandPayAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/hub/broadBandPay/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/broadBandPay/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="broadBandPayAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/hub/broadBandPay/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 取消银行卡缴费 -->
+		<action name="cancelCardCharge" class="broadBandPayAction" method="cancelCardCharge">
+		    <result name="cancelCardCharge">/jsp/customize/hub/broadBandPay/prompt.jsp</result>
+		</action>	
+		
+	</package>	
+</struts>

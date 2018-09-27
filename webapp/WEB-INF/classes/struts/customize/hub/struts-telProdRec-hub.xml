@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="telProdDiy" extends="struts-common" namespace="/telProdDiy">		
+		<!-- 自选套餐查询 -->
+		<action name="qryTelProdList" class="telProdDiyAction" method="qryTelProdList">
+		    <result name="qryTelProdList">/jsp/customize/hub/telProdDiy/telProdList.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<!-- 自选套餐办理 -->
+		<action name="recSubmit" class="telProdDiyAction" method="recSubmit">
+			<result name="error">/commonError.jsp</result>
+			<result name="success">/jsp/customize/hub/telProdDiy/recSuccess.jsp</result>	
+		</action>	
+		
+	</package>	
+</struts>

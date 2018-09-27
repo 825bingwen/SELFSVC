@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="hubfeeservice" extends="struts-common" namespace="/hubfeeservice">		
+				
+		<!-- 湖北账户余额查询 -->
+		<action name="qryAccBalance" class="feeBalanceAction" method="qryAccBalance">
+		    <result name="qryBalance">/jsp/customize/hub/feeservice/feeBalance/qrybalance.jsp</result>    
+		</action>
+		
+		<!-- 湖北的账单分析 -->
+		<action name="billAnalysis" class="billAnalysisAction" method="qryCurMonthBillAy">
+		    <result name="qryCurMonthBillAy">/jsp/customize/hub/feeservice/billAnalysis/curMonthBillAy.jsp</result>    
+		</action>
+		<action name="monthBillAy" class="billAnalysisAction" method="qryMonthBillAy">
+			<result name="qryMonthBill">/jsp/customize/hub/feeservice/billAnalysis/monthBillAy.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 湖北的资费推荐 -->
+		<action name="qryChargeGuide" class="chargeGuideAction" method="qryChargeGuide">
+			<result name="success">/jsp/customize/hub/feeservice/chargeGuide/qryChargeGuide.jsp</result>
+			<result name="chargeGuide">/jsp/customize/hub/feeservice/chargeGuide/chargeGuide.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 湖北欠费历史查询 -->
+		<action name="qryArrearHub" class="qryArrearAction" method="qryArrear">
+			<result name="success">/jsp/customize/hub/selfqry/arrear/qryarrear.jsp</result>
+		</action>
+		
+		<!-- 新版账单查询 add by xkf57421 begin -->
+		<!-- 月账单查询 -->
+		<action name="monthBill" class="monthBillAction" method="selectBillMonth">
+		    <result name="selectBillMonth">/jsp/customize/hub/monthBill/selectBillMonth.jsp</result>
+		</action>
+		<action name="queryMonthBill" class="monthBillAction" method="queryMonthBill">
+		    <result name="monthBillDetail">/jsp/customize/hub/monthBill/monthBillDetail.jsp</result>
+		    <result name="curMonBillDetail">/jsp/customize/hub/feeservice/billQueryNew/curMonBillDetail.jsp</result>
+		    <result name="hisMonBillDetail">/jsp/customize/hub/feeservice/billQueryNew/hisMonBillDetail.jsp</result>
+		</action>
+		
+		<!-- 当前月 begin-->
+		<action name="toCurBillDetail" class="billQueryHubAction" method="toCurBillDetail">
+			<result name="curBillDetail">/jsp/customize/hub/feeservice/billQueryNew/curMonthBill/curBillDetail.jsp</result>
+		</action>
+		<action name="curBillDetail" class="billQueryHubAction" method="curBillDetail">
+		</action>
+		
+		<action name="toCurBillSelfSv" class="billQueryHubAction" method="toCurBillSelfSv">
+			<result name="curBillSelfSv">/jsp/customize/hub/feeservice/billQueryNew/curMonthBill/curBillSelfSv.jsp</result>
+		</action>
+		<action name="curBillSelfSv" class="billQueryHubAction" method="curBillSelfSv">
+		</action>
+		
+		<action name="toCurBillAgentSv" class="billQueryHubAction" method="toCurBillAgentSv">
+			<result name="curBillAgentSv">/jsp/customize/hub/feeservice/billQueryNew/curMonthBill/curBillAgentSv.jsp</result>
+		</action>
+		<action name="curBillAgentSv" class="billQueryHubAction" method="curBillAgentSv">
+		</action>
+		
+		<action name="toCurBillCommDetail" class="billQueryHubAction" method="toCurBillCommDetail">
+			<result name="curBillCommDetail">/jsp/customize/hub/feeservice/billQueryNew/curMonthBill/curBillCommDetail.jsp</result>
+		</action>
+		<action name="curBillCommDetail" class="billQueryHubAction" method="curBillCommDetail">
+		</action>
+		
+		<action name="curBillBalance" class="billQueryHubAction" method="curBillBalance">
+		</action>
+		
+		<!-- 当前月 end-->
+		
+		<!-- 割接后历史账单 begin -->
+		<action name="hisBillBalance" class="hisBillQryHubAction" method="hisBillBalance">
+		</action>
+		
+		<action name="toHisBillDetail" class="hisBillQryHubAction" method="toHisBillDetail">
+			<result name="hisBillDetail">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillDetail.jsp</result>
+		</action>
+		<action name="hisBillDetail" class="hisBillQryHubAction" method="hisBillDetail">
+		</action>
+		<action name="toHisBillTrendImg" class="hisBillQryHubAction" method="toHisBillTrendImg">
+			<result name="hisBillTrendImg">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillTrendImg.jsp</result>
+		</action>
+		<action name="hisBillTrendImg" class="hisBillQryHubAction" method="hisBillTrendImg">
+		</action>
+		<action name="printTrendImg" class="billBarImgAction" method="printTrendImg">
+		</action>
+		
+		<action name="toHisBillStructImg" class="hisBillQryHubAction" method="toHisBillStructImg">
+			<result name="hisBillStructImg">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillStructImg.jsp</result>
+		</action>
+		<action name="hisBillStructImg" class="hisBillQryHubAction" method="hisBillStructImg">
+		</action>
+		<action name="printStructImg" class="billPieImgAction" method="printStructImg">
+		</action>
+		
+		<action name="toHisBillValuate" class="hisBillQryHubAction" method="toHisBillValuate">
+			<result name="hisBillValuate">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillValuate.jsp</result>
+		</action>
+		<action name="hisBillValuate" class="hisBillQryHubAction" method="hisBillValuate">
+		</action>
+		
+		<action name="toHisBillAccInfo" class="hisBillQryHubAction" method="toHisBillAccInfo">
+			<result name="hisBillAccInfo">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillAccInfo.jsp</result>
+		</action>
+		<action name="hisBillAccInfo" class="hisBillQryHubAction" method="hisBillAccInfo">
+		</action>
+		
+		<action name="toHisBillMvalue" class="hisBillQryHubAction" method="toHisBillMvalue">
+			<result name="hisBillMvalue">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillMvalue.jsp</result>
+		</action>
+		<action name="hisBillMvalue" class="hisBillQryHubAction" method="hisBillMvalue">
+		</action>
+		
+		<action name="toHisBillSelfSv" class="hisBillQryHubAction" method="toHisBillSelfSv">
+			<result name="hisBillSelfSv">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillSelfSv.jsp</result>
+		</action>
+		<action name="hisBillSelfSv" class="hisBillQryHubAction" method="hisBillSelfSv">
+		</action>
+		
+		<action name="toHisBillAgentSv" class="hisBillQryHubAction" method="toHisBillAgentSv">
+			<result name="hisBillAgentSv">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillAgentSv.jsp</result>
+		</action>
+		<action name="hisBillAgentSv" class="hisBillQryHubAction" method="hisBillAgentSv">
+		</action>
+		
+		<action name="toHisBillCommDetail" class="hisBillQryHubAction" method="toHisBillCommDetail">
+			<result name="hisBillCommDetail">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillCommDetail.jsp</result>
+		</action>
+		<action name="hisBillCommDetail" class="hisBillQryHubAction" method="hisBillCommDetail">
+		</action>
+		
+		<action name="toHisBillAccDetail" class="hisBillQryHubAction" method="toHisBillAccDetail">
+			<result name="hisBillAccDetail">/jsp/customize/hub/feeservice/billQueryNew/hisMonthBill/hisBillAccDetail.jsp</result>
+		</action>
+		<action name="hisBillAccDetail" class="hisBillQryHubAction" method="hisBillAccDetail">
+		</action>
+		
+		<!-- 割接后历史账单 end -->
+		
+		<!-- 新版账单查询 add by xkf57421 end -->
+		<!-- 资助终端账单协同查询 -->
+	   	<action name="billColQuery139Email" class="monthBillAction" method="billColQuery139Email">
+		</action>
+			<action name="billColQueryMessage" class="monthBillAction" method="billColQueryMessage">
+		</action>
+			<action name="billColQueryColorMessage" class="monthBillAction" method="billColQueryColorMessage">
+		</action>
+		<!-- 资助终端账单协同查询 -->
+		
+		<action name="showBalanceDetail" class="balanceDetailAction" method="showBalanceDetail">
+			<result name="success">/jsp/customize/hub/balanceQuery/showBalanceDetail.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+	</package>	
+</struts>

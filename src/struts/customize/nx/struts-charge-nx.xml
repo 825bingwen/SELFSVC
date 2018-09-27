@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="charge" extends="struts-common" namespace="/charge">		
+		<!-- 话费充值 -->
+		<action name="feeCharge" class="feeChargeAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/customize/nx/feeCharge/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 话费充值信息查询 -->
+		<action name="qryfeeChargeAccount" class="feeChargeAction" method="qryfeeChargeAccount">
+		    <result name="success">/jsp/customize/nx/feeCharge/accountInfo.jsp</result>
+		    <result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 选择其它金额 -->
+		<action name="selectOtherFee" class="feeChargeAction" method="selectOtherFee">
+			<result name="success">/jsp/customize/nx/feeCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- 手工输入缴费金额页面 -->
+		<action name="toInputMoney" class="feeChargeAction" method="toInputMoney">
+		    <result name="toInputMoney">/jsp/customize/nx/feeCharge/inputMoney.jsp</result>
+		</action>
+		
+		<!-- 选择话费充值方式 -->
+		<action name="selectFeeChargeType" class="feeChargeAction" method="selectFeeChargeType">
+		    <result name="selectType">/jsp/customize/nx/feeCharge/selectType.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币 -->
+		<action name="cashCharge" class="feeChargeAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/customize/nx/feeCharge/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币提交 -->
+		<action name="cashChargeCommit" class="feeChargeAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/nx/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/nx/feeCharge/cash/cashErrorPage.jsp</result>
+		    <!--add begin g00140516 2012/08/24 R003C12L08n01 解决宁夏重复交费问题 -->
+		    <result name="repeatError">/jsp/customize/nx/feeCharge/repeatFeeCharge.jsp</result>
+		    <!--add end g00140516 2012/08/24 R003C12L08n01 解决宁夏重复交费问题 -->
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="feeChargeAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/nx/feeCharge/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 无需进行随机密码验证，直接打印发票 -->
+		<action name="printInvoiceWithoutPwd" class="feeChargeAction" method="printInvoiceWithoutPwd">
+			<result name="print">/jsp/customize/nx/feeCharge/printInvoice.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="feeChargeAction" method="insertInvoiceLog">
+		</action>
+		
+		<!-- 话费充值银行卡选择金额页面 -->
+		<action name="cardCharge" class="feeChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/nx/feeCharge/otherFee.jsp</result>
+		    <result name="cardChargePage">/jsp/customize/nx/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡免责声明页面 -->
+		<action name="dutyInfo" class="feeChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/nx/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="feeChargeAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/nx/feeCharge/card/readCard.jsp</result>
+		</action>
+		
+		<!-- 银联卡密码输入页面 -->
+		<action name="inputCardPwd" class="feeChargeAction" method="inputCardPwd">
+			<result name="inputPwd">/jsp/customize/nx/feeCharge/card/cardPassword.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="feeChargeAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/nx/feeCharge/card/makeSure.jsp</result>
+		    <result name="makeSure_ylpwd">/jsp/customize/nx/feeCharge/card/makeSure_ylpwd.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="feeChargeAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="feeChargeAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="feeChargeAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/nx/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/nx/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="feeChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/nx/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 校验当前时间现金缴费是否可用 -->
+		<action name="checkTime" class="feeChargeAction" method="checkTime">
+		</action>
+	</package>	
+</struts>

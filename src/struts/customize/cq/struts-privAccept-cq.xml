@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="privAccept" extends="struts-common" namespace="/privAccept">		
+		<!-- 查询优惠 -->
+		<action name="qryPriv" class="privAcceptAction" method="queryPriv">
+		    <result name="qryPrivInfo">/jsp/customize/cq/privAccept/recPrivDetail.jsp</result>
+		    <result name="error">/jsp/customize/cq/privAccept/privPreAccept.jsp</result>
+		</action>
+		
+		<!-- 办理优惠缴费方式 -->
+		<action name="privFeeChargeType" class="privAcceptAction" method="privFeeChargeType">
+		    <result name="selectType">/jsp/customize/cq/privAccept/selectType.jsp</result>
+		    <result name="failed">/jsp/customize/cq/privAccept/privPreAccept.jsp</result>	
+		</action>
+		
+		<!-- 交费充值投币 -->
+		<action name="privcashCharge" class="privAcceptAction" method="privcashCharge">
+		    <result name="cashChargePage">/jsp/customize/cq/privAccept/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 现金交费异常处理 -->
+		<action name="goCashError" class="privAcceptAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/cq/privAccept/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 现金交费充值投币提交 -->
+		<action name="privCashCommit" class="privAcceptAction" method="privCashCommit">
+		    <result name="success">/jsp/customize/cq/privAccept/finish.jsp</result>
+		    <result name="error">/jsp/customize/cq/privAccept/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 交费银行卡免责声明页面 -->
+		<action name="privcardCharge" class="privAcceptAction" method="cardCharge">
+		    <result name="cardChargePage">/jsp/customize/cq/privAccept/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="privAcceptAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/cq/privAccept/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="privAcceptAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/cq/privAccept/card/readCard.jsp</result>
+		</action>	
+		
+		<!-- 银联卡密码输入页面 -->
+		<action name="inputCardPwd" class="privAcceptAction" method="inputCardPwd">
+			<result name="inputPwd">/jsp/customize/cq/privAccept/card/cardPassword.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="privAcceptAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/cq/privAccept/card/makeSure.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="privAcceptAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="privAcceptAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="privCardCommit" class="privAcceptAction" method="privCardCommit">
+		    <result name="success">/jsp/customize/cq/privAccept/finish.jsp</result>
+		    <result name="error">/jsp/customize/cq/privAccept/card/cardErrorPage.jsp</result>
+		</action>
+	</package>	
+</struts>

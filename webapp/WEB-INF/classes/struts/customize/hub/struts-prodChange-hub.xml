@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="prodChange" extends="struts-common" namespace="/prodChange">		
+		<!-- 查询可转换的套餐 -->
+		<action name="qryChangeList" class="prodChangeAction" method="qryChangeList">
+		    <result name="qryList">/jsp/customize/hub/prodChange/recProdList.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<action name="qryChgContent" class="prodChangeAction" method="qryChangeContent">
+		    <result name="success">/jsp/customize/hub/prodChange/prodContent.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<action name="proChgCommit" class="prodChangeAction" method="proChgCommit">
+		    <result name="success">/jsp/customize/hub/prodChange/prodCommit.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<action name="getProdTmpList" class="prodChangeAction" method="getProdTmpList">
+		    <result name="success">/jsp/customize/hub/prodChange/recProdTempList.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<!--add begin yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+		
+		<!-- 查询可转换的主体产品列表 -->
+		<action name="qryMainProdTempChangeList" class="mainProdChangeAction" method="qryMainProdTempChangeList">
+		    <result name="qryMainProdTempList">/jsp/customize/hub/prodChange/mainProdTempList.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		<action name="mainProductRecInfo" class="mainProdChangeAction" method="mainProductRecInfo">
+		    <result name="mainProductRecInfo">/jsp/customize/hub/prodChange/mainProductRecInfo.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<action name="mainProductChangeSubmit" class="mainProdChangeAction" method="mainProductChangeSubmit">
+		    <result name="mainProductRecInfo">/jsp/customize/hub/prodChange/mainProdChangeFinish.jsp</result>
+		    <result name="error">/commonError.jsp</result>		
+		</action>
+		
+		<!--add end yKF70747 2012/04/12 R003C12L04n01 OR_HUB_201202_1193  -->
+		
+	</package>	
+</struts>

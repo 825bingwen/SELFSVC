@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 套餐信息查询Action -->
+	<bean id="packageInfoAction" parent="baseAction" class="com.customize.nx.selfsvc.serviceinfo.action.PackageInfoAction" scope="prototype">
+	    <property name="packageInfoBean" ref="packageInfoBean"></property>
+	</bean>
+	
+	<!-- 套餐信息查询Bean -->
+	<bean id="packageInfoBean" parent="baseBeanNX" class="com.customize.nx.selfsvc.bean.PackageInfoBean"></bean>
+	
+</beans>

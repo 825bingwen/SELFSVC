@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 套餐剩余量查询 -->
+	<package name="comboInfo" extends="struts-common" namespace="/comboInfo">
+	    
+		<!-- 套餐信息查询 -->
+		
+		<action name="selectTaoCanMonth" class="packageInfoAction" method="selectTaoCanMonth">
+		    <result name="selectBillMonth">/jsp/customize/nx/packageInfo/selectTaoCanMonth.jsp</result>
+		</action>
+		
+		<action name="qryComboInfo" class="packageInfoAction" method="qryPackageInfo">
+		    <result name="queryTcService">/jsp/customize/nx/packageInfo/qryTcService.jsp</result>
+		</action>
+	</package>
+</struts>

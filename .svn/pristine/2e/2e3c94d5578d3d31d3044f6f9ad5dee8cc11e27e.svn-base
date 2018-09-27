@@ -1,0 +1,45 @@
+-- 在生产环境上： regionlis、操作员表、组织信息表、组织信息CHILD表 需要建立与tbcs的同义词
+-- 请参考脚本“NG自助终端同义词_NGSH_DDL.sql”
+
+--SH_INFO_REGIONLIST
+--SH_INFO_OPERATOR
+--SH_ORGANIZATION
+--SH_ORGANIZATION_CHILD
+
+-------------------------------
+脚本使用说明：
+一、首先参考脚本001和002 使用DBA用户创建表空间和用户
+001_SS_DDL_DBA_createtablespace_20110722.sql
+002_SS_DDL_DBA_createuser_20110722.sql
+
+二、用创建的NGSH用户登录数据库，然后执行如下的脚本：
+
+1、开发人员初始化脚本顺序参考：
+203_SS_DDL_NGSH_createTable_20110722.sql
+207_SS_DML_NGSH_initdata_20110722.sql
+
+103_SS_DDL_NGSH_createTable_20110722.sql
+104_SS_DDL_NGSH_createView_20110722.sql
+105_SS_DDL_NGSH_createSequence_20110722.sql
+106_SS_DDL_NGSH_createProcedure_20110722.sql
+107_SS_DML_NGSH_initdata_20110722.sql
+
+2、现场人员初始化脚本顺序参考：
+-- 在生产环境上： regionlis、操作员表、组织信息表、组织信息CHILD表 需要建立与tbcs的同义词
+-- 请参考脚本“NG自助终端同义词_NGSH_DDL.sql” 建立同义词
+
+NG自助终端同义词_NGSH_DDL.sql
+
+103_SS_DDL_NGSH_createTable_20110722.sql
+104_SS_DDL_NGSH_createView_20110722.sql
+105_SS_DDL_NGSH_createSequence_20110722.sql
+106_SS_DDL_NGSH_createProcedure_20110722.sql
+107_SS_DML_NGSH_initdata_20110722.sql
+
+
+三、文件夹0_baseline_hub/相关脚本
+里面脚本为自助终端相关的外部系统需要的数据库脚本，
+如：后台common配置、虚拟操作员赋权、创建同义词、接口平台协议配置、自助终端后台管理平台菜单配置、赋权
+
+
+

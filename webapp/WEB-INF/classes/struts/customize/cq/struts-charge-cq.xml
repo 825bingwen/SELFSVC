@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="charge" extends="struts-common" namespace="/charge">		
+		<!-- 话费充值 -->
+		<action name="feeCharge" class="feeChargeAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/customize/cq/feeCharge/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 话费充值（账户信息+支付方式） -->
+		<action name="qryfeeChargeAccount" class="feeChargeAction" method="qryfeeChargeAccount">
+		    <result name="success">/jsp/customize/cq/feeCharge/accountInfo.jsp</result>
+		    <result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 选择其它金额 -->
+		<action name="selectOtherFee" class="feeChargeAction" method="selectOtherFee">
+			<result name="selectOtherFee">/jsp/customize/cq/feeCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- 手工输入缴费金额页面 -->
+		<action name="toInputMoney" class="feeChargeAction" method="toInputMoney">
+		    <result name="toInputMoney">/jsp/customize/cq/feeCharge/inputMoney.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币 -->
+		<action name="cashCharge" class="feeChargeAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/customize/cq/feeCharge/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币提交 -->
+		<action name="cashChargeCommit" class="feeChargeAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/cq/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/cq/feeCharge/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="feeChargeAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/cq/feeCharge/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡选择金额页面 -->
+		<action name="cardCharge" class="feeChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/cq/feeCharge/otherFee.jsp</result>
+		    <result name="cardChargePage">/jsp/customize/cq/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡免责声明页面 -->
+		<action name="dutyInfo" class="feeChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/cq/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="feeChargeAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/cq/feeCharge/card/readCard.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="feeChargeAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/cq/feeCharge/card/makeSure.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="feeChargeAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="feeChargeAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="feeChargeAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/cq/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/cq/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="feeChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/cq/feeCharge/card/cardErrorPage.jsp</result>
+		</action>	
+		
+		<!-- 打印发票需要随机密码验证 -->
+		<action name="validateByRandomPwd" class="feeChargeAction" method="validateByRandomPwd">
+			<result name="success">/jsp/customize/cq/feeCharge/randomPwd.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 随机密码验证通过后打印发票 -->
+		<action name="printInvoice" class="feeChargeAction" method="printInvoiceWithPwd">
+			<result name="success">/jsp/customize/cq/feeCharge/printInvoice.jsp</result>
+		    <result name="error">/jsp/customize/cq/feeCharge/randomPwd.jsp</result>
+		</action>		
+		
+		<!-- 无需进行随机密码验证，直接打印发票 -->
+		<action name="printInvoiceWithoutPwd" class="feeChargeAction" method="printInvoiceWithoutPwd">
+			<result name="print">/jsp/customize/cq/feeCharge/printInvoice.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="feeChargeAction" method="insertInvoiceLog">
+		</action>
+	</package>	
+</struts>

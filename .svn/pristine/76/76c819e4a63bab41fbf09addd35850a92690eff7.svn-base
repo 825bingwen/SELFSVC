@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!--功能： 基础服务办理 -->
+	
+	<!-- 显示功能列表 -->
+	<bean id="baseServiceAction" class="com.gmcc.boss.selfsvc.baseService.BaseServiceAction" scope="prototype"></bean>
+	
+	<!-- 余额提醒Action -->
+	<bean id="chgBalanceUrgeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.ChgBalanceUrgeAction" scope="prototype">
+	    <property name="chgBalanceUrgeBean" ref="chgBalanceUrgeBean"></property>
+	</bean>
+	
+	<!-- 余额提醒Bean -->
+	<bean id="chgBalanceUrgeBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ChgBalanceUrgeBean"></bean>
+	
+	<!-- 通用受理页面Action -->
+	<bean id="commonServPageAction" class="com.gmcc.boss.selfsvc.baseService.CommonServPageAction" scope="prototype"></bean>
+	
+	<!-- 基础业务办理提示费用信息页面Action -->
+	<bean id="feeMessageAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.FeeMessageAction" scope="prototype">
+	    <property name="feeMessageBean" ref="feeMessageBean"></property>
+	</bean>
+	
+	<!-- 基础业务办理提示费用信息页面Bean -->
+	<bean id="feeMessageBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.FeeMessageBean"></bean>
+	
+    <!-- 停开机业务处理Action -->
+    <bean id="recOpenAndStopSubsAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.RecOpenAndStopSubsAction" scope="prototype">
+        <property name="recOpenAndStopSubsBean" ref="recOpenAndStopSubsBean"></property>
+    </bean>
+    
+    <!-- 停开机业务处理Bean -->
+    <bean id="recOpenAndStopSubsBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.RecOpenAndStopSubsBean"></bean>
+    
+    <!-- 修改密码Action -->
+    <bean id="changePasswordAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.ChangePasswordAction" scope="prototype">
+        <property name="changePasswordBean" ref="changePasswordBean"></property>
+    </bean>
+    
+    <!-- 修改密码Bean -->
+    <bean id="changePasswordBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ChangePasswordBean"></bean>
+    
+    <!-- 密码重置 -->
+    <bean id="passwordResetAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.PasswordResetAction" scope="prototype">
+    	<property name="passwordResetBean" ref="passwordResetBean"></property>
+    	<property name="loginService" ref="loginService" ></property>
+    </bean>
+    
+    <!-- 密码重置Bean -->
+    <bean id="passwordResetBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.PasswordResetBean"></bean>
+    
+    <!-- 梦网业务查询退订Action_湖北 -->
+    <bean id="SPAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.spService.action.SPAction" scope="prototype">
+        <property name="spBean" ref="spBean"></property>
+        <property name="spService" ref="spService"></property>
+    </bean>
+    
+    <!-- 业务查询退订Action_山东，宁夏 -->
+    <bean id="recSpAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.spService.action.RecSPAction" scope="prototype">
+        <property name="spBean" ref="spBean"></property>
+    </bean>
+    
+    <!-- 查询可订购的梦网业务 -->
+    <bean id="spService" parent="baseTransactionProxy">
+    	<property name="target">
+			<ref local="spServiceImpl"/>
+		</property>
+    </bean>
+    
+    <!-- 梦网业务serviceImpl -->
+    <bean id="spServiceImpl" class="com.gmcc.boss.selfsvc.baseService.spService.service.SpServiceImpl" >
+		<property name="spDaoImpl" ref="spDaoImpl" />
+	</bean>
+	
+	<!-- 梦网业务daoImpl -->
+	<bean id="spDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.baseService.spService.dao.SpDaoImpl"></bean>
+	
+    <!-- 梦网业务查询退订Bean -->
+    <bean id="spBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.SPBean"></bean>
+    
+    <!-- 家庭网成员添加Action -->
+    <bean id="addFamilyMemAction" parent="baseAction" class="com.gmcc.boss.selfsvc.baseService.familymem.action.AddFamilyMemAction" scope="prototype">
+   		<property name="addFamilyMemBean" ref="addFamilyMemBean"></property>
+    </bean>
+     <!-- 家庭网成员添加Bean -->
+    <bean id="addFamilyMemBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.AddFamilyMemBean">
+    </bean>
+    
+</beans>

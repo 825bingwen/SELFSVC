@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 跨省缴费 -->
+	<package name="nonlocalChargeSD" extends="struts-common" namespace="/nonlocalChargeSD">
+		<!-- 输入手机号码 -->
+		<action name="inputNumber" class="nonlocalChargeAction" method="inputNumber">
+		    <result name="success">/jsp/customize/sd/feeCharge/nonlocalCharge/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 查询用户信息 -->
+        <action name="qryfeeChargeAccount" class="nonlocalChargeAction" method="qryfeeChargeAccount">
+            <result name="qryfeeChargeAccount">/jsp/customize/sd/feeCharge/nonlocalCharge/accountInfo.jsp</result>
+            <result name="error">/jsp/customize/sd/feeCharge/nonlocalCharge/chargeError.jsp</result>
+        </action>
+        
+        <!-- 跳转到现金缴费页面 -->
+        <action name="cashCharge" class="nonlocalChargeAction" method="cashCharge">
+            <result name="cashCharge">/jsp/customize/sd/feeCharge/nonlocalCharge/cashChargePage.jsp</result>
+        </action>
+        
+        <!-- 银联卡缴费，选择缴费金额 -->
+        <action name="cardCharge" class="nonlocalChargeAction" method="cardCharge">
+            <result name="otherFee">/jsp/customize/sd/feeCharge/nonlocalCharge/otherFee.jsp</result>
+        </action>
+        
+        <!-- 话费充值银行卡免责声明页面 -->
+        <action name="dutyInfo" class="nonlocalChargeAction" method="dutyInfo">
+            <result name="dutyInfo">/jsp/customize/sd/feeCharge/nonlocalCharge/dutyInfo.jsp</result>
+        </action>
+        
+        <!-- 手工输入缴费金额页面 -->
+        <action name="toInputMoney" class="nonlocalChargeAction" method="toInputMoney">
+            <result name="toInputMoney">/jsp/customize/sd/feeCharge/nonlocalCharge/inputMoney.jsp</result>
+        </action>
+        
+        <!-- 银联卡缴费页面 -->
+        <action name="toReadCard" class="nonlocalChargeAction" method="toReadCard">
+            <result name="toReadCard">/jsp/customize/sd/feeCharge/nonlocalCharge/readCard.jsp</result>
+        </action>
+        
+        <!-- 银联卡扣款成功后更新缴费日志 -->
+        <action name="updateCardChargeLog" class="nonlocalChargeAction" method="updateCardChargeLog">
+        </action>
+        
+        <!-- 现金/银联卡缴费异常 -->
+        <action name="chargeError" class="nonlocalChargeAction" method="chargeError">
+            <result name="chargeError">/jsp/customize/sd/feeCharge/nonlocalCharge/chargeError.jsp</result>
+        </action>
+        
+        <!-- 现金/银联卡缴费提交 -->
+        <action name="chargeCommit" class="nonlocalChargeAction" method="chargeCommit">
+            <result name="chargeCommit">/jsp/customize/sd/feeCharge/nonlocalCharge/finish.jsp</result>
+            <result name="chargeError">/jsp/customize/sd/feeCharge/nonlocalCharge/chargeError.jsp</result>
+        </action>
+	</package>
+	
+</struts>

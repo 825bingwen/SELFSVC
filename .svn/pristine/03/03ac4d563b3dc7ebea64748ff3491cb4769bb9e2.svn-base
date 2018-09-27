@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="recommendProduct" extends="struts-common" namespace="/recommendProduct">		
+		
+		<!-- 推荐业务列表展示 -->
+		<action name="getRecommendProductList" class="recommendProductAction" method="getRecommendProductList">
+		    <result name="recommendProductList">/jsp/customize/hub/recommendProduct/recommendProductList.jsp</result>
+		    <result name="recommendProductListNew">/jsp/customize/hub/recommendProduct/recommendProductListNew.jsp</result>
+		    <result name="failed">/jsp/customize/hub/recommendProduct/recommendError.jsp</result>
+		    <result name="continue">/jsp/customize/hub/recommendProduct/continue.jsp</result>
+		</action>
+		
+		<!-- 继续办理,记录业务推荐结果 -->
+		<action name="recommendFeedback" class="recommendProductAction" method="recommendFeedback">
+		    <result name="continue">/jsp/customize/hub/recommendProduct/continue.jsp</result>
+		    <result name="failed">/jsp/customize/hub/recommendProduct/recommendError.jsp</result>
+		</action>
+		
+		<!-- 推荐业务受理 -->
+		<action name="recommendProduct" class="recommendProductAction" method="recommendProduct">
+		    <result name="failed">/jsp/customize/hub/recommendProduct/recommendError.jsp</result>
+		    <result name="success">/jsp/customize/hub/recommendProduct/recommendSuccess.jsp</result>
+		</action>	
+		
+		<!-- 推荐业务受理成功或者失败，继续办理原业务 -->
+		<action name="contineRec" class="recommendProductAction" method="contineRec">
+		    <result name="continue">/jsp/customize/hub/recommendProduct/continue.jsp</result>
+		</action>	
+		
+		<!-- 转向服务密码认证 -->
+		<action name="checkPassword" class="recommendProductAction" method="checkPassword">
+			<result name="checkPassword">/jsp/customize/hub/recommendProduct/checkPassword.jsp</result>
+		</action>
+
+		<!-- 查询推荐反馈定义列表 -->
+		<action name="qryFeedBackDefList" class="recommendProductAction" method="qryFeedBackDefList">
+		    <result name="feedBackDefList">/jsp/customize/hub/recommendProduct/feedBackDefList.jsp</result>
+		    <result name="failed">/jsp/customize/hub/recommendProduct/recommendError.jsp</result>
+		</action>	
+		
+		<!-- 推荐反馈定义受理 -->
+		<action name="doFeedBackDef" class="recommendProductAction" method="doFeedBackDef">
+		    <result name="failed">/jsp/customize/hub/recommendProduct/recommendError.jsp</result>
+		    <result name="success">/jsp/customize/hub/recommendProduct/recommendSuccess.jsp</result>
+		</action>
+		
+	</package>	
+</struts>

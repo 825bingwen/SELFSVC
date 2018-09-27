@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 打印月结发票 -->
+    <package name="monInvoice" namespace="/monInvoice" extends="struts-common">
+        <!-- 查询近六个月月份 -->
+        <action name="qryCurrentMonth" class="monInvoPrintActionNX" method="qryCurrentMonth">
+            <result name="qryCurrentMonth">
+                /jsp/customize/nx/invoice/currentMonthInvoice.jsp
+            </result>
+        </action>
+        
+        <!-- 查询账期 -->
+        <action name="qryBillCycle" class="monInvoPrintActionNX" method="qryBillCycle">
+            <result name="qryBillCycle">
+                /jsp/customize/nx/invoice/showCycle.jsp
+            </result>
+        </action>
+        
+        <!-- 打印发票 -->
+        <action name="printMonInvoice" class="monInvoPrintActionNX" method="printMonInvoice">
+            <result name="printMonInvoice">
+                /jsp/customize/nx/invoice/printMonInvoice.jsp
+            </result>
+        </action>
+    </package>
+</struts>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!--功能： 服务信息查询 -->
+	
+	<!-- 显示功能列表 -->
+	<bean id="serviceInfoAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.ServiceInfoAction" scope="prototype"></bean>
+	
+	<!-- 本机品牌资费及已开通功能Action -->
+	<bean id="qryFavourableAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.FavourableAction" scope="prototype">
+	    <property name="favourableBean" ref="qryFavourableBean"></property>
+	</bean>
+	
+	<!-- 本机品牌资费及已开通功能Bean -->
+	<bean id="qryFavourableBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.FavourableBean"></bean>
+	
+	<!-- PUK码查询Action -->
+	<bean id="qryPukCodeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.PukCodeAction" scope="prototype">
+	    <property name="pukCodeBean" ref="pukCodeBean"></property>
+	</bean>
+	
+	<!-- PUK码查询Bean -->
+	<bean id="pukCodeBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.PukCodeBean"></bean>
+	
+	<!-- 本机状态查询Action -->
+	<bean id="qryCurrentStatusAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.CurrentStatusAction" scope="prototype">
+	    <property name="currentStatusBean" ref="currentStatusBean"></property>
+	</bean>
+	
+	<!-- 本机状态查询Bean -->
+	<bean id="currentStatusBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.CurrentStatusBean"></bean>
+	
+	<!-- 号码归属地查询Action -->
+	<bean id="userRegionAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.UserRegionAction" scope="prototype">
+	    <property name="userRegionBean" ref="userRegionBean"></property>
+	</bean>
+	
+	<!-- 号码归属地查询Bean -->
+	<bean id="userRegionBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.UserRegionBean"></bean>
+	
+	<!-- 受理历史查询Action -->
+	<bean id="qryServiceHistoryAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.ServiceHistoryAction" scope="prototype">
+	    <property name="qryServiceHistoryBean" ref="qryServiceHistoryBean"></property>
+	</bean>
+	
+	<!-- 受理历史查询Bean -->
+	<bean id="qryServiceHistoryBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ServiceHistoryBean"></bean>
+		
+	<!-- 积分查询 bean-->
+	<bean id="qryScoreBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ScoreBean"></bean>
+	
+	<!-- 积分查询 Action-->
+	<bean id="scoreAction" parent="baseAction" class="com.gmcc.boss.selfsvc.serviceinfo.action.ScoreAction" scope="prototype">
+	    <property name="qryScoreBean" ref="qryScoreBean"></property>
+	</bean>
+	
+
+
+</beans>

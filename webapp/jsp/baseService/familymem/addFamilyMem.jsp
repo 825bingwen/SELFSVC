@@ -1,0 +1,557 @@
+<%@page contentType="text/html; charset=GBK"%>
+<%@taglib prefix="s" uri="/struts-tags"%>
+<%@page import="com.gmcc.boss.selfsvc.common.Constants"%>
+<%@page import="com.gmcc.boss.selfsvc.cache.PublicCache"%>
+<%@page import="com.gmcc.boss.selfsvc.login.model.NserCustomerSimp"%>
+<%
+    String errorMsg = (String)request.getAttribute("errormessage");
+    if (errorMsg == null)
+    {
+        errorMsg = "";
+    }
+    
+    String keyFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_OPERATION_KEYFLAG);
+    
+    String popupFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_ERRORMSG_POPUPFLAG);
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>移动自助终端</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+		<meta http-equiv="pragma" content="no-cache"/>
+		<meta http-equiv="Cache-Control" content="no-cache"/>
+		<meta http-equiv="Expires" content="0"/>
+		<link href="${sessionScope.basePath }css/reset.css?ver=${jsVersion }" type="text/css"
+			rel="stylesheet" />
+		<link href="${sessionScope.basePath }css/style.css?ver=${jsVersion }" type="text/css"
+			rel="stylesheet" />
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/public.js?ver=${jsVersion }"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/script.js?ver=${jsVersion }"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/dialyzer.js?ver=${jsVersion }"></script>
+		<script type="text/javascript">
+		var submitFlag = 0;
+		
+		document.onkeydown = pwdKeyboardDown;
+		
+		function pwdKeyboardDown(e) 
+		{
+			var key = GetKeyCode(e);
+			
+			if (key == 77) 
+			{
+				preventEvent(e);
+			}
+			
+			if (!KeyIsNumber(key)) 
+			{
+				return false;//这句话最关键
+			}
+		}
+		
+		function KeyIsNumber(KeyCode) 
+		{
+    		//只允许输入0-9
+    		if (KeyCode >= 48 && KeyCode <= 57)
+    		{
+    			return true;
+    		}
+    		
+    		return false;
+		}
+		
+		document.onkeyup = pwdKeyboardUp;
+		
+		function pwdKeyboardUp(e) 
+		{
+			var key = GetKeyCode(e);
+
+			//确认
+			if (key == 13 || key == 89 || key == 221) 
+			{
+				doSub();
+				return;
+			}
+			
+				//返回
+				if (key == 82 || key == 220) 
+				{
+					goback("");
+					return;
+				}
+				//更正
+				else if (key == 8 || key == 32 || key == 66 || key ==77)
+				{
+					var etarget = getEventTarget(e);
+					if (etarget.type == "text" || etarget.type == "password") 
+					{
+						etarget.value = backString(etarget.value);
+					}
+					if (etarget.name == 'password' && etarget.value == '' )
+					{
+							MoveLast(document.getElementById('servnumber'));
+					}
+				}
+			
+				var tel = document.forms[0].servnumber.value;
+				var password = document.forms[0].password.value;		
+		
+				if ((key == 8 || key == 32 || key == 66 || key ==77)
+				 		&& pangu_getStrLen(trim(password)) == 0 && pangu_getStrLen(trim(tel)) == 11)
+				{
+					document.forms[0].servnumber.focus();
+					
+					changObj(document.forms[0].servnumber, 1);
+					
+					return true;
+				}
+				
+	 			if (pangu_getStrLen(trim(tel)) == 11 && pangu_getStrLen(trim(password)) == 0) 
+	 			{
+	 				document.forms[0].password.focus();
+	 				
+	 				changObj(document.forms[0].password, 2);
+	 				
+	 				return true;
+	 			}
+			return true;
+		}		
+		
+		function MoveLast(lastObj)
+		{
+			var r = lastObj.createTextRange(); 
+			r.collapse(false); 
+			r.select();
+		}
+		
+		function trim(str) 
+		{
+			while (str.charAt(str.length - 1) == " ") 
+			{
+				str = str.substring(0, str.length - 1);
+			}
+			
+			while (str.charAt(0) == " ") 
+			{
+				str = str.substring(1, str.length);
+			}
+			
+			return str;
+		}
+
+		function pangu_getStrLen(s) 
+		{
+			var count = 0;
+			var lenByte = s.length;
+			for (i = 0; i < lenByte; i++) 
+			{
+				if (s.charCodeAt(i) > 256) 
+				{
+					count = count + 2;
+				} 
+				else 
+				{
+					count = count + 1;
+				}
+			}
+			
+			return count;
+		}
+
+		function doSub()
+		{
+			//对号码进行判断
+			var pattern = /^\d{11}$/;
+			
+			var telNumber = document.getElementById("servnumber").value;
+			if (telNumber == "" || !pattern.test(telNumber))
+			{
+				changObj(document.getElementById('servnumber'), 1);
+			
+				if ("1" == "<%=popupFlag %>")
+				{
+					alertRedErrorMsg("请输入正确的手机号码");
+				}
+				else
+				{
+					document.getElementById("errorMsg").innerHTML = "请输入正确的手机号码";
+				}
+				
+				return;
+			}
+			
+			var password = document.getElementById("password").value;
+			if (password.value == "" || pangu_getStrLen(trim(password)) != 3)
+			{
+				changObj(document.getElementById('password'), 2);
+				
+				if ("1" == "<%=popupFlag %>")
+				{
+					alertRedErrorMsg("请正确输入短号");
+				}
+				else
+				{
+					document.getElementById("errorMsg").innerHTML = "请正确输入短号！";
+				}
+				
+				return;
+			}
+			
+			if (-1 != "<s:property value='shortNum'/>".indexOf(password))
+			{
+			    {
+			    	submitReception();
+			    	return ;
+			    }
+			}
+			if ("1" == "<%=popupFlag %>")
+			{
+				alertRedErrorMsg("您输入的短号不在下列范围之内");
+			}
+			else
+			{
+				document.getElementById("errorMsg").innerHTML = "您输入的短号不在下列范围之内！";
+			}
+			
+		}
+		function submitReception()
+		{
+			if (submitFlag == 0)
+			{
+				submitFlag = 1;
+				
+				openWindow_wait('pls_wait');
+				
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}baseService/addFamilyMem.action";
+				document.actform.submit();
+			}
+		}		
+		
+		//返回上一页
+		function goback(menuid)
+		{
+			// add begin g00140516 2012/10/19 eCommerce V200R003C12L10 OR_huawei_201210_125
+			if (document.getElementById("backWaitingFlag").value == "1")
+			{
+				openWindow_wait('pls_wait');
+			}
+			// add end g00140516 2012/10/19 eCommerce V200R003C12L10 OR_huawei_201210_125
+			
+			window.history.back();
+		}
+		
+		<%--
+		* 转向身份认证页面。
+		* @remark create m00227318 2013/02/07 R003C13L01n01 OR_NX_201302_600
+		--%>
+		function goIDPage()
+		{
+			alert(submitFlag);
+		    if (submitFlag == 0)
+		    {
+		        submitFlag = 1;
+		        
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}login/goIDPage.action";
+				document.actform.submit();
+		    }
+		}
+		</script>
+	</head>
+	<body scroll="no">
+		<form name="actform" method="post">
+			<%@ include file="/titleinc.jsp"%>
+
+			<div class="main" id="main">
+				<div class="blank20"></div>
+				<span class="yellow fs16 ml10" >
+					&nbsp;&nbsp;
+				</span>
+			
+				<%--modify end g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600 --%>
+
+				<div class="b966">
+					<div class="blank30" id="errorMsg"></div>
+
+					<div class=" p40">
+						<p class="fs22 mb30"></p>
+
+						<!--键盘+输入框+温馨提示-->
+						<div class="keyboard_wrap clearfix">
+							<ul class="phone_num_list fl">
+								<li class="on fs20 clearfix" id="phone_input_1">
+									<i class="lh30">1.输入添加成员手机号码</i>
+									<span id="redstar1" class="pl20 fl lh75">手机号码：</span>
+									<input type="text" id="servnumber" name="familyMemPO.telNum"
+										maxlength="11" class="text1 fl relative"
+										onclick="changObj(this, 1);MoveLast(this);" />
+								</li>
+								<li class="fs20 clearfix" id="phone_input_2">
+									<i class="lh30">2.输入短号号码</i>
+									<span id="redstar2" class="pl20 fl lh75">输入短号：</span>
+									<input type="text" name="familyMemPO.shortNum" id="password"
+										maxlength="3" class="text1 fl relative"
+										onclick="changObj(this, 2);MoveLast(this);" />
+								</li>
+								<li class="fs20 clearfix">
+									<span id="redstar2" class="pl20 fl lh75">可选择的短号：
+										<s:property value='shortNum'/>
+									</span>
+								</li>
+							</ul>
+
+
+
+							<!--小键盘-->
+							<div class="numboard numboard_big fl" id="numBoard">
+								<div class=" numbox">
+									<div class="blank10"></div>
+									<a href="javascript:void(0)">1</a><a href="javascript:void(0)">2</a><a
+										href="javascript:void(0)">3</a>
+									<a href="javascript:void(0)" class="func1" name="functionkey"
+										id="numBoardBack" onmousedown="this.className='func1on'"
+										onmouseup="this.className='func1';changValue(-1);"></a>
+									<div class="clear"></div>
+									<a href="javascript:void(0)">4</a><a href="javascript:void(0)">5</a><a
+										href="javascript:void(0)">6</a>
+									<a href="javascript:void(0)" class="func2" name="functionkey"
+										id="numBoardClear" onmousedown="this.className='func2on'"
+										onmouseup="this.className='func2';changValue(-2);"></a>
+									<div class="clear"></div>
+									<div class="nleft">
+										<a href="javascript:void(0)">7</a><a href="javascript:void(0)">8</a><a
+											href="javascript:void(0)">9</a>
+										<a href="javascript:void(0)">x</a><a href="javascript:void(0)">0</a><a
+											href="javascript:void(0)">#</a>
+									</div>
+									<div class="nright">
+										<a href="javascript:void(0)" onclick="doSub();return false;"
+											class="func3" name="functionkey" id="numBoardEnter"
+											onmousedown="this.className='func3on'"
+											onmouseup="this.className='func3'">1</a>
+									</div>
+									<div class="blank10"></div>
+								</div>
+							</div>
+							
+							<!--弹出框 正在处理 请稍候-->
+							<div class="popupWin fs28 credit_pls_wait" id="pls_wait">
+								<div class="bg"></div>
+								<p class="mt40">
+									<img src="${sessionScope.basePath }images/loading.gif" alt="处理中..." />
+								</p>
+								
+								<%-- modify begin hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+								<p class="tips_txt">
+									<%=CommonUtil.getParamValue(Constants.REC_WAITLOADING_MSG,"正在处理，请稍候......") %>
+								</p>
+								<%-- modify end hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+								
+								<div class="line"></div>
+								<div class="popup_banner"></div>
+							</div>
+							
+							<script type="text/javascript">
+							openWindow_wait = function(id)
+							{
+							  	wiWindow = new OpenWindow("pls_wait", 804, 515);//打开弹出窗口
+							}			
+						    </script>
+							<!--弹出窗结束-->
+
+							<script type="text/javascript">	
+								<%
+									if("1".equals(redStarKey))
+									{
+								%>
+									var textContent1 = document.getElementById('redstar1').innerHTML;
+									document.getElementById('redstar1').innerHTML=textContent1 + '<font color="red">*</font>';
+									
+									var textContent2 = document.getElementById('redstar2').innerHTML;
+									document.getElementById('redstar2').innerHTML=textContent2 + '<font color="red">*</font>';
+								<%
+									}
+								%>	
+	                			var numBoardBtns = document.getElementById('numBoard').getElementsByTagName('div')[0].getElementsByTagName('a');
+								var lastObj = document.getElementById('servnumber');
+								var type = 1;
+								lastObj = document.getElementById('password');
+								type = 0;
+								
+								for (i = 0; i < numBoardBtns.length; i++)
+								{
+						    		if (!numBoardBtns[i].className) 
+						    		{
+						    			numBoardBtns[i].className='';
+						    		}
+						    		
+					     			if (numBoardBtns[i].name == 'functionkey')
+					     			{
+					     				continue;  
+					     			}
+						 
+									numBoardBtns[i].onmousedown = function(){
+							 			this.className = 'on';
+									}
+									
+									numBoardBtns[i].onmouseup = function(){
+									
+										changValue(0, this.innerHTML);
+										
+							  			this.className = '';
+							  			
+							  			// servnumber输入完毕自动跳转到password
+							  			if (pangu_getStrLen(lastObj.value) == 11 
+							  					&& pangu_getStrLen(trim(document.forms[0].password.value)) == 0) 
+							 			{
+							 				document.forms[0].password.focus();
+							 				
+							 				changObj(document.forms[0].password, 2);
+							 				
+							 				return true;
+							 			}
+							   
+									}					
+								}
+						
+								function changObj(o, t)
+								{
+									document.getElementById("errorMsg").innerHTML = "";
+									
+									lastObj = o;
+							
+									if (t == 1)
+									{
+										type = 1;
+										document.getElementById('phone_input_1').className = "on fs20 clearfix";
+										document.getElementById('phone_input_2').className = "fs20 clearfix";
+									}
+									else
+									{
+										type = 0;
+										document.getElementById('phone_input_1').className = "fs20 clearfix";
+										document.getElementById('phone_input_2').className = "on fs20 clearfix";
+									}
+								}					
+						
+								function changValue(t, v)
+								{
+									lastObj.focus();
+									lastObj.select();
+									if (t == -1)
+									{
+										lastObj.value = lastObj.value.slice(0, -1);
+									}
+									else if(t == -2)
+									{
+										lastObj.value = "";
+									}
+									else if (lastObj.value.length < 11 && !isNaN(v) && type == 1)
+									{	
+										lastObj.value += v;
+									}
+									else if(lastObj.value.length < 6 && !isNaN(v) && type == 0)
+									{
+										lastObj.value += v;
+									}
+									var r = lastObj.createTextRange(); 
+									r.collapse(false); 
+									r.select();
+								}
+										
+	              			</script>
+							<!--小键盘end-->
+							
+							<!-- 红色错误提示信息 -->
+							<div class="popup_confirm" id="openWin_ErrorMsg">
+								<div class="bg"></div>
+								<div class="tips_title">提示：</div>
+								<div class="fs24 red pl55 pr30 pt40 line_height_12 h200" id="winText_ErrorMsg"></div>
+								<div class="btn_box tc mt20">
+									<span class=" inline_block ">
+										<a class="btn_bg_146" href="javascript:void(0);" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">关闭</a>
+									</span>
+								</div>
+							</div>
+							
+							<div class="popup_confirm" id="openWin_successMsg">
+								<div class="bg"></div>
+								<div class="tips_title">提示：</div>
+								<div class="fs24 yellow pl55 pr30 pt40 line_height_12 h200" id="winText_successMsg"></div>
+								<div class="btn_box tc mt20">
+									<span class=" inline_block ">
+										<a class="btn_bg_146" href="javascript:void(0);" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">确认</a>
+									</span>
+								</div>
+							</div>
+							
+							<div class="popup_confirm" id="weakPwdCheck_confirm">
+			                  <div class="bg"></div>
+			                  <div class="tips_title">提示：</div>
+			                  <div class="tips_body">
+			                  	<div class="blank30"></div>
+							    <p id="weakPwdPromptId"></p>
+							    <div class="blank30"></div>
+							  </div>
+			                  <div class="btn_box tc mt20">
+				                  <span class=" mr10 inline_block "><a href="#" class="btn_bg_146" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();toRealNameCheck();">确认</a></span>
+			                  </div>
+			                </div>
+							
+							<div class="popup_confirm" id="realNameCheck_confirm">
+			                  <div class="bg"></div>
+			                  <div class="tips_title">提示：</div>
+			                  <div class="tips_body">
+			                  	<div class="blank30"></div>
+							    <p id="realnamePromptId"></p>
+							    <div class="blank30"></div>
+							  </div>
+			                  <div class="btn_box tc mt20">
+				                  <span class=" mr10 inline_block "><a href="#" class="btn_bg_146" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';submitReception();">确认</a></span>
+				                  <span class=" inline_block "><a class="btn_bg_146" href="#" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">取消</a></span>
+			                  </div>
+			                </div>
+							<script type="text/javascript">								
+								alertRedErrorMsg = function(content)
+								{
+									document.getElementById('winText_ErrorMsg').innerHTML = content;
+									wiWindow = new OpenWindow("openWin_ErrorMsg", 708, 392);
+								};
+							</script>
+						</div>
+						<div class="blank10"></div>
+					</div>
+				</div>
+			</div>
+
+			<%@ include file="/backinc.jsp"%>
+		</form>
+	</body>
+	<!--弹出正在处理div-->
+	<div class="popupWin fs28 credit_pls_wait" id="recWaitLoading">
+		<div class="bg"></div>
+	    <p class="mt120"><img src="${sessionScope.basePath }images/loading.gif" alt="处理中..." /></p>
+	    
+	    <%-- modify begin hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+	   	<p class="tips_txt"><%=CommonUtil.getParamValue(Constants.REC_WAITLOADING_MSG,"正在处理，请稍候......") %></p> 
+	   	<%-- modify end hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>                
+	</div>
+	<script type="text/javascript">
+		if ("" != "<%=errorMsg %>")
+		{			
+			if ("1" == "<%=popupFlag %>")
+			{
+				alertRedErrorMsg("<%=errorMsg %>");
+			}
+			else
+			{
+				document.getElementById("errorMsg").innerHTML = "<%=errorMsg %>";
+			}
+		}
+		
+	</script>
+</html>

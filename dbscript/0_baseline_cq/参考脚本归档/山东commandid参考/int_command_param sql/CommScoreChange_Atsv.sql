@@ -1,0 +1,9 @@
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('CommScoreChange_Atsv', 1, null, '', 'OPCODE', 'CommScoreChange', '积分调整', null);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('CommScoreChange_Atsv', 2, null, 'TELNUM=TELNUM&OPERTYPE=OPERTYPE&SCOREVALUE=SCOREVALUE&ISNEGATIVE=ISNEGATIVE&SCORETYPEID=SCORETYPEID&REASON=REASON&OPERID=OPERID', '', '', '', null);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('CommScoreChange_Atsv', 4, null, '100=0', '', '', '', null);
+

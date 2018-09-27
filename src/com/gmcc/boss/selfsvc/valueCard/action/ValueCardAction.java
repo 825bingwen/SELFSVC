@@ -1,0 +1,783 @@
+package com.gmcc.boss.selfsvc.valueCard.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.customize.hub.selfsvc.common.service.FeeService;
+import com.customize.sd.selfsvc.charge.service.FeeChargeService;
+import com.customize.sd.selfsvc.common.service.IFeeServiceSD;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.model.DictItemVO;
+import com.gmcc.boss.selfsvc.resdata.model.DictItemPO;
+import com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+import com.gmcc.boss.selfsvc.valueCard.model.ValueCardVO;
+import com.gmcc.boss.selfsvc.valueCard.service.ValueCardService;
+
+/**
+ * 
+ * <有价卡销售的Action类>
+ * <有价卡销售及付款的>
+ * 
+ * @author  wWX217192
+ * @version  [版本号, Apr 27, 2015]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ * @remark create by wWX219697 OR_HUB_201503_1068_关于配合集团《关于下发电子化有价卡业务省级系统改造方案的通知》的改造需求自助终端改造
+ */
+public class ValueCardAction extends BaseAction
+{
+
+	private static final long serialVersionUID = -6465923811291189955L;
+	
+	/**
+	 * 日志
+	 */ 
+    private static Log logger = LogFactory.getLog(ValueCardAction.class);
+	
+	/**
+	 * 有价卡service
+	 */
+	private ValueCardService valueCardService;
+	
+	/**
+	 * 湖北公共交费的Service
+	 */
+	private FeeService feeService;
+	
+	/**
+	 * 山东公共交费记录日志的Service
+	 */
+	private IFeeServiceSD feeServiceSDImpl;
+	
+	/**
+	 * 交费service
+	 */
+	private FeeChargeService feeChargeService;
+	
+	/**
+	 * 购买有价卡的用户手机号码
+	 */
+	private String telnum;
+	
+	/**
+	 * 当前菜单
+	 */
+    private String curMenuId = "";
+    
+    /**
+     * 设置错误信息
+     */
+    private String errormessage;
+    
+    /**
+     * 有价卡面值信息
+     */
+    private List<DictItemVO> dictList = new ArrayList<DictItemVO>();
+    
+    /**
+     * 有价卡类型列表
+     */
+    private List<DictItemPO> typeList = new ArrayList<DictItemPO>();
+    
+    /**
+     * 获取有价卡购买的支付方式
+     */
+    private List<MenuInfoPO> usableTypes = new ArrayList<MenuInfoPO>();
+    
+    /**
+     * 应收总金额
+     */
+    private String totalFee;
+    
+    /**
+     * 获取用户购买的有价卡信息列表
+     */
+    private List<ValueCardVO> cardList =  new ArrayList<ValueCardVO>();
+	
+    /**
+     * 交费金额
+     */
+    private String tMoney;
+    
+    /**
+     * 获取用户选择的有价卡信息
+     */
+    private ValueCardVO valueCardVO = new ValueCardVO();
+    
+    /**
+     * 支付方式 1：银联，4：现金
+     */
+    private String payType;
+    
+    /**
+     * 异常类型
+     */
+    private String errorType;
+    
+    /**
+     * 是否需要退卡
+     */
+    private String needReturnCard = "";
+    
+    /**
+     * 银联打印信息
+     */
+    private String printcontext = "";
+    
+    /**
+     * 软POS异常类型
+     */
+    private String initPosResCode = "";
+    private String cmtPosResCode = "";
+    private String errPosResCode = "";
+    
+    /**
+     * 输入手机号码的页面提示信息
+     */
+    private List<DictItemPO> tipsList = new ArrayList<DictItemPO>();
+    
+    /**
+     * 交费日志信息
+     */
+    private transient CardChargeLogVO cardPayLogVO = new CardChargeLogVO();
+    
+    /**
+     * 手机号码（山东）
+     */
+    private String servNumber;
+    
+    /**
+	 * 银联返回错误码，银联卡扣款失败时用到
+	 */
+	private String unionRetCode = "";
+    
+	/**
+	 * 跳转至输入手机号码页面
+	 * @return 
+	 */
+	public String inputNumber()
+	{
+		logger.debug("inputNumber start...");
+		
+		//温馨提示
+		tipsList = getDictItemByGrp(Constants.SH_VALUECARD_TIPS);
+		
+		if(Constants.PROOPERORGID_HUB.equals(PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID)))
+		{
+			
+			return SUCCESS;
+		}
+		else
+		{
+			return "success_sd";
+		}
+	}
+	
+	/**
+	 * 跳转至选择有价卡类型，面值和数量的页面
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public String chooseValueCard()
+	{
+		logger.debug("chooseValueCard start...");
+		
+		try
+		{
+			if(Constants.PROOPERORGID_HUB.equals(PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID)))
+			{
+				// 判断购买有价卡的手机号码是否为本省号码
+				valueCardService.qryUserStatus(telnum, curMenuId);
+				
+				// 获取有价卡的面值信息
+				dictList = valueCardService.getDictItemByGroup(Constants.FEE_EVCARD , curMenuId, telnum);
+			}
+			else if(Constants.PROOPERORGID_SD.equals(PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID)))
+			{
+				// 判断购买有价卡的手机号码是否为本省号码
+				valueCardService.qryUserStatusSD(telnum, curMenuId);
+				
+				// 获取有价卡的面值信息
+				dictList = valueCardService.getDictItemSD(curMenuId, telnum);
+			}
+			
+			// 获取有价卡类型
+			typeList = (List<DictItemPO>)PublicCache.getInstance().getCachedData(Constants.VALUECARD_TYPE);
+			
+			logger.debug("chooseValueCard end...");
+			
+			return SUCCESS;
+		}
+		catch(ReceptionException e)
+		{
+			setErrormessage(e.getMessage());
+			return ERROR;
+		}
+	}
+	
+	/**
+	 * 跳转至支付方式确认页面
+	 * @return
+	 */
+	public String qryPayType()
+	{
+		usableTypes = valueCardService.getPayType(curMenuId, telnum);
+		
+		if(usableTypes.size() == 0)
+		{
+			// 没有可用的充值方式
+            setErrormessage("对不起，暂时没有可用的交费方式，请返回执行其他操作。");
+            
+			return ERROR; 
+		}
+		
+		return SUCCESS;
+	}
+	
+	/**
+	 * 跳转至现金投币页面
+	 * @return
+	 */
+	public String cashCharge()
+	{
+		// 湖北
+		if(Constants.PROOPERORGID_HUB.equals(PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID)))
+		{
+			cardPayLogVO.setPayType(Constants.PAYBYMONEY);
+			
+			// 获取交费信息，为后续操作做准备
+			cardPayLogVO = feeService.addChargeLog(cardPayLogVO, Constants.VALUECARD_RECLOG);
+			
+			return SUCCESS;
+		}
+		// 山东
+		else
+		{
+			// 屏蔽超时返回首页的功能
+	        getRequest().setAttribute("sdCashFlag", "1");
+	        
+	        // 山东页面上使用servNumber作为手机号码传值
+	        setServNumber(cardPayLogVO.getServnumber());
+	        
+	        // 设置支付类型
+	        cardPayLogVO.setPayType(payType);
+	        
+	        // 投币前记录缴费日志
+	        cardPayLogVO = feeServiceSDImpl.addChargeLog(cardPayLogVO,feeChargeService.getChargeLogOID(),
+	        		Constants.VALUECARD_RECLOG,
+	        		Constants.PROVINCE_REGION_999);
+	        
+	        return "cashCharge_sd";
+		}
+	}
+	
+	/**
+	 * 湖北现金交费投币后记录日志
+	 */
+	public void updateCashChargeLog()
+	{
+		try
+		{
+			feeService.updateCashChargeLog(cardPayLogVO);
+			
+			// 更新缴费日志成功
+            writeXmlMsg("1");
+		}
+		catch(Exception e)
+		{
+			// 更新缴费日志失败
+            writeXmlMsg("0");
+            
+            logger.error("现金投币之后更新投币明细日志异常：", e);
+		}
+	}
+	
+	/**
+	 * 投币结束后点击交费按钮，购买有价卡
+	 * @return
+	 */
+	public String buyValueCards()
+	{
+		// 封装有价卡信息
+		valueCardVO.setMinMoney(totalFee);
+		cardPayLogVO.setPayType(payType);
+		
+		try
+		{
+			cardList = valueCardService.addValueCards(cardPayLogVO, valueCardVO, curMenuId);
+		}
+		catch(ReceptionException re)
+		{
+			String msg = re.getMessage();
+			
+			if("1".equals(msg.split(";,;")[0]))
+			{
+				return "repeatError";
+			}
+			else if("2".equals(msg.split(";,;")[0]))
+			{
+				if(StringUtils.isEmpty(msg.split(";,;")[1]))
+				{
+					setErrormessage("有价卡购买失败！");
+				}
+				else
+				{
+					setErrormessage(msg.split(";,;")[1]);
+				}
+				
+				// 判断是现金还是银联卡交费异常
+				if(Constants.PAYBYMONEY.equals(cardPayLogVO.getPayType()))
+				{
+					return "cashError";
+				}
+				else
+				{
+					return "cardError";
+				}
+			}
+		}
+		return SUCCESS;
+	}
+	
+	/**
+	 * 现金交费异常
+	 * @return
+	 */
+	public String goCashError()
+	{
+		try
+		{
+			valueCardService.updateCashError(cardPayLogVO, errormessage, tMoney);
+		}
+		catch(Exception e)
+		{
+			logger.error("记录扣款错误日志异常：",e);
+            errormessage = errormessage + e.getMessage();
+		}
+		
+		return SUCCESS;
+	}
+	
+	/**
+	 * 跳转至银联扣款页面
+	 * @return
+	 */
+	public String cardCharge()
+	{
+		return SUCCESS;
+	}
+	
+	/**
+	 * 跳转至读取银行卡页面
+	 * @return
+	 */
+	public String readCard()
+	{
+		return SUCCESS;
+	}
+	
+	/**
+	 * 跳转至输入银行卡密码的页面
+	 * @return
+	 */
+	public String inputCardPwd()
+    {
+        return SUCCESS;
+    }
+	
+	/**
+	 * 转向确认银行卡信息页面
+	 * @return
+	 */
+	public String makeSure()
+	{
+		return SUCCESS;
+	}
+	
+	/**
+	 * 缴费前添加扣款日志
+	 */
+	public void addCardChargeLog()
+	{
+		logger.debug("addChargeLog  start...");
+		
+		try
+		{
+			writeXmlMsg(valueCardService.addCardChargeLog(cardPayLogVO, Constants.VALUECARD_RECLOG));
+		}
+		catch(Exception e)
+		{
+			writeXmlMsg("0");
+			
+			errormessage = e.getMessage();
+		}
+		
+		logger.debug("addChargeLog  end...");
+	}
+	
+	/**
+	 * 交费完成后，更新扣款日志
+	 */
+	public void updateCardChargeLog()
+	{
+		logger.debug("updateCardChargeLog   start...");
+		
+		try
+		{
+			writeXmlMsg(valueCardService.updateCardChargeLog(cardPayLogVO));
+		}
+		catch(Exception e)
+		{
+			errormessage = e.getMessage();
+		}
+		
+		logger.debug("updateCardChargeLog   end...");
+	}
+	
+	/**
+	 * 银联卡交费异常
+	 * @return
+	 */
+	public String goCardError()
+	{
+		try
+        {
+			valueCardService.addCardError(cardPayLogVO, errormessage, Constants.VALUECARD_RECLOG, tMoney, errPosResCode, errorType);
+        }
+        catch (Exception e)
+        {
+            // 捕获一切异常,使页面必须走退卡页面
+            logger.error(e);
+            errormessage = errormessage + e.getMessage();
+        }
+        return SUCCESS;
+	}
+	
+	/**
+     * 跳转至读卡页面（山东）
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+	public String readCard_sd()
+	{
+		setServNumber(cardPayLogVO.getServnumber());
+		
+		// 设置支付方式
+		cardPayLogVO.setPayType(payType);
+		
+		// 交费前记录交费日志信息
+		cardPayLogVO = feeServiceSDImpl.addChargeLog(
+				cardPayLogVO, 
+        		feeChargeService.getChargeLogOID(),
+        		Constants.VALUECARD_RECLOG,
+        		Constants.PROVINCE_REGION_999);
+		
+		return SUCCESS;
+	}
+	
+	/**
+     * 扣款成功之后，更新交费日志(山东)
+     * 山东与湖北的成功标志不同，1：湖北，0：山东
+     * @throws Exception
+     * @see
+     */
+    public void updateCardChargeLog_sd()
+    {
+    	try 
+    	{
+    		feeServiceSDImpl.updateCardChargeLog(cardPayLogVO);
+    		writeXmlMsg(Constants.RECSTATUS_SUCCESS);
+		}
+    	catch (Exception e) 
+    	{
+    		logger.error(e.getMessage(), e);
+    		writeXmlMsg(Constants.RECSTATUS_FALID);
+    	}
+    }
+	
+	/**
+     * 山东缴费异常处理（银联卡和现金）
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String chargeError()
+    {
+    	// 银联卡返回的金额单位是分，转换为元
+        if (Constants.PAYBYUNIONCARD.equals(cardPayLogVO.getPayType()))
+        {
+        	cardPayLogVO.settMoney(CommonUtil.fenToYuan(cardPayLogVO.gettMoney()));
+        }
+        
+        cardPayLogVO.settMoney(CommonUtil.fenToYuan(CommonUtil.yuanToFen(cardPayLogVO.gettMoney())));
+    	
+    	feeServiceSDImpl.updateChargeLog(cardPayLogVO, errormessage, unionRetCode, null);
+    	if(Constants.PAYBYMONEY.equals(cardPayLogVO.getPayType()))
+    	{
+    		return "cashError";
+    	}
+    	else
+    	{
+    		return "cardError";
+    	}
+    }
+    
+    /**
+     * 山东有价卡购买
+     * @return
+     */
+    public String buyValueCards_sd()
+    {
+    	// 设置金额
+    	valueCardVO.setMinMoney(totalFee);
+    	
+    	// 支付方式
+    	cardPayLogVO.setPayType(payType);
+    	
+    	try
+    	{
+    		if (Constants.PAYBYUNIONCARD.equals(payType))
+            {
+    			cardPayLogVO.settMoney(CommonUtil.fenToYuan(cardPayLogVO.gettMoney()));
+            }
+    		cardList= valueCardService.addValueCards_sd(cardPayLogVO, valueCardVO, curMenuId, unionRetCode);
+    	}
+    	catch(ReceptionException re)
+    	{
+    		String msg = re.getMessage();
+			
+			if(StringUtils.isEmpty(msg))
+			{
+				setErrormessage("有价卡购买失败！");
+			}
+			else
+			{
+				setErrormessage(msg);
+			}
+			
+			return "chargeError";
+    	}
+    	return SUCCESS;
+    }
+	
+	/**
+     * <充值交费单笔充值最低金额>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String getMinMoney()
+    {
+        return CommonUtil.getParamValue(Constants.NONLOCAL_CHARGE_MIN, "10");
+    }
+
+	public String getTelnum() {
+		return telnum;
+	}
+
+	public void setTelnum(String telnum) {
+		this.telnum = telnum;
+	}
+
+	public ValueCardService getValueCardService() {
+		return valueCardService;
+	}
+
+	public void setValueCardService(ValueCardService valueCardService) {
+		this.valueCardService = valueCardService;
+	}
+
+	public String getCurMenuId() {
+		return curMenuId;
+	}
+
+	public void setCurMenuId(String curMenuId) {
+		this.curMenuId = curMenuId;
+	}
+
+	public String getErrormessage() {
+		return errormessage;
+	}
+
+	public void setErrormessage(String errormessage) {
+		this.errormessage = errormessage;
+	}
+
+	public List<DictItemVO> getDictList() {
+		return dictList;
+	}
+
+	public void setDictList(List<DictItemVO> dictList) {
+		this.dictList = dictList;
+	}
+
+	public List<DictItemPO> getTypeList() {
+		return typeList;
+	}
+
+	public void setTypeList(List<DictItemPO> typeList) {
+		this.typeList = typeList;
+	}
+
+	public List<MenuInfoPO> getUsableTypes() {
+		return usableTypes;
+	}
+
+	public void setUsableTypes(List<MenuInfoPO> usableTypes) {
+		this.usableTypes = usableTypes;
+	}
+
+	public String getTotalFee() {
+		return totalFee;
+	}
+
+	public void setTotalFee(String totalFee) {
+		this.totalFee = totalFee;
+	}
+
+	public List<ValueCardVO> getCardList() {
+		return cardList;
+	}
+
+	public void setCardList(List<ValueCardVO> cardList) {
+		this.cardList = cardList;
+	}
+
+	public String getTMoney() {
+		return tMoney;
+	}
+
+	public void setTMoney(String money) {
+		tMoney = money;
+	}
+
+	public ValueCardVO getValueCardVO() {
+		return valueCardVO;
+	}
+
+	public void setValueCardVO(ValueCardVO valueCardVO) {
+		this.valueCardVO = valueCardVO;
+	}
+
+	public String getPayType() {
+		return payType;
+	}
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getErrorType() {
+		return errorType;
+	}
+
+	public void setErrorType(String errorType) {
+		this.errorType = errorType;
+	}
+
+	public String getNeedReturnCard() {
+		return needReturnCard;
+	}
+
+	public void setNeedReturnCard(String needReturnCard) {
+		this.needReturnCard = needReturnCard;
+	}
+
+	public String getPrintcontext() {
+		return printcontext;
+	}
+
+	public void setPrintcontext(String printcontext) {
+		this.printcontext = printcontext;
+	}
+
+	public String getInitPosResCode() {
+		return initPosResCode;
+	}
+
+	public void setInitPosResCode(String initPosResCode) {
+		this.initPosResCode = initPosResCode;
+	}
+
+	public String getCmtPosResCode() {
+		return cmtPosResCode;
+	}
+
+	public void setCmtPosResCode(String cmtPosResCode) {
+		this.cmtPosResCode = cmtPosResCode;
+	}
+
+	public String getErrPosResCode() {
+		return errPosResCode;
+	}
+
+	public void setErrPosResCode(String errPosResCode) {
+		this.errPosResCode = errPosResCode;
+	}
+
+	public FeeService getFeeService() {
+		return feeService;
+	}
+
+	public void setFeeService(FeeService feeService) {
+		this.feeService = feeService;
+	}
+
+	public CardChargeLogVO getCardPayLogVO() {
+		return cardPayLogVO;
+	}
+
+	public void setCardPayLogVO(CardChargeLogVO cardPayLogVO) {
+		this.cardPayLogVO = cardPayLogVO;
+	}
+
+	public List<DictItemPO> getTipsList() {
+		return tipsList;
+	}
+
+	public void setTipsList(List<DictItemPO> tipsList) {
+		this.tipsList = tipsList;
+	}
+
+	public IFeeServiceSD getFeeServiceSDImpl() {
+		return feeServiceSDImpl;
+	}
+
+	public void setFeeServiceSDImpl(IFeeServiceSD feeServiceSDImpl) {
+		this.feeServiceSDImpl = feeServiceSDImpl;
+	}
+
+	public FeeChargeService getFeeChargeService() {
+		return feeChargeService;
+	}
+
+	public void setFeeChargeService(FeeChargeService feeChargeService) {
+		this.feeChargeService = feeChargeService;
+	}
+
+	public String getServNumber() {
+		return servNumber;
+	}
+
+	public void setServNumber(String servNumber) {
+		this.servNumber = servNumber;
+	}
+
+	public String getUnionRetCode() {
+		return unionRetCode;
+	}
+
+	public void setUnionRetCode(String unionRetCode) {
+		this.unionRetCode = unionRetCode;
+	}
+}

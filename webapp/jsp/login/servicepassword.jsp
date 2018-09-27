@@ -1,0 +1,1441 @@
+<%@page contentType="text/html; charset=GBK"%>
+<%@page import="com.gmcc.boss.selfsvc.common.Constants"%>
+<%@page import="com.gmcc.boss.selfsvc.cache.PublicCache"%>
+<%@page import="com.gmcc.boss.selfsvc.login.model.NserCustomerSimp"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="com.gmcc.boss.selfsvc.util.CommonUtil"%>
+<%@ page import="com.huawei.boss.common.security.RSAUtil"%>
+
+<%
+    RSAUtil.generateKeyPair(session, 1024);
+    String errorMsg = (String)request.getAttribute("errormessage");
+    if (errorMsg == null)
+    {
+        errorMsg = "";
+    }
+    
+	// add begin qWX279398 2015-08-25 OR_HUB_201508_599 关于整改自助缴费机安全漏洞的需求
+	errorMsg = CommonUtil.errorMessage(errorMsg);
+	// add end qWX279398 2015-08-25 OR_HUB_201508_599 关于整改自助缴费机安全漏洞的需求
+	    
+    
+    String keyFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_OPERATION_KEYFLAG);
+    
+    String popupFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_ERRORMSG_POPUPFLAG);
+    
+    String pageProvince = (String) PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID);
+    
+    // modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式
+    // 山东可选方式登录样式切换标志   1:新样式  0：老样式
+    String availableFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_AVAILABLECODE_FLAG);
+    String currServnumber = (String)request.getAttribute("servnumber");
+    if (null == currServnumber)
+    {
+        currServnumber = "";
+    }
+    // modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式
+    
+    //add begin CKF76106 2012/09/27 R003C12L07n01 OR_HUB_201206_597
+    
+    // 产品大类
+    String typeID = "";
+    
+    if(null != request.getParameter("typeID"))
+    {
+    	typeID = (String)request.getParameter("typeID");
+    }
+    
+    // 产品快速发布标识
+    String quickPubFlag = "";
+    
+    if(null != request.getParameter("quickPubFlag"))
+    {
+    	quickPubFlag = (String)request.getParameter("quickPubFlag");
+    }
+    
+    //add end CKF76106 2012/09/27  R003C12L07n01 OR_HUB_201206_597
+    
+    //add begin m00227318 2013/02/07 R003C13L01n01 OR_NX_201302_600
+    String authCodeType = (String) request.getParameter("authCodeType");
+    
+    // 可选认证方式
+    String resultAvaiCode = (String)request.getParameter("resultAvaiCode");
+    
+    // 用户已认证，手机号码自动填充且不可修改
+    NserCustomerSimp custInformation = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);
+    //add end m00227318 2013/02/07 R003C13L01n01 OR_NX_201302_600
+    
+    // add begin cKF76106 2013/04/16  R003C13L04n01 OR_HUB_201303_548
+    String cdrQryTelnum = (String)session.getAttribute("CDRQRY_TELNUM");
+    // add end cKF76106 2013/04/16  R003C13L04n01 OR_HUB_201303_548
+    
+    //修改bug，从营销业务跳转过来后点击上一页显示空白页
+    //add by sWX219697 2015-2-13 17:17:45 修改bug86167
+    String isssGoBackFlag = (String)session.getAttribute("isssGoBackFlag");
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>移动自助终端</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+		<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+		<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+		<META HTTP-EQUIV="Expires" CONTENT="0">
+		<link href="${sessionScope.basePath }css/reset.css" type="text/css"
+			rel="stylesheet" />
+		<link href="${sessionScope.basePath }css/style.css" type="text/css"
+			rel="stylesheet" />
+		<script type="text/javascript"  src="${sessionScope.basePath }js/BigInt.js"></script>
+        <script type="text/javascript"  src="${sessionScope.basePath }js/Barrett.js"></script>
+        <script type="text/javascript"  src="${sessionScope.basePath }js/RSA.js"></script>	
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/public.js"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/script.js"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/dialyzer.js"></script>
+		<script type="text/javascript">
+		
+		// modify begin by qWX279398 DTS2015111900633
+		// 可选服务密码跳转到随机密码页面标志 
+		window.parent.currFlag = "servicePWD";
+		// modify end by qWX279398 DTS2015111900633
+		
+		var submitFlag = 0;
+		
+		document.onkeydown = pwdKeyboardDown;
+		
+		function pwdKeyboardDown(e) 
+		{
+			var key = GetKeyCode(e);
+			
+			if (key == 77) 
+			{
+				preventEvent(e);
+			}
+			
+			if (!KeyIsNumber(key)) 
+			{
+				return false;//这句话最关键
+			}
+		}
+		
+		function KeyIsNumber(KeyCode) 
+		{
+    		//只允许输入0-9
+    		if (KeyCode >= 48 && KeyCode <= 57)
+    		{
+    			return true;
+    		}
+    		
+    		return false;
+		}
+		
+		document.onkeyup = pwdKeyboardUp;
+		
+		function pwdKeyboardUp(e) 
+		{
+			var key = GetKeyCode(e);
+
+			//确认
+			if (key == 13 || key == 89 || key == 221) 
+			{
+				doSub();
+				return;
+			}
+			
+			<%
+			if (Constants.PROOPERORGID_NX.equalsIgnoreCase(pageProvince))
+			{
+			%>		
+				// 退出
+				if (key == 82 || key == 220)
+				{
+					window.location.href = "${sessionScope.basePath }login/index.action?lockTerm=lockTerm&timeoutFlag=1";
+					return;			
+				}
+				// 清除
+				else if (key == 77)
+				{
+					changValue(-2);
+					return;
+				}	
+				//更正
+				else if (key == 8 || key == 32 || key == 66)
+				{
+					var etarget = getEventTarget(e);
+					if (etarget.type == "text" || etarget.type == "password") 
+					{
+						etarget.value = backString(etarget.value);
+					}
+					if (etarget.name == 'password' && etarget.value == '' )
+					{
+						<%
+						if (null == custInformation)
+						{
+						%>
+							MoveLast(document.getElementById('servnumber'));
+						<%
+						}
+						%>
+					}
+				}
+			
+				<%
+				if (null == custInformation)
+				{
+				%>
+				var tel = document.forms[0].servnumber.value;
+				var password = document.forms[0].password.value;		
+		
+				if ((key == 8 || key == 32 || key == 66)
+				 		&& pangu_getStrLen(trim(password)) == 0 && pangu_getStrLen(trim(tel)) == 11) 
+				{
+					document.forms[0].servnumber.focus();
+					
+					changObj(document.forms[0].servnumber, 1);
+					
+					return true;
+				}
+				
+	 			if (pangu_getStrLen(trim(tel)) == 11 && pangu_getStrLen(trim(password)) == 0) 
+	 			{
+	 				document.forms[0].password.focus();
+	 				
+	 				changObj(document.forms[0].password, 2);
+	 				
+	 				return true;
+	 			}
+	 			<%
+				}
+				%>
+	 			
+				return true;
+			<%
+			}
+			else
+			{
+			%>	
+				//返回
+				if (key == 82 || key == 220) 
+				{
+					goback("");
+					return;
+				}
+				//更正
+				else if (key == 8 || key == 32 || key == 66 || key ==77)
+				{
+					var etarget = getEventTarget(e);
+					if (etarget.type == "text" || etarget.type == "password") 
+					{
+						etarget.value = backString(etarget.value);
+					}
+					if (etarget.name == 'password' && etarget.value == '' )
+					{
+						<%
+						if (null == custInformation)
+						{
+						%>
+							MoveLast(document.getElementById('servnumber'));
+						<%
+						}
+						%>
+					}
+				}
+			
+				<%
+				if (null == custInformation)
+				{
+				%>
+				var tel = document.forms[0].servnumber.value;
+				var password = document.forms[0].password.value;		
+		
+				if ((key == 8 || key == 32 || key == 66 || key ==77)
+				 		&& pangu_getStrLen(trim(password)) == 0 && pangu_getStrLen(trim(tel)) == 11)
+				{
+					document.forms[0].servnumber.focus();
+					
+					changObj(document.forms[0].servnumber, 1);
+					
+					return true;
+				}
+				
+	 			if (pangu_getStrLen(trim(tel)) == 11 && pangu_getStrLen(trim(password)) == 0) 
+	 			{
+	 				document.forms[0].password.focus();
+	 				
+	 				changObj(document.forms[0].password, 2);
+	 				
+	 				return true;
+	 			}
+	 			<%
+				}
+				%>
+	 			
+				return true;
+			<%
+			}
+			%>
+		}		
+		
+		function MoveLast(lastObj)
+		{
+			var r = lastObj.createTextRange(); 
+			r.collapse(false); 
+			r.select();
+		}
+		
+		function trim(str) 
+		{
+			while (str.charAt(str.length - 1) == " ") 
+			{
+				str = str.substring(0, str.length - 1);
+			}
+			
+			while (str.charAt(0) == " ") 
+			{
+				str = str.substring(1, str.length);
+			}
+			
+			return str;
+		}
+
+		function pangu_getStrLen(s) 
+		{
+			var count = 0;
+			var lenByte = s.length;
+			for (i = 0; i < lenByte; i++) 
+			{
+				if (s.charCodeAt(i) > 256) 
+				{
+					count = count + 2;
+				} 
+				else 
+				{
+					count = count + 1;
+				}
+			}
+			
+			return count;
+		}
+
+		// 宁夏非实名制登记确认后提交
+		function submitReception()
+		{
+			if (submitFlag == 0)
+			{
+				if ("<%=Constants.PROOPERORGID_HUB%>" == "<%=((String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID))%>")
+				{
+					encryptPassword("password","<%=(String)session.getAttribute(RSAUtil.PUBLIC_STRING)%>","<%=(String)session.getAttribute(RSAUtil.MODULUS_STRING)%>");
+				}
+				submitFlag = 1;
+				
+				openWindow_wait('pls_wait');
+				
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}login/userLoginWithPwd.action";
+				document.actform.submit();
+			}
+		}		
+
+		function doSub()
+		{
+			//modify begin zWX176560 2013/08/15 OR_NX_201308_11
+			if("<%=Constants.PROOPERORGID_NX%>" == "<%=((String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID))%>")
+			{
+				//对号码进行判断
+				var telNumber = document.getElementById("servnumber").value;
+				if (telNumber == "")
+				{
+					changObj(document.getElementById('servnumber'), 1);
+				
+					if ("1" == "<%=popupFlag %>")
+					{
+						alertRedErrorMsg("请输入正确的手机号码");
+					}
+					else
+					{
+						document.getElementById("errorMsg").innerHTML = "请输入正确的手机号码";
+					}
+					
+					return;
+				}
+			}
+			else
+			{
+				<%--add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+				if ("<%=Constants.PROOPERORGID_HUB%>" == "<%=((String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID))%>")
+				{
+					//对号码进行判断
+					var pattern = /^\d{11}$/;
+				
+					var telNumber = document.getElementById("servnumber").value;
+					if (telNumber == "" || !pattern.test(telNumber))
+					{
+						changObj(document.getElementById('servnumber'), 1);
+				
+						if ("1" == "<%=popupFlag %>")
+						{
+							alertRedErrorMsg("请输入正确的手机号码");
+						}
+						else
+						{
+							document.getElementById("errorMsg").innerHTML = "请输入正确的手机号码";
+						}
+					
+						return;
+					}
+					
+					var randomCode = document.getElementById("randomCodeImage").value;
+					if (randomCode.value == "" || pangu_getStrLen(trim(randomCode)) != 4)
+					{
+						changObj(document.getElementById('randomCodeImage'), 3);
+
+						alertRedErrorMsg("请正确输入验证码");
+
+						return;
+					}
+
+					//验证图片验证码
+					var ran = randomCodeSecurity();
+			
+					if (ran == "0")
+					{
+						alertRedErrorMsg("图片验证码输入错误");
+						changeImage();
+						return;
+					}	
+							
+				}
+				else
+				{
+				<%--add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+					//对号码进行判断
+					var pattern = /^\d{11}$/;
+				
+					var telNumber = document.getElementById("servnumber").value;
+					if (telNumber == "" || !pattern.test(telNumber))
+					{
+						changObj(document.getElementById('servnumber'), 1);
+				
+						if ("1" == "<%=popupFlag %>")
+						{
+							alertRedErrorMsg("请输入正确的手机号码");
+						}
+						else
+						{
+							document.getElementById("errorMsg").innerHTML = "请输入正确的手机号码";
+						}
+					
+						return;
+					}
+				<%--add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+				}
+				<%--add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+			}
+			
+			<%--add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+			//校验图片验证码
+			function randomCodeSecurity()
+			{
+				var url = "${sessionScope.basePath}login/randomCodeSecurity.action";
+				var params = "randomCodeImage=" + getValue("randomCodeImage");
+				var resXml;
+				var loader = new net.ContentLoaderSynchro(url, netload = function()
+				{
+					resXml = this.req.responseText;
+				}, null, "POST", params, "application/x-www-form-urlencoded");
+			
+				return resXml;
+			}
+			<%--add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+			//modify end zWX176560 2013/08/15 OR_NX_201308_11
+			
+			//检验用户输入的手机号是否在黑名单中(宁夏)
+			<%
+				if(Constants.PROOPERORGID_NX.equals(pageProvince))
+				{
+			%>
+					if(checkBlackList(telNumber))
+					{
+						changObj(document.getElementById('servnumber'), 1);
+						if ("1" == "<%=popupFlag %>")
+						{
+							alertRedErrorMsg("对不起，您不能在自助终端办理业务");
+						}
+						else
+						{
+							document.getElementById("errorMsg").innerHTML = "对不起，您不能在自助终端办理业务";
+						}
+						return;
+					}
+			<%
+				}
+			%>
+			var password = document.getElementById("password").value;
+			if (password.value == "" || pangu_getStrLen(trim(password)) != 6)
+			{
+				changObj(document.getElementById('password'), 2);
+				
+				if ("1" == "<%=popupFlag %>")
+				{
+					alertRedErrorMsg("请正确输入密码");
+				}
+				else
+				{
+					document.getElementById("errorMsg").innerHTML = "请正确输入密码！";
+				}
+				
+				return;
+			}
+			
+			// add begin by hWX5316476 2014-2-18  OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求
+			// 登录时候是否是弱密码验证
+			<%
+			if(Constants.PROOPERORGID_NX.equals(pageProvince))
+			{
+			%>
+				var curMenuId = '<%=request.getParameter("curMenuId")%>';
+				var ret = weakPwdCheckLogin(document.getElementById("servnumber").value,password);
+				if(ret.split('^')[0] == '2')
+				{
+					if("recChangePwd" == curMenuId )
+					{
+						alertRedErrorMsg("尊敬的用户您好，您的服务密码过于简单，不允许修改，只允许重置！");
+					}
+					else
+					{
+						openWeakPwdConfirm(ret.split('^')[1]);
+					}
+					return;
+				}
+				else if(ret.split('^')[0] == '0')
+				{
+					alertRedErrorMsg(ret.split('^')[1]);
+					return;
+				}
+				toRealNameCheck();
+			<%
+			}
+			else
+			{
+			%>
+				submitReception();
+			<%
+			}
+			%>
+
+		}
+		
+		// 登录时候校验是否是弱密码验证
+		function weakPwdCheckLogin(telNumber,password)
+		{
+			var url="${sessionScop.basePath}login/weakPwdCheckLogin.action";
+			var param="servnumber="+telNumber+"&password="+password;
+			var data = "";
+			var contentLoader=new net.ContentLoaderSynchro(url,function(){
+				data=this.req.responseText;
+			},null,"POST",param,"application/x-www-form-urlencoded");
+			return data;
+			
+		}
+		
+		//弹出弱密码确认框
+		openWeakPwdConfirm = function(content)
+		{
+			document.getElementById('weakPwdPromptId').innerHTML = content;
+			wiWindow = new OpenWindow("weakPwdCheck_confirm",708,392);//打开弹出窗口例子
+		}
+		
+		// add end  by hWX5316476  OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求
+		
+		// 非实名制验证
+		function toRealNameCheck()
+		{
+			// 是否实名制信息登记
+			var ret = realNameCheck(document.getElementById("servnumber").value);
+			if(ret.split('^')[0] == '0')
+			{
+				openRealNameConfirm(ret.split('^')[1]);
+				return;
+			}
+			submitReception();
+		}
+		
+		// 非实名制信息提示
+		function realNameCheck(telNumber)
+		{
+			var url="${sessionScop.basePath}login/realNameCheck.action";
+			var param="servnumber="+telNumber;
+			var data = "";
+			var contentLoader=new net.ContentLoaderSynchro(url,function(){
+				data=this.req.responseText;
+			},null,"POST",param,"application/x-www-form-urlencoded");
+			return data;
+		}
+		
+		//弹出确认框
+		openRealNameConfirm = function(content)
+		{
+			document.getElementById('realnamePromptId').innerHTML = content;
+			wiWindow = new OpenWindow("realNameCheck_confirm",708,392);//打开弹出窗口例子
+		}
+		
+		// 转向到随机密码认证页面
+		function goRamdomPage()
+		{   
+			//对号码进行判断
+			var pattern = /^\d{11}$/;
+			
+			var telNumber = document.getElementById("servnumber").value;
+			if (telNumber == "" || !pattern.test(telNumber))
+			{
+				changObj(document.getElementById('servnumber'), 1);
+			
+				if ("1" == "<%=popupFlag %>")
+				{
+					alertRedErrorMsg("请输入正确的手机号码");
+				}
+				else
+				{
+					document.getElementById("errorMsg").innerHTML = "请输入正确的手机号码";
+				}
+				
+				return;
+			}
+			
+			if (submitFlag == 0)
+			{
+				submitFlag = 1;		
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}login/randomcode_cq.action";
+				document.actform.submit();
+			}
+		}
+		
+		//返回上一页
+		function goback(menuid)
+		{
+			// add begin g00140516 2012/10/19 eCommerce V200R003C12L10 OR_huawei_201210_125
+			if (document.getElementById("backWaitingFlag").value == "1")
+			{
+				openWindow_wait('pls_wait');
+			}
+			// add end g00140516 2012/10/19 eCommerce V200R003C12L10 OR_huawei_201210_125
+			
+			//modify begin sWX219697 2015-2-13 17:08:32 bug 86167
+			<% 
+			if(StringUtils.isBlank(isssGoBackFlag))
+			{
+			%>
+				window.history.back();
+			<%
+			}
+			else
+			{
+				session.removeAttribute("isssGoBackFlag");
+			%>
+				window.location.href = "${sessionScope.basePath }login/goHomePage.action?timeoutFlag=0";
+			<%
+			}
+			%>
+			//modify end sWX219697 2015-2-13 17:08:32 bug 86167
+		}
+		
+		<%--
+		* 用户已认证，光标聚焦密码框；用户未认证，光标聚焦手机号码输入框。
+		* @remark create g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600
+		--%>
+		function focusText()
+		{
+			<%
+			if (null == custInformation && null == cdrQryTelnum)
+			{
+			%>
+				document.getElementById('servnumber').focus();
+			<%
+			}
+			else
+			{
+			%>
+				document.getElementById('password').focus();
+			<%
+			}
+			%>
+		}
+		
+	    <%--
+		* 转向到短信验证码认证页面。
+		* @remark create m00227318 2013/02/07 R003C13L01n01 OR_NX_201302_600
+		--%>
+		function goRandomPwdPage()
+		{  
+			if (submitFlag == 0)
+			{
+				submitFlag = 1;	
+					
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}login/goRandomPwdPage.action";
+				document.actform.submit();
+			}
+			
+		}
+		
+		<%--
+		* 转向身份认证页面。
+		* @remark create m00227318 2013/02/07 R003C13L01n01 OR_NX_201302_600
+		--%>
+		function goIDPage()
+		{
+		    if (submitFlag == 0)
+		    {
+		        submitFlag = 1;
+		        
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath}login/goIDPage.action";
+				document.actform.submit();
+		    }
+		}
+		
+		// 弹出正在处理DIV(宁夏)
+		openRecWaitLoading_NX = function(id){
+		<%
+			if(Constants.PROOPERORGID_NX.equalsIgnoreCase(pageProvince))
+			{
+		%>
+				wiWindow = new OpenWindow("recWaitLoading", 804, 515);
+		<%
+			}
+		%>
+		}
+		
+		<%--add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+		function changeImage()
+		{
+			document.getElementById('refreshRandomCodeImage').src="${sessionScope.basePath}login/randomCodeImage.action?pageId=" + Math.random();
+		}
+		<%--add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 --%>
+		
+		</script>
+	</head>
+	<body scroll="no" onload="focusText();">
+		<form name="actform" method="post">
+			<!--add begin CKF76106 2012/09/27  R003C12L07n01 OR_HUB_201206_597-->
+			<input type="hidden" id="typeID" name="typeID" value="<%=typeID %>"/>
+			<input type="hidden" id="quickPubFlag" name="quickPubFlag" value="<%=quickPubFlag %>"/>
+			<!--add end CKF76106 2012/09/27  R003C12L07n01 OR_HUB_201206_597-->
+			
+			<%--add begin g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600 --%>
+			<input type="hidden" id="authCodeType" name="authCodeType" value="<%=authCodeType %>"/>
+			<input type="hidden" id="resultAvaiCode" name="resultAvaiCode" value="<%=resultAvaiCode %>"/>
+			<%--add end g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600 --%>
+			
+			<%@ include file="/titleinc.jsp"%>
+
+			<div class="main" id="main">
+				<div class="blank20"></div>
+				<span class="yellow fs16 ml10" >
+					&nbsp;&nbsp;
+				</span>
+			
+				<%--modify begin g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600 --%>
+				<div class="blank50">
+				<%
+				    // modify begin yKF28472
+				    if (Constants.PROOPERORGID_CQ.equalsIgnoreCase(pageProvince))
+				    {
+				%>
+				<br>
+				<a href="#" class="bt10 fr mr43"
+					onmousedown="this.className='bt10on fr mr43'"
+					onmouseup="this.className='bt10 fr mr43';goRamdomPage(); return false;"
+					style="display: inline">随机密码认证</a>
+				<%
+				    }
+				    
+				    // modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式
+				    // 非重庆和非山东可选方式   或非重庆和参数报表中配置使用原先样式,使用原有按钮展示页面
+				    else if (!((Constants.PROOPERORGID_CQ.equalsIgnoreCase(pageProvince)) || (Constants.PROOPERORGID_SD.equals(pageProvince)&& null != resultAvaiCode)) 
+				    			|| (!Constants.PROOPERORGID_CQ.equalsIgnoreCase(pageProvince) && (!"1".equals(availableFlag))))
+				    // modify end by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式
+				    
+				    {
+				    	// 可切换至身份证认证页面
+				    	if ("optional".equals(authCodeType) && resultAvaiCode.charAt(2) == '1')
+						{
+				%>
+					<a id="idModeLink" href="#" class="bt10 fr mr43" onmousedown="this.className='bt10on fr mr43'" onmouseup="this.className='bt10 fr mr43';goIDPage(); return false;" style="display:inline">身份证认证登录</a>    
+				<%
+						}
+				
+						// 可切短信验证码认证页面
+						if ("optional".equals(authCodeType) && resultAvaiCode.charAt(1) == '1')
+						{
+				%>		
+					<a href="#" class="bt10 fr mr43" onmousedown="this.className='bt10on fr mr43'" onmouseup="this.className='bt10 fr mr43';goRandomPwdPage(); return false;" style="display:inline">短信验证码登录</a>    
+				<%
+						}
+				    }
+				%>
+				</div>
+				<%--modify end g00140516 2013/02/21 R003C13L02n01 OR_NX_201302_600 --%>
+
+				<div class="b966">
+					<div class="blank30" id="errorMsg"></div>
+
+					<div class=" p40">
+						<p class="fs22 mb30"></p>
+
+						<!--键盘+输入框+温馨提示-->
+						<div class="keyboard_wrap clearfix">
+							<ul class="phone_num_list fl">
+								<%
+								if (null == custInformation && null == cdrQryTelnum)
+								{
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 
+									if (Constants.PROOPERORGID_HUB.equals(pageProvince))
+									{
+									%>
+										<li class="on fs20 clearfix" id="phone_input_1">
+											<i class="lh30">1.输入手机号码</i>
+											<span id="redstar1" class="pl20 fl lh75">手机号码：</span>
+											<input type="text" id="servnumber" name="servnumber"
+												maxlength="11" class="text1 fl relative" style="margin-left:20px;"
+												onclick="changObj(this, 1);MoveLast(this);" value="<%=currServnumber %>" />
+										</li>
+										<li class="fs20 clearfix" id="phone_input_2">
+											<i class="lh30">2. 密码验证</i>
+											<span id="redstar2" class="pl20 fl lh75">密码验证：</span>
+											<input type="password" name="password" id="password"
+												maxlength="6" class="text1 fl relative" style="margin-left:20px;"
+												onclick="changObj(this, 2);MoveLast(this);" />
+										</li>
+										<li class="fs20 clearfix" id="phone_input_3">
+											<i class="lh30">3. 图片验证码验证</i>
+											<span id="redstar3" class="pl20 fl lh75">验证码：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+											<input type="text" name="randomCodeImage" id="randomCodeImage"
+												maxlength="6" class="text3 fl relative"
+												onclick="changObj(this, 3);MoveLast(this);" />
+											<img border="1" 
+												src="${sessionScope.basePath}login/randomCodeImage.action" width="60"
+												height="45" title="点击重新获取验证码" id="refreshRandomCodeImage"
+												onclick="changeImage();" style="cursor: pointer;" />
+										</li>
+									<%	
+									}
+									else
+									{
+									//add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 
+									%>	
+								<li class="on fs20 clearfix" id="phone_input_1">
+									<i class="lh30">1.输入手机号码</i>
+									<span id="redstar1" class="pl20 fl lh75">手机号码：</span>
+									<input type="text" id="servnumber" name="servnumber"
+										maxlength="11" class="text1 fl relative" style="margin-left:20px;"
+										onclick="changObj(this, 1);MoveLast(this);" value="<%=currServnumber %>" />
+								</li>
+								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								<% 
+								// 山东可选方式登录且为新样式标志
+								if (Constants.PROOPERORGID_SD.equals(pageProvince) && "optional".equals(authCodeType) && null != resultAvaiCode && ("1".equals(availableFlag)))
+								{
+								%>
+								<li class="fs20 clearfix" id="phone_input_3" style="height:100%">
+									<span id="redstar1" class="pl20 fl lh75">验证方式：</span>
+									<span>
+									<% 
+							    	if ("optional".equals(authCodeType) && resultAvaiCode.charAt(0) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112on fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112on fr mr92';" style="display:inline">服务密码登录</a>
+									<% 
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(1) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goRandomPwdPage(); return false;" style="display:inline">短信随机码登录</a>
+									<%
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(2) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goIDPage(); return false;" style="display:inline">身份证认证登录</a> 
+									<%
+									}
+									%>
+									</span>
+								</li>
+								<% 
+								}
+								%>								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								
+								<li class="fs20 clearfix" id="phone_input_2">
+									<i class="lh30">2. 密码验证</i>
+									<span id="redstar2" class="pl20 fl lh75">密码验证：</span>
+									<input type="password" name="password" id="password"
+										maxlength="6" class="text1 fl relative" style="margin-left:20px;"
+										onclick="changObj(this, 2);MoveLast(this);" />
+								</li>
+								<%
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改
+									}
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 
+								}
+								else if(null != cdrQryTelnum)
+								{
+								%>
+								<li class="fs20 clearfix" id="phone_input_1">
+									<i class="lh30">1.输入手机号码</i>
+									<span id="redstar1" class="pl20 fl lh75">手机号码：</span>
+									<%-- 手机号码自动填充，且不可修改 --%>
+									<input type="text" id="servnumber" name="servnumber" value="<%=cdrQryTelnum %>"
+									style="margin-left:20px;"	class="text1 fl relative" readonly="readonly" />
+								</li>
+								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								<% 
+								// 山东可选方式登录且为新样式标志
+								if (Constants.PROOPERORGID_SD.equals(pageProvince) && "optional".equals(authCodeType) && null != resultAvaiCode && ("1".equals(availableFlag)))
+								{
+								%>
+								<li class="fs20 clearfix" id="phone_input_3" style="height:100%">
+									<span id="redstar1" class="pl20 fl lh75">验证方式：</span>
+									<span>
+									<% 
+							    	if ("optional".equals(authCodeType) && resultAvaiCode.charAt(0) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112on fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112on fr mr92';" style="display:inline">服务密码登录</a>
+									<% 
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(1) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goRandomPwdPage(); return false;" style="display:inline">短信随机码登录</a>
+									<%
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(2) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goIDPage(); return false;" style="display:inline">身份证认证登录</a> 
+									<%
+									}
+									%>
+									</span>
+								</li>
+								<% 
+								}
+								%>								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								
+								<li class="on fs20 clearfix" id="phone_input_2">
+									<i class="lh30">2. 密码验证</i>
+									<span id="redstar2" class="pl20 fl lh75">密码验证：</span>
+									<input type="password" name="password" id="password"
+										maxlength="6" class="text1 fl relative" style="margin-left:20px;"
+										onclick="changObj(this, 2);MoveLast(this);" />
+								</li>									
+								<%
+								}
+								else
+								{
+								%>
+								<li class="fs20 clearfix" id="phone_input_1">
+									<i class="lh30">1.输入手机号码</i>
+									<span id="redstar1" class="pl20 fl lh75">手机号码：</span>
+									<%-- 手机号码自动填充，且不可修改 --%>
+									<input type="text" id="servnumber" name="servnumber" value="<%=custInformation.getServNumber() %>"
+									style="margin-left:20px;"	class="text1 fl relative" readonly="readonly" />
+								</li>
+								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								<% 
+								// 山东可选方式登录且为新样式标志
+								if (Constants.PROOPERORGID_SD.equals(pageProvince) && "optional".equals(authCodeType) && null != resultAvaiCode && ("1".equals(availableFlag)))
+								{
+								%>
+								<li class="fs20 clearfix" id="phone_input_3" style="height:100%">
+									<span id="redstar1" class="pl20 fl lh75">验证方式：</span>
+									<span>
+									<% 
+							    	if ("optional".equals(authCodeType) && resultAvaiCode.charAt(0) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112on fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112on fr mr92';" style="display:inline">服务密码登录</a>
+									<% 
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(1) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goRandomPwdPage(); return false;" style="display:inline">短信随机码登录</a>
+									<%
+									}
+									if ("optional".equals(authCodeType) && resultAvaiCode.charAt(2) == '1')
+									{
+									%>
+									<a id="idModeLink" href="#" class="bt112 fr mr92" onmousedown="this.className='bt112on fr mr92'" onmouseup="this.className='bt112 fr mr92';goIDPage(); return false;" style="display:inline">身份证认证登录</a> 
+									<%
+									}
+									%>
+									</span>
+								</li>
+								<% 
+								}
+								%>								
+								<%-- modify begin by qWX279398 2015-10-29 OR_SD_201510_540_山东_自助终端’用户登陆鉴权’增加短信随机码方式 --%>
+								
+								<li class="on fs20 clearfix" id="phone_input_2">
+									<i class="lh30">2. 密码验证</i>
+									<span id="redstar2" class="pl20 fl lh75">密码验证：</span>
+									<input type="password" name="password" id="password"
+										maxlength="6" class="text1 fl relative" style="margin-left:20px;"
+										onclick="changObj(this, 2);MoveLast(this);" />
+								</li>									
+								<%
+								}
+								%>
+								
+
+								<%
+								    // modify begin yKF28472
+								    if (Constants.PROOPERORGID_CQ.equalsIgnoreCase(pageProvince))
+								    {
+								%>
+								<div class="blank30"></div>
+								<div class="blank30"></div>
+								<div class="blank30"></div>
+								<p class="tit_arrow ">
+									<span class=" bg"></span>温馨提示：
+								</p>
+								<p class="p20">
+									1. 您也可通过终端的金属键盘输入；
+								</p>
+								<p class="p20">
+									2. 提供服务和短信密码两种验证方式。
+								</p>
+								<%
+								    }
+								    else if ("1".equals(keyFlag))
+								    {
+								%>
+								<li class="fs18 mt30 line_height_12">
+         							<p class="tit_arrow "><span class=" bg"></span>温馨提示：</p>
+         							<p class="p10">1. 信息输入完毕后，请按"确认"键提交；</p>
+         							<p class="p10">2. 如需修改，请按"清除"键。</p>
+         						</li>
+								<%
+								    }
+								%>
+
+							</ul>
+
+
+
+							<!--小键盘-->
+							<div class="numboard numboard_big fl" id="numBoard">
+								<div class=" numbox">
+									<div class="blank10"></div>
+									<a href="javascript:void(0)">1</a><a href="javascript:void(0)">2</a><a
+										href="javascript:void(0)">3</a>
+									<a href="javascript:void(0)" class="func1" name="functionkey"
+										id="numBoardBack" onmousedown="this.className='func1on'"
+										onmouseup="this.className='func1';changValue(-1);"></a>
+									<div class="clear"></div>
+									<a href="javascript:void(0)">4</a><a href="javascript:void(0)">5</a><a
+										href="javascript:void(0)">6</a>
+									<a href="javascript:void(0)" class="func2" name="functionkey"
+										id="numBoardClear" onmousedown="this.className='func2on'"
+										onmouseup="this.className='func2';changValue(-2);"></a>
+									<div class="clear"></div>
+									<div class="nleft">
+										<a href="javascript:void(0)">7</a><a href="javascript:void(0)">8</a><a
+											href="javascript:void(0)">9</a>
+										<a href="javascript:void(0)">x</a><a href="javascript:void(0)">0</a><a
+											href="javascript:void(0)">#</a>
+									</div>
+									<div class="nright">
+										<a href="javascript:void(0)" onclick="doSub();return false;"
+											class="func3" name="functionkey" id="numBoardEnter"
+											onmousedown="this.className='func3on'"
+											onmouseup="this.className='func3'">1</a>
+									</div>
+									<div class="blank10"></div>
+								</div>
+							</div>
+							
+							<!--弹出框 正在处理 请稍候-->
+							<div class="popupWin fs28 credit_pls_wait" id="pls_wait">
+								<div class="bg"></div>
+								<p class="mt40">
+									<img src="${sessionScope.basePath }images/loading.gif" alt="处理中..." />
+								</p>
+								
+								<%-- modify begin hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+								<p class="tips_txt">
+									<%=CommonUtil.getParamValue(Constants.REC_WAITLOADING_MSG,"正在处理，请稍候......") %>
+								</p>
+								<%-- modify end hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+								
+								<div class="line"></div>
+								<div class="popup_banner"></div>
+							</div>
+							
+							<script type="text/javascript">
+							openWindow_wait = function(id)
+							{
+							  	wiWindow = new OpenWindow("pls_wait", 804, 515);//打开弹出窗口
+							}			
+						    </script>
+							<!--弹出窗结束-->
+
+							<script type="text/javascript">	
+								<%
+									if("1".equals(redStarKey))
+									{
+								%>
+									var textContent1 = document.getElementById('redstar1').innerHTML;
+									document.getElementById('redstar1').innerHTML=textContent1 + '<font color="red">*</font>';
+									
+									var textContent2 = document.getElementById('redstar2').innerHTML;
+									document.getElementById('redstar2').innerHTML=textContent2 + '<font color="red">*</font>';
+								<%
+									}
+								%>
+								<% 
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改
+									if (Constants.PROOPERORGID_HUB.equals(pageProvince)) 
+									{
+								%>
+									var numBoardBtns = document.getElementById('numBoard').getElementsByTagName('div')[0].getElementsByTagName('a');
+									var lastObj = document.getElementById('servnumber');
+									var lastpw = document.getElementById('password');
+									var type = 1;
+									
+									<%
+									if (null != custInformation)
+									{
+									%>
+										lastObj = document.getElementById('password');
+										type = 0;
+									<%
+									}
+									%>
+									
+									for (i = 0; i < numBoardBtns.length; i++)
+									{
+						    			if (!numBoardBtns[i].className) 
+						    			{
+						    				numBoardBtns[i].className='';
+						    			}
+						    		
+					     				if (numBoardBtns[i].name == 'functionkey')
+					     				{
+					     					continue;  
+					     				}
+						 
+										numBoardBtns[i].onmousedown = function(){
+							 				this.className = 'on';
+										}
+									
+										numBoardBtns[i].onmouseup = function(){
+									
+											changValue(0, this.innerHTML);
+										
+							  				this.className = '';
+							  			
+							  				// servnumber输入完毕自动跳转到password
+							  				if (pangu_getStrLen(lastObj.value) == 11 
+							  						&& pangu_getStrLen(trim(document.forms[0].password.value)) == 0) 
+							 				{
+							 					document.forms[0].password.focus();
+							 				
+							 					changObj(document.forms[0].password, 2);
+							 				
+							 					return true;
+							 				}
+							 				
+							 				// password输入完毕自动跳转到randomCodeImage
+							 				if (pangu_getStrLen(lastpw.value) == 6 
+							  						&& pangu_getStrLen(trim(document.forms[0].randomCodeImage.value)) == 0) 
+							 				{
+							 					document.forms[0].randomCodeImage.focus();
+							 				
+							 					changObj(document.forms[0].randomCodeImage, 3);
+							 				
+							 					return true;
+							 				}
+							   
+										}					
+									}
+									
+									function changObj(o, t)
+									{
+										document.getElementById("errorMsg").innerHTML = "";
+									
+										lastObj = o;
+							
+										if (t == 1)
+										{
+											type = 1;
+											document.getElementById('phone_input_1').className = "on fs20 clearfix";
+											document.getElementById('phone_input_2').className = "fs20 clearfix";
+											document.getElementById('phone_input_3').className = "fs20 clearfix";
+										}
+										else if (t == 2)
+										{
+											type = 0;
+											document.getElementById('phone_input_1').className = "fs20 clearfix";
+											document.getElementById('phone_input_2').className = "on fs20 clearfix";
+											document.getElementById('phone_input_3').className = "fs20 clearfix";
+										}
+										else
+										{
+											type = 2;
+											document.getElementById('phone_input_1').className = "fs20 clearfix";
+											document.getElementById('phone_input_2').className = "fs20 clearfix";
+											document.getElementById('phone_input_3').className = "on fs20 clearfix";
+										}
+									}					
+						
+									function changValue(t, v)
+									{
+										lastObj.focus();
+										lastObj.select();
+										if (t == -1)
+										{
+											lastObj.value = lastObj.value.slice(0, -1);
+										}
+										else if(t == -2)
+										{
+											lastObj.value = "";
+										}
+										else if (lastObj.value.length < 11 && !isNaN(v) && type == 1)
+										{	
+											lastObj.value += v;
+										}
+										else if(lastObj.value.length < 6 && !isNaN(v) && type == 0)
+										{
+											lastObj.value += v;
+										}
+										else if (lastObj.value.length < 4 && !isNaN(v) && type == 2)
+										{
+											lastObj.value += v;
+										}
+										var r = lastObj.createTextRange(); 
+										r.collapse(false); 
+										r.select();
+									}
+									
+								<%	
+									}
+									else
+									{
+									//add end lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改
+								%>
+									var numBoardBtns = document.getElementById('numBoard').getElementsByTagName('div')[0].getElementsByTagName('a');
+									var lastObj = document.getElementById('servnumber');
+									var type = 1;
+									<%
+									if (null != custInformation)
+									{
+									%>
+										lastObj = document.getElementById('password');
+										type = 0;
+									<%
+									}
+									%>
+									
+									for (i = 0; i < numBoardBtns.length; i++)
+									{
+						    			if (!numBoardBtns[i].className) 
+						    			{
+						    				numBoardBtns[i].className='';
+						    			}
+						    		
+					     				if (numBoardBtns[i].name == 'functionkey')
+					     				{
+					     					continue;  
+					     				}
+						 
+										numBoardBtns[i].onmousedown = function(){
+							 				this.className = 'on';
+										}
+									
+										numBoardBtns[i].onmouseup = function(){
+									
+											changValue(0, this.innerHTML);
+										
+							  				this.className = '';
+							  			
+							  				// servnumber输入完毕自动跳转到password
+							  				if (pangu_getStrLen(lastObj.value) == 11 
+							  						&& pangu_getStrLen(trim(document.forms[0].password.value)) == 0) 
+							 				{
+							 					document.forms[0].password.focus();
+							 				
+							 					changObj(document.forms[0].password, 2);
+							 				
+							 					return true;
+							 				}
+							   
+										}					
+									}
+						
+									function changObj(o, t)
+									{
+										document.getElementById("errorMsg").innerHTML = "";
+									
+										lastObj = o;
+							
+										if (t == 1)
+										{
+											type = 1;
+											document.getElementById('phone_input_1').className = "on fs20 clearfix";
+											document.getElementById('phone_input_2').className = "fs20 clearfix";
+										}
+										else
+										{
+											type = 0;
+											document.getElementById('phone_input_1').className = "fs20 clearfix";
+											document.getElementById('phone_input_2').className = "on fs20 clearfix";
+										}
+									}					
+						
+									function changValue(t, v)
+									{
+										lastObj.focus();
+										lastObj.select();
+										if (t == -1)
+										{
+											lastObj.value = lastObj.value.slice(0, -1);
+										}
+										else if(t == -2)
+										{
+											lastObj.value = "";
+										}
+										else if (lastObj.value.length < 11 && !isNaN(v) && type == 1)
+										{	
+											lastObj.value += v;
+										}
+										else if(lastObj.value.length < 6 && !isNaN(v) && type == 0)
+										{
+											lastObj.value += v;
+										}
+										var r = lastObj.createTextRange(); 
+										r.collapse(false); 
+										r.select();
+									}
+								<%
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改
+									}
+									//add begin lWX431760 2017-01-05 OR_HUB_201609_640_自助终端用户登录验证方式修改 
+								%>	
+	                			
+								
+								
+								
+										
+	              			</script>
+							<!--小键盘end-->
+							
+							<!-- 红色错误提示信息 -->
+							<div class="popup_confirm" id="openWin_ErrorMsg">
+								<div class="bg"></div>
+								<div class="tips_title">提示：</div>
+								<div class="fs24 red pl55 pr30 pt40 line_height_12 h200" id="winText_ErrorMsg"></div>
+								<div class="btn_box tc mt20">
+									<span class=" inline_block ">
+										<a class="btn_bg_146" href="javascript:void(0);" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">关闭</a>
+									</span>
+								</div>
+							</div>
+							
+							<div class="popup_confirm" id="openWin_successMsg">
+								<div class="bg"></div>
+								<div class="tips_title">提示：</div>
+								<div class="fs24 yellow pl55 pr30 pt40 line_height_12 h200" id="winText_successMsg"></div>
+								<div class="btn_box tc mt20">
+									<span class=" inline_block ">
+										<a class="btn_bg_146" href="javascript:void(0);" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">确认</a>
+									</span>
+								</div>
+							</div>
+							
+							<div class="popup_confirm" id="weakPwdCheck_confirm">
+			                  <div class="bg"></div>
+			                  <div class="tips_title">提示：</div>
+			                  <div class="tips_body">
+			                  	<div class="blank30"></div>
+							    <p id="weakPwdPromptId"></p>
+							    <div class="blank30"></div>
+							  </div>
+			                  <div class="btn_box tc mt20">
+				                  <span class=" mr10 inline_block "><a href="#" class="btn_bg_146" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();toRealNameCheck();">确认</a></span>
+			                  </div>
+			                </div>
+							
+							<div class="popup_confirm" id="realNameCheck_confirm">
+			                  <div class="bg"></div>
+			                  <div class="tips_title">提示：</div>
+			                  <div class="tips_body">
+			                  	<div class="blank30"></div>
+							    <p id="realnamePromptId"></p>
+							    <div class="blank30"></div>
+							  </div>
+			                  <div class="btn_box tc mt20">
+				                  <span class=" mr10 inline_block "><a href="#" class="btn_bg_146" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';submitReception();">确认</a></span>
+				                  <span class=" inline_block "><a class="btn_bg_146" href="#" onmousedown="this.className='key_down'" onmouseup="this.className='btn_bg_146';wiWindow.close();">取消</a></span>
+			                  </div>
+			                </div>
+							<script type="text/javascript">								
+								alertRedErrorMsg = function(content)
+								{
+									document.getElementById('winText_ErrorMsg').innerHTML = content;
+									wiWindow = new OpenWindow("openWin_ErrorMsg", 708, 392);
+								};
+							</script>
+						</div>
+						<div class="blank10"></div>
+					</div>
+				</div>
+			</div>
+
+			<%@ include file="/backinc.jsp"%>
+		</form>
+	</body>
+	<!--弹出正在处理div-->
+	<div class="popupWin fs28 credit_pls_wait" id="recWaitLoading">
+		<div class="bg"></div>
+	    <p class="mt120"><img src="${sessionScope.basePath }images/loading.gif" alt="处理中..." /></p>
+	    <%-- modify begin hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+	   	<p class="tips_txt"><%=CommonUtil.getParamValue(Constants.REC_WAITLOADING_MSG,"正在处理，请稍候......") %></p>      
+	   	<%-- modify end hWX5316476 2015-6-27 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>               
+	</div>
+	<script type="text/javascript">
+		if ("" != "<%=errorMsg %>")
+		{			
+			if ("1" == "<%=popupFlag %>")
+			{
+				alertRedErrorMsg("<%=errorMsg %>");
+			}
+			else
+			{
+				document.getElementById("errorMsg").innerHTML = "<%=errorMsg %>";
+			}
+		}
+		
+		//页面跳转之前清除session：isssGoBackFlag
+		//add by sWX219697 2015-2-13 17:26:48 修改bug：86167
+		window.onbeforeunload = function()
+		{
+		    <%
+			if(StringUtils.isNotBlank(isssGoBackFlag))
+			{
+				session.removeAttribute("isssGoBackFlag");
+			}
+			%>
+		}
+	</script>
+</html>

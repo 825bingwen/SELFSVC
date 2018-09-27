@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="activitiesRec" extends="struts-common" namespace="/activitiesRec">		
+		
+		<!-- 可办理活动列表展示 -->
+		<action name="queryActivities" class="activitiesRecAction" method="queryActivities">
+		    <result name="success">/jsp/customize/hub/activitiesRec/activitiesList.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 活动下的档次列表显示 -->
+		<action name="queryDangCiList" class="activitiesRecAction" method="queryDangCiList">
+		    <result name="success">/jsp/customize/hub/activitiesRec/dangciList.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+				
+		<!-- 档次描述 -->
+		<action name="queryDangCiDesc" class="activitiesRecAction" method="queryDangCiDesc">
+		    <result name="success">/jsp/customize/hub/activitiesRec/dangciDesc.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!--
+		<action name="queryPresentsList" class="activitiesRecAction" method="queryPresentsList">
+		    <result name="success">/jsp/customize/hub/activitiesRec/presentsList.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		<action name="recDutyInfo" class="activitiesRecAction" method="recDutyInfo">
+		    <result name="success">/jsp/customize/hub/activitiesRec/recDutyInfo.jsp</result>
+		</action>
+		 -->
+		 
+		<!-- 选择缴费类型页面 -->
+		<action name="selectType" class="activitiesRecAction" method="selectType">
+		    <result name="success">/jsp/customize/hub/activitiesRec/selectType.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 等待投钞页面 -->
+		<action name="cashActivities" class="activitiesRecAction" method="cashActivities">
+		    <result name="success">/jsp/customize/hub/activitiesRec/cashChargePage.jsp</result>
+		    <result name="error">/jsp/customize/hub/activitiesRec/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 交易完成页面 -->
+		<action name="finish" class="activitiesRecAction" method="finish">
+		    <result name="success">/jsp/customize/hub/activitiesRec/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/activitiesRec/finish.jsp</result>
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="activitiesRecAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/hub/activitiesRec/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 读银联卡页面 -->
+		<action name="readCard" class="activitiesRecAction" method="readCard">
+		    <result name="success">/jsp/customize/hub/activitiesRec/card/readCard.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 输入密码页面 -->
+		<action name="cardPassword" class="activitiesRecAction" method="cardPassword">
+		    <result name="success">/jsp/customize/hub/activitiesRec/card/cardPassword.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="makeSure" class="activitiesRecAction" method="makeSure">
+		    <result name="makeSure">/jsp/customize/hub/activitiesRec/card/makeSure.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="activitiesRecAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="activitiesRecAction" method="updateCardChargeLog">		
+		</action>
+		
+		<!-- 银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="activitiesRecAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/hub/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/activitiesRec/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 交易完成页面 -->
+		<action name="cardFinish" class="activitiesRecAction" method="cardFinish">
+		    <result name="success">/jsp/customize/hub/activitiesRec/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/activitiesRec/finish.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="activitiesRecAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/hub/activitiesRec/card/cardErrorPage.jsp</result>
+		</action>		
+		
+		<!-- 打印发票 -->
+		<action name="goPrintInvoice" class="activitiesRecAction" method="goPrintInvoice">
+			<result name="printInvoice">/jsp/customize/hub/activitiesRec/printInvoice.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="activitiesRecAction" method="insertInvoiceLog">
+		</action>
+		
+		<!--add begin hWX5316476 2015-2-10 V200R005C10LG0201 OR_HUB_201501_96_湖北_自助终端存量活动主动营销 -->
+		<!-- 服务密码校验 -->
+		<action name="chkServPwd" class="activitiesRecAction" method="chkServPwd">
+		</action>
+		
+		<!-- 短信验证码校验 -->
+		<action name="chkRandomPwd" class="activitiesRecAction" method="chkRandomPwd">
+		</action>
+		
+		<!-- 活动预受理 -->
+		<action name="preAccept" class="activitiesRecAction" method="preAccept">
+		</action>
+		<!--add end hWX5316476 2015-2-10 V200R005C10LG0201 OR_HUB_201501_96_湖北_自助终端存量活动主动营销 -->
+	</package>	
+</struts>

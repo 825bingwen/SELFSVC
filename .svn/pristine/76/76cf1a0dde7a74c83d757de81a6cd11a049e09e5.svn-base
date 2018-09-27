@@ -1,0 +1,273 @@
+package com.customize.sd.selfsvc.bean;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.customize.sd.selfsvc.bean.impl.BaseBeanSDImpl;
+import com.customize.sd.selfsvc.cardbusi.model.FeeConfirmPO;
+import com.customize.sd.selfsvc.cardbusi.model.SimInfoPO;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.bean.UserLoginBean;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+import com.gmcc.boss.selfsvc.util.DESedeEncrypt;
+
+/**
+ * <补卡接口调用>
+ * <功能详细描述>
+ * 
+ * @author  zKF69263
+ * @version  [版本号, 2014-12-27]
+ * @see  [相关类/方法]
+ * @since  [产品/OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求]
+ */
+public class ReissueCardBean extends BaseBeanSDImpl
+{
+    private static Log logger = LogFactory.getLog(ReissueCardBean.class);
+    
+    /**
+     * 用户身份认证
+     */
+    private UserLoginBean userLoginBean;
+    
+    /**
+     * <校验身份证信息与手机号是否相符>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+   	 * @remark create by zKF69263 2014-12-27 OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求
+     */
+    public void checkReissueIdCard(String idCardNo, String telnum, String curMenuId, 
+    		TerminalInfoPO termInfo)
+    {
+        // 创建报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+            "", MsgHeaderPO.ROUTETYPE_TELNUM, telnum);
+        
+        ReturnWrap rw = this.getSelfSvcCallSD().checkReissueIdCard(msgHeader, idCardNo);
+    	
+        // 调用失败
+        if (rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException("校验用户身份证信息与手机号码失败");
+        }
+        
+        CTagSet tagSet = (CTagSet)rw.getReturnObject();
+        
+        // 校验结果：校验通过 1；不通过，0
+        if (!"1".equals(tagSet.GetValue("ifvalid")))
+        {
+            throw new ReceptionException("用户身份证信息与手机号码不相符");
+        }
+    }
+    
+    /** 
+     * <校验用户手机密码>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by zKF69263 2014-12-27 OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求
+     */
+    public NserCustomerSimp checkSubTelPwd(String telnum, String password, String curMenuId, TerminalInfoPO termInfo)
+    {
+        try
+        {
+            // 手机密码进行3DES加密
+            DESedeEncrypt encrypt = new DESedeEncrypt();
+            password = encrypt.encrypt(password);
+        }
+        catch (Exception e)
+        {
+            logger.error("山东密码验证时，加密密码错误：", e);
+            throw new ReceptionException("密码加密失败");
+        }
+        
+        // 调用CRM统一认证接口进行认证，密码需要进行3DES加密
+        Map returnMap = userLoginBean.checkPassword(termInfo, telnum, curMenuId, password);
+        
+        // 返回码<>100时，提示
+        if (returnMap == null || !"100".equals(String.valueOf(returnMap.get("errcode"))))
+        {
+            logger.error("使用服务密码进行身份认证失败，手机号码：" + telnum);
+            throw new ReceptionException("使用服务密码进行认证失败");
+        }
+        
+        // 依据手机号码查询用户信息
+        Map customerSimpMap = userLoginBean.getUserInfo(telnum, termInfo);
+        
+        // 取登录用户信息
+        NserCustomerSimp customerSimp = (NserCustomerSimp) customerSimpMap.get("customerSimp");
+        
+        if (customerSimp == null)
+        {
+            logger.error("查询用户信息失败，手机号码：" + telnum + " " + customerSimpMap.get("returnMsp"));
+            throw new ReceptionException("查询用户信息失败");
+        }
+        
+        return customerSimp;
+    }
+    
+    /**
+     * <补卡规则校验>
+     * <功能详细描述>
+     * @param telnum
+     * @param curMenuId
+     * @param termInfo
+     * @see [类、类#方法、类#成员]
+   	 * @remark create by zKF69263 2014-12-27 OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求
+     */
+    public void checkReissueNum(String telnum, String curMenuId, TerminalInfoPO termInfo)
+    {
+        // 创建报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+            "", MsgHeaderPO.ROUTETYPE_TELNUM, telnum);
+        
+        ReturnWrap rw = this.getSelfSvcCallSD().checkReissueNum(msgHeader);  
+        
+        // 调用失败
+        if (rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+    }
+    
+    /**
+     * <补卡算费>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+   	 * @remark create by zKF69263 2014-12-27 OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求
+     */
+    public Map<String,Object> countReissueFee(String servnum, String iccid, String blankCardNum, 
+    		String curMenuId, TerminalInfoPO termInfo)
+    {
+        // 创建报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+            "", MsgHeaderPO.ROUTETYPE_TELNUM, servnum);
+        
+        // 补卡算费
+        ReturnWrap rw = this.getSelfSvcCallSD().countReissueFee(msgHeader,iccid,blankCardNum);  
+        
+        // 调用失败
+        if (rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+        
+        Map<String,Object> map = new HashMap<String,Object>();
+        
+        //费用明细
+        List<FeeConfirmPO> feeList = new ArrayList<FeeConfirmPO>();
+        
+        CRSet crSet = (CRSet)rw.getReturnObject();
+        
+        //总费用
+        BigDecimal totalFee = new BigDecimal("0");
+        
+        //遍历返回费用明细，并计算费用合计
+        for(int i=0; i < crSet.GetRowCount(); i++)
+        {
+            FeeConfirmPO feePO = new FeeConfirmPO();
+            
+            //费用项名称
+            feePO.setFeeName(crSet.GetValue(i, 0));
+            
+            //应收金额(分转元)
+            feePO.setFee(CommonUtil.fenToYuan(crSet.GetValue(i, 1)));
+            
+            //优惠费用(分转元)
+            feePO.setPrivFee(CommonUtil.fenToYuan(crSet.GetValue(i, 2)));
+            
+            //费用大类
+            feePO.setFeeKind(crSet.GetValue(i, 3));
+            
+            //收费类型，实收、赠送、已收等
+            feePO.setFeeType(crSet.GetValue(i, 4));
+            
+            //实收费用=应收金额-优惠费用
+            feePO.setRealFee(new BigDecimal(feePO.getFee()).subtract(new BigDecimal(feePO.getPrivFee())).toString());
+            
+            //计算总费用
+            totalFee = totalFee.add(new BigDecimal(feePO.getRealFee()));
+            
+            feeList.add(feePO);
+        }
+        
+        //总费用
+        FeeConfirmPO feeConfirmPO = new FeeConfirmPO();
+        feeConfirmPO.setFeeName("费用合计");
+        feeConfirmPO.setRealFee(totalFee.toString());
+        feeList.add(feeConfirmPO);
+        
+        map.put("feeList", feeList);
+        map.put("recFee", totalFee.toString());
+        
+        return map;
+    }
+    
+    /**
+     * <补卡提交>
+     * <功能详细描述>
+     * @param servnum
+     * @param curMenuId
+     * @param recFee
+     * @param payType
+     * @param simInfo
+     * @param termInfo
+     * @param chargeType 缴费类型
+     * @param terminalSeq 银行缴费流水号
+     * @return
+     * @remark create by zKF69263 2014-12-27 OR_SD_201407_1069_山东_关于在自助终端增加开户、补卡功能的需求
+     */
+    public String reissueCommit(String servnum, String curMenuId, String recFee, String payType, String blankno,
+        SimInfoPO simInfo, TerminalInfoPO termInfo, String chargeType, String terminalSeq)
+    {
+        // 创建报文头信息
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+            "", MsgHeaderPO.ROUTETYPE_TELNUM, servnum);
+        
+        // modify begin zKF69263 2015-5-8 OR_SD_201503_333_SD_自助终端活动受理预存赠送
+        ReturnWrap rw = this.getSelfSvcCallSD().reissueCommit(msgHeader,
+            recFee, payType, blankno, simInfo, chargeType + termInfo.getBankno(), terminalSeq);
+		// modify end zKF69263 2015-5-8 OR_SD_201503_333_SD_自助终端活动受理预存赠送
+
+        // 调用失败
+        if (rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+        
+        CTagSet tagSet = (CTagSet)rw.getReturnObject();
+        
+        // 流水号
+        return tagSet.GetValue("recoid");
+    }
+
+    /**
+     * @return 返回 userLoginBean
+     */
+    public UserLoginBean getUserLoginBean()
+    {
+        return userLoginBean;
+    }
+
+    /**
+     * @param 对userLoginBean进行赋值
+     */
+    public void setUserLoginBean(UserLoginBean userLoginBean)
+    {
+        this.userLoginBean = userLoginBean;
+    }
+}

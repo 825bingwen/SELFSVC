@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="cdrquery" extends="struts-common" namespace="/cdrquery">		
+		
+		<action name="selectMonth" class="newDetailedRecordsAction" method="selectMonth">
+			<result name="months">/jsp/customize/nx/feeservice/detailedRecords/months.jsp</result>
+		</action>
+		
+		<action name="selectCycle" class="newDetailedRecordsAction" method="selectCycle">
+			<result name="cycles">/jsp/customize/nx/feeservice/detailedRecords/cycles.jsp</result>
+			<result name="singleCycle" type="redirect">/cdrquery/selectType.action?CurMenuid=${CurMenuid}&amp;custName=${custName}&amp;cycle=${cycle}&amp;startDate=${startDate}&amp;endDate=${endDate}&amp;month=${month}</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="selectType" class="newDetailedRecordsAction" method="selectType">
+			<result name="oldTypes">/jsp/customize/nx/feeservice/detailedRecords/oldTypes.jsp</result>
+			<result name="types">/jsp/customize/nx/feeservice/detailedRecords/types.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="qryDetailedRecordsOld" class="newDetailedRecordsAction" method="qryDetailedRecordsOld">
+			<result name="success">/jsp/customize/nx/feeservice/detailedRecords/records.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="qryDetailedRecords" class="newDetailedRecordsAction" method="qryDetailedRecords">
+			<result name="FIXFEE">/jsp/customize/nx/feeservice/detailedRecords/fixfeeRecords.jsp</result>
+			<result name="GSM">/jsp/customize/nx/feeservice/detailedRecords/gsmRecords.jsp</result>
+			<result name="SMS">/jsp/customize/nx/feeservice/detailedRecords/smsRecords.jsp</result>
+			<result name="GPRSWLAN">/jsp/customize/nx/feeservice/detailedRecords/gprswlanRecords.jsp</result>
+			<result name="ISMG">/jsp/customize/nx/feeservice/detailedRecords/ismgRecords.jsp</result>
+			<result name="INFOFEE">/jsp/customize/nx/feeservice/detailedRecords/infofeeRecords.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="getPrintData" class="newDetailedRecordsAction" method="getPrintData">
+			<result name="success">/jsp/customize/nx/feeservice/detailedRecords/hiddenFrame.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="getPrintDataNew" class="newDetailedRecordsAction" method="getPrintDataNew">
+			<result name="success">/jsp/customize/nx/feeservice/detailedRecords/hiddenFrame.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="updatePrintTimes" class="newDetailedRecordsAction" method="updatePrintTimes">
+		</action>
+		
+		<!--add begin g00140516 2013/02/02 R003C13L01n01 每年的12个月，每月详单均只能打印一次 -->
+		<action name="checkPrintTimes" class="newDetailedRecordsAction" method="checkPrintTimes">
+		</action>
+		<!--add end g00140516 2013/02/02 R003C13L01n01 每年的12个月，每月详单均只能打印一次 -->
+	</package>	
+</struts>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 多媒体播放 -->
+	<package name="media" extends="struts-common">
+	
+		<!-- 查询屏保资源列表  -->
+		<action name="getMediaScList" class="mediaAction" method="getMediaScList">
+		</action>
+		
+		<!-- 查询广告资源列表 -->
+		<action name="getMediaAdvList" class="mediaAction" method="getMediaAdvList">
+		</action>
+		
+		<!-- 到广告播放首页面 -->
+		<action name="advIndex" class="mediaAction" method="advIndex">
+			<result name="success">/jsp/SelfMedia/SelfAdv/selfAdvUpdate.jsp</result>
+		</action>
+		
+	</package>	
+</struts>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="hubprodinstall" extends="struts-common" namespace="/hubprodinstall">		
+	
+		  <!-- 协议确认页面 -->
+        <action name="ruleConfirm" class="choSerNOUserAction" method="ruleConfirm">
+                <result name="ruleConfirm">/jsp/customize/hub/prodInstall/ruleShowInit.jsp</result>
+        </action>
+           <action name="getRuleInfo" class="choSerNOUserAction" method="getRuleInfo">
+                <result name="ruleInfoShow">/jsp/customize/hub/prodInstall/dutyInfoShow.jsp</result>
+        </action>
+         <action name="getCardInfo" class="choSerNOUserAction" method="getCardInfo">
+                <result name="cardInfo">/jsp/customize/hub/prodInstall/cardInfor.jsp</result>
+        </action>
+          <action name="ReadIdCard" class="choSerNOUserAction" method="ReadIdCard">
+                <result name="ReadIdCard">/jsp/customize/hub/prodInstall/readCard.jsp</result>
+        </action>
+           <action name="cardInfoConfirm" class="choSerNOUserAction" method="cardInfoConfirm">
+                <result name="chooseProduct">/jsp/customize/hub/prodInstall/productList.jsp</result>
+        </action>
+         <action name="chooseTheProduct" class="choSerNOUserAction" method="chooseTheProduct">
+                <result name="telnumbLoad">/jsp/customize/hub/prodInstall/loadingPhoneList.jsp</result>
+                <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+        </action>
+         <action name="ShowTelNumbers" class="choSerNOUserAction" method="ShowTelNumbers">
+                <result name="ShowTelNumbers">/jsp/customize/hub/prodInstall/phoneListMain.jsp</result>
+                 <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+        </action>
+        <action name="chooseTelNum" class="choSerNOUserAction" method="chooseTelNum">
+                <result name="feeConfirm" type="chain">ckTelSimCard</result>
+                <result name="reChooseTelnum">/jsp/customize/hub/prodInstall/loadingPhoneList.jsp</result>
+                <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+        </action>
+       <action name="handleError" class="choSerNOUserAction" method="handleError">
+               <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+        </action>
+        <action name="handleErrorg" class="choSerNOUserAction" method="handleError">
+               <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+        </action>
+         
+         
+		<!-- 自助终端实现卡号消售 add by xkf57421 begin -->
+		<!-- add begin by wWX191797 for OR_HUB_201311_1069_ -->
+		<action name="queryLowFee" class="installFeeHubAction" method="queryLowFee">
+		</action>
+		<!-- add end by wWX191797 for OR_HUB_201311_1069_ -->
+		<action name="ckTelSimCard" class="installFeeHubAction" method="ckTelSimCard">
+		    <result name="success">/jsp/customize/hub/prodInstall/installFlow.jsp</result>
+		    <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		
+		<action name="installChargeType" class="installFeeHubAction" method="installChargeType">
+			<result name="selectType">/jsp/customize/hub/prodInstall/selectType.jsp</result>
+			 <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		
+		<action name="cashCharge" class="installFeeHubAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/customize/hub/prodInstall/cash/cashChargePage.jsp</result>
+		     <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		
+		<action name="installCashCommit" class="installFeeHubAction" method="installCashCommit">
+		    <result name="success">/jsp/customize/hub/prodInstall/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		
+		<action name="goCashError" class="installFeeHubAction" method="goCashError">
+		    <result name="cashErrorPage">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		
+		<action name="installCashCancel" class="installFeeHubAction" method="installCashCancel">
+		    <result name="cashErrorPage">/jsp/customize/hub/prodInstall/installError.jsp</result>
+		</action>
+		<!-- 自助终端实现卡号消售 add by xkf57421 end -->
+		
+		<!-- lWX162765 add by xkf57421 end -->
+		<!-- 湖北打印发票需要随机密码验证 -->
+		<action name="validateByRandomPwd" class="installFeeHubAction" method="validateByRandomPwd">
+			<result name="success">/jsp/customize/hub/prodInstall/randomPwd.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 随机密码验证通过后打印发票 -->
+		<action name="printInvoice" class="installFeeHubAction" method="printInvoiceWithPwd">
+			<result name="success">/jsp/customize/hub/prodInstall/printInvoice.jsp</result>
+		    <result name="error">/jsp/customize/hub/prodInstall/randomPwd.jsp</result>
+		</action>		
+		
+		<!-- 无需进行随机密码验证，直接打印发票 -->
+		<action name="printInvoiceWithoutPwd" class="installFeeHubAction" method="printInvoiceWithoutPwd">
+			<result name="print">/jsp/customize/hub/prodInstall/printInvoice.jsp</result>
+		</action>
+		<!-- lWX162765 add by xkf57421 end -->
+	</package>	
+</struts>

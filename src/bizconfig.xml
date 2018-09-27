@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="GB2312"?>
+<config>
+        <!--以下是落地方业务对应的bizID映射关系-->
+	    <DownBizID>
+            <BIP2B132-T2101107>MUSICMULTIS2B</BIP2B132-T2101107><!--无线音乐业务、平台批量受理-->
+            <BIP2B131-T2101108>MUSICMULTIB2S</BIP2B131-T2101108><!--无线音乐业务、平台批量受理确认-->
+            <BIP2B133-T2101109>IMPSMULTIS2B</BIP2B133-T2101109><!--飞信业务、平台批量受理-->
+            <BIP2B134-T2101110>IMPSMULTIB2S</BIP2B134-T2101110><!--飞信业务、平台批量确认-->
+            <BIP6B640-T6000602>DSMP_ORDERQRY</BIP6B640-T6000602><!-- DSMP发起的用户订购关系查询 -->
+            <BIP6B638-T6001602>DSMP_ORDER</BIP6B638-T6001602><!-- DSMP发起的订购/退订/赠送 -->
+            <BIP6B641-T6000603>DSMP_AUTH</BIP6B641-T6000603><!-- DSMP发起的业务鉴权 -->
+        </DownBizID>
+    	
+    	<!--落地方交易代码对应业务类设置（落地方业务）-->
+    	<busifunc>         
+            <hanlf_test>com.huawei.boss.sp.busi.BizProc</hanlf_test>
+        </busifunc>
+        
+        <!--通用http接口设置-->
+	    <post>
+	        <SNPASS>boss1:boss1</SNPASS><!--一级BOSS的SN的HTTP用户名，密-->
+	        <TRANS_TIMEOUT>200</TRANS_TIMEOUT>
+	        <XmlEncode>UTF-8</XmlEncode>
+	        <URLEncode>UTF-8</URLEncode>
+	        <httpEncode>UTF-8</httpEncode>
+	        <CmdEncode>UTF-8</CmdEncode>
+    	</post>        
+    	
+
+    	<!--系统设置-->
+    	<system>
+    	    <xmlLogDir>c:\test</xmlLogDir><!--报文记录日志-->
+    	    <xmlErrLogDir>c:\test\error</xmlErrLogDir><!--报文记录日志-->
+    	    <XMLHEAD><![CDATA[$xmldata=;xmldata=;$xml=;xml=]]></XMLHEAD><!--解析报文头，用;分割的字段-->
+    	    <interval>5</interval><!--查询数据库的时间间隔，单位：秒-->
+    	    <intervalnew>20</intervalnew><!--查询数据库查询不到数据后睡眠时间，单位：秒-->
+    	    <maxwait>30</maxwait><!-- 数据库链接超时时间设置 单位：秒 -->
+    	    <maxLoad>5000</maxLoad><!--每次从数据加载的最大数据量-->
+    	    <BATCH_COUNT>100</BATCH_COUNT><!--批量业务每个包的数据条数最大值-->
+    	    <CALL_SERVICE_BY_TABLE>1</CALL_SERVICE_BY_TABLE>
+    	</system>
+    	
+    	<!-- 参数表配置 -->
+    	<param_table_config>
+    	    <originbiz_define>sh_sp_bizdefine_origin</originbiz_define> <!-- 发起方业务定义表 -->
+    	    <homebiz_define>sh_sp_bizdefine_home</homebiz_define> <!-- 落地方业务定义表 -->
+    	    <param_denfiene>sh_sp_params</param_denfiene> <!-- 固定参数表 -->
+    	    <xml_denfine>sh_sp_xmldefine</xml_denfine> <!-- xml定义表 -->
+    	    <trans_defnine>sh_sp_trans</trans_defnine> <!-- 参数转换表 -->
+    	</param_table_config>
+    	
+    	<!-- 此配置支持由 固定值【组织方式为fix（值）】，时间【组织方式为date（n|m）】，序列号组织方式为【seq（长度）】-->
+    	<oprnumConfig>
+         <B2HSCS_ORDER>fix(531BIP2B041),date(0|14),seq(6)</B2HSCS_ORDER>
+        </oprnumConfig>
+    	
+</config>
+

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="feeservice" extends="struts-common">		
+		<!-- 移动话费查询 -->
+		<action name="feeServiceFunc" class="feeServiceAction" method="initFunctionList">
+			<result name="funclist">/jsp/feeservice/feeserviceIndex.jsp</result>
+		</action>
+		<!-- 月详单查询 -->	
+		<action name="detailedRecords" class="detailedRecordsAction" method="showMonths">
+			<result name="success">/jsp/feeservice/detailedRecords/months.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- 从月份选择页面返回，需要清空session中保存的详单记录 -->
+		<action name="backToFunctionList" class="detailedRecordsAction" method="backToFunctionList">
+			<result name="back">/index.jsp</result>
+		</action>
+		<!-- 详单类型选择 -->	
+		<action name="selectType" class="detailedRecordsAction" method="showTypes">
+			<!--add begin g00140516 2012/02/09 R003C12L01n01 OR_HUB_201201_981 -->
+			<result name="hub_success">/jsp/customize/hub/detailedRecords/oldTypes.jsp</result>
+			<!--add end g00140516 2012/02/09 R003C12L01n01 OR_HUB_201201_981 -->
+			<result name="success">/jsp/feeservice/detailedRecords/types.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>		
+		<!-- 详单记录查询 -->	
+		<action name="qryDetailedRecords" class="detailedRecordsAction" method="qryDetailedRecords">
+			<result name="success">/jsp/feeservice/detailedRecords/records.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+			
+			<!-- 湖北专用 -->
+			<result name="fee_type">/jsp/feeservice/detailedRecords/feeType.jsp</result>
+		</action>
+		<!-- 打印详单 -->
+		<action name="getPrintData" class="detailedRecordsAction" method="getPrintData">
+			<result name="success">/jsp/feeservice/detailedRecords/hiddenFrame.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>	
+		<!-- 从详单记录显示页面返回到详单类型选择页面 -->	
+		<action name="backToSelectType" class="detailedRecordsAction" method="backToTypesPage">
+			<result name="success">/jsp/feeservice/detailedRecords/types.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- 更新清单打印次数 -->
+		<action name="updatePrintTimes" class="detailedRecordsAction" method="updatePrintTimes">
+			<!-- yKF28472
+			<result name="success">/jsp/feeservice/detailedRecords/months.jsp</result>
+			-->
+			<result name="success">/jsp/feeservice/detailedRecords/records.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<action name="monthDeduct" class="monthDeductAction" method="queryMonthDeduct">
+			<result name="success">/jsp/feeservice/monthDeduct/queryMonthDeduct.jsp</result>
+		</action>
+		
+		<!-- 缴费历史记录查询 -->	
+		<action name="chargeHistory" class="chargeHistoryAction" method="qryChargeHistory">			
+			<result name="inputMonth">/jsp/feeservice/chargeHistory/inputMonth.jsp</result>
+			<result name="success">/jsp/feeservice/chargeHistory/historyRecords.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="qryChargeHistoryRecords" class="chargeHistoryAction" method="qryCharegeHistoryRecords">			
+			<result name="success">/jsp/feeservice/chargeHistory/historyRecords.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!--modify begin cKF48754 2011/11/14 R003C11L11n01 OR_SD_201108_652-->
+		<!-- 查询是否已开通139邮箱-->
+		<action name="qryMailbox" class="detailedRecordsAction" method="qryMailbox">
+		</action>
+		
+		<!-- 发送详单 -->
+		<action name="sendMail" class="detailedRecordsAction" method="sendMail">	
+		</action>
+		
+		<!-- 开通139邮箱-->
+		<action name="add139Mail" class="detailedRecordsAction" method="add139Mail">
+		<result name="failed">/commonError.jsp</result>
+		</action>
+		<!--modify end cKF48754 2011/11/14 R003C11L11n01 OR_SD_201108_652-->
+		
+		<!--add begin g00140516 2013/02/22 R003C13L02n01 OR_NX_201302_600-->
+		<action name="qryCurrBillFee" class="currBillFeeAction" method="qryCurrBillFee">
+			<result name="success">/jsp/feeservice/currbillfee/currBillFee.jsp</result>
+		</action>
+		<!--add end g00140516 2013/02/22 R003C13L02n01 OR_NX_201302_600-->
+	</package>	
+</struts>

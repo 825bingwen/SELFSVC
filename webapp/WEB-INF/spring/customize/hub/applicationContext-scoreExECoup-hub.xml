@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"> 
+
+    <!-- 湖北积分兑换电子券查询奖品列表Action -->
+    <bean id ="scoreExECoupAction" parent="baseAction" class="com.customize.hub.selfsvc.scorexecoup.action.ScoreExECoupAction" scope="prototype">
+        <property name="qryScoreExCoupBean" ref="qryScoreExCoupBean"></property>
+        <property name="scoreExECoupService" ref="scoreExECoupService"></property>
+    </bean>
+    
+    <!-- 湖北积分兑换电子券查询奖品列表Bean -->
+    <bean id ="qryScoreExCoupBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.ScoreExECoupBean">
+    </bean>
+    <bean id="scoreExECoupService" parent="baseTransactionProxy">
+		<property name="target"><ref local="scoreExECoupServiceImpl"/></property>
+	</bean>
+    <bean id="scoreExECoupServiceImpl" class="com.customize.hub.selfsvc.scorexecoup.service.ScoreExECoupServiceImpl">
+    	<property name="scoreExECoupDao" ref="scoreExECoupDao"> </property>
+    </bean>
+    
+    <bean id="scoreExECoupDao" parent="baseDao" class="com.customize.hub.selfsvc.scorexecoup.dao.ScoreExECoupDaoImpl" ></bean>
+    
+</beans>

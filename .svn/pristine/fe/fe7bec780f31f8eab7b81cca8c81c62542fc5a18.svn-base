@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="media">
+
+	<!-- 结果对象 -->
+	<typeAlias alias="selfMediaVO" type="com.gmcc.boss.selfsvc.media.model.SelfMediaVO" />
+	
+	<!-- 查询对象 -->
+	<typeAlias alias="selfMediaQO" type="com.gmcc.boss.selfsvc.media.model.SelfMediaQO" />
+	
+	<!-- 广告资源列表 -->
+	<select id="getAdvList" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select b.advlist from SH_TERM_GROUP a, SH_GROUP_ADV b
+		where a.termgrpid = b.termgrpid and a.status = 1 and b.status = 1
+		and a.termid = #termid#
+	</select>
+	
+	<!-- 屏保资源列表 -->
+	<select id="getScList" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select b.sclist from SH_TERM_GROUP a, SH_GROUP_SCREEN b
+		where a.termgrpid = b.termgrpid and a.status = 1 and b.status = 1
+		and a.termid = #termid#
+	</select>
+	
+	<!-- 资源对象列表 -->
+	<select id="getMediaResList" parameterClass="selfMediaQO" resultClass="selfMediaVO">
+		select t.region,t.resid,t.resname,lower(t.resformat) resformat,t.reslink,
+		       t.status,t.statusdate,t.createdate,t.createoper,t.resplaytime
+		from SH_INFO_MEDIARES t
+		where t.region in ($regions$)
+		and t.resid in ($resids$)
+		and t.restype = #restype#
+		and t.status = 1
+	</select>
+	
+	<!-- 查询所有资源对象列表 -->
+	<select id="getAllMediaFiles" resultClass="java.lang.String"> 
+		SELECT RESNAME 
+		  FROM SH_INFO_MEDIARES 
+		 WHERE STATUS = 1 
+	     ORDER BY RESNAME
+	</select>
+	
+	<!-- 湖北 查询按省份设置的屏保资源信息列表 -->
+	<select id="getProvinceScList" resultClass="String" parameterClass="String">
+		SELECT A.DICTID FROM SH_DICT_ITEM A WHERE A.GROUPID = #groupId# AND A.STATUS = 1 order by A.sortOrder asc
+	</select>
+	
+</sqlMap>
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="qryUserScoreInfoByType" extends="struts-common" namespace="/qryUserScoreInfoByType">		
+		
+		<action name="qryUserScoreType" class="qryUserScoreInfoByTypeAction" method="qryUserScoreType">
+			<result name="scoreTypePage">/jsp/customize/nx/qryUserScoreInfoByType/scoreTypePage.jsp</result>		
+		</action>
+		<action name="qryUserScoreInfoByType" class="qryUserScoreInfoByTypeAction" method="qryUserScoreInfoByType">
+			<result name="userScoreInfoPage">/jsp/customize/nx/qryUserScoreInfoByType/userScoreInfoPage.jsp</result>		
+		</action>
+
+	</package>
+</struts>

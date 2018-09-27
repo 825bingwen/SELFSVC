@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="install">
+
+	<!-- 在线开户 -->
+	
+	<typeAlias alias="logInstallPO" type="com.customize.nx.selfsvc.prodInstall.model.LogInstallPO" />
+	<typeAlias alias="tpltTempletPO" type="com.customize.nx.selfsvc.prodInstall.model.TpltTempletPO" />	
+	<typeAlias alias="cashDetailLog" type="com.gmcc.boss.selfsvc.charge.model.CashDetailLogPO"/>
+
+	<!-- 查询开户模板 -->	
+	<select id="qryTpltTempletList" resultClass="tpltTempletPO" parameterClass="tpltTempletPO">		
+		SELECT TEMPLETID,TEMPLETNAME,MAINPRODID,MAINPRODNAME,BRAND,MONTHFEE/100 AS MONTHFEE,DESCRIPTION,REGION,ORGID,CREATEDATE,STATUSDATE,SORTORDER,MINFEE,OPERID,NOTES
+		FROM SH_TPLT_TEMPLET_NX
+	</select>
+	
+	<!-- 记录开户日志 -->
+	<insert id="addLogInstall" parameterClass="logInstallPO">
+	    INSERT INTO SH_LOG_INSTALL_NX 
+	    (OID, TERMID, CHARGEID, REGION, SERVNUMBER, MAINPRODIID, PRODTEMPLETID, CHARGETYPE, RECFEE, TOFEE, CUSTNAME, CERTID, LINKADDR, SEX, BLANKCARD, ICCID, IMSI, SMSP, LINKPHONE, PRODUCTLIST, SUBMAILADDR, CREATEDATE, STATUSDATE, WRITECARDSTATUS, PAYSTATUS, INSTALLSTATUS, REFUNDMENT, FORMNUM, SUBSID, NOTES)
+		VALUES
+		(#oid#,#termId#,#chargeId#,#region#,#servnumber#,#mainProdId#,#prodTempletId#,#chargeType#,#recFee#,#toFee#,#custName#,#certId#,#linkAddr#,#sex#,#blankCard#,#iccid#,#imsi#,#smsp#,#linkPhone#,#productList#,#submailAddr#,sysdate,sysdate,#writeCardStatus#,#payStatus#,#installStatus#,#refundment#,#formnum#,#subsId#,#notes#)
+	</insert>
+	
+	<!-- 记录投币记录 -->
+	<insert id="insertCashDetailLog" parameterClass="cashDetailLog">
+		INSERT INTO SH_CHARGE_CASHINFO(TERMID, FORMNUM, SERVNUM, CASHFEE, CREATEDATE)
+		VALUES(#termID#, #formNum#, #servNum#, #cashFee#, SYSDATE)
+	</insert>
+	
+	<!-- 取缴费流水号 -->
+	<select id="getChargeLogOID" resultClass="java.lang.String">
+		SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL
+	</select>
+	
+	<!-- 取开户流水号 -->
+	<select id="getInstallId" resultClass="java.lang.String">
+		SELECT SEQ_LOG_INSTALL_OID.NEXTVAL FROM DUAL
+	</select>
+	
+	<!-- 银行卡缴费日志记录 -->
+	<insert id="insertChargeLog" parameterClass="cardChargeLog">
+	    INSERT INTO SH_CHARGE_LOG(CHARGELOGOID,
+	                              REGION, 
+	                              TERMID, 
+	                              OPERID, 
+	                              SERVNUMBER, 
+	                              PAYTYPE, 
+	                              FEE, 
+	                              UNIONPAYUSER,
+	                              UNIONPAYCODE, 
+	                              BUSITYPE, 
+	                              CARDNUMBER, 
+	                              BATCHNUM, 
+	                              AUTHORIZATIONCODE, 
+	                              BUSINESSREFERENCENUM,
+	                              UNIONPAYTIME,
+	                              VOUCHERNUM, 
+	                              UNIONPAYFEE, 
+	                              TERMINALSEQ,
+	                              RECDATE, 
+	                              STATUS, 
+	                              DESCRIPTION, 
+	                              DEALNUM, 
+	                              ACCEPTTYPE,
+	                              SERVREGION,
+	                              ORGID,
+	                              POSNUM,
+	                              BATCHNUMBEFOREKOUKUAN,
+	                              RECTYPE,
+	                              BANKNO
+	                              )
+				           VALUES(
+				                  #chargeLogOID#,
+				                  #region#,
+				                  #termID#,
+				                  #operID#,
+					              #servnumber#,
+					              #payType#,
+					              #fee#,
+					              #unionpayuser#,
+					              #unionpaycode#,
+					              #busiType#,
+					              #cardnumber#,
+					              #batchnum#,
+					              #authorizationcode#,
+					              #businessreferencenum#,
+					              TO_DATE(#unionpaytime#, 'yyyymmddhh24:mi:ss'),
+					              #vouchernum#,
+					              #unionpayfee#,
+					              #terminalSeq#,
+					              TO_DATE(#recdate#, 'yyyymmddhh24:mi:ss'),
+					              #status#,
+					              #description#,
+					              #dealnum#,
+					              #acceptType#,
+					              #servRegion#,
+					              #orgID#,
+					              #posNum#,
+					              #batchNumBeforeKoukuan#,
+					              #recType#,
+					              #bankno#
+					              )
+	</insert>
+	
+	<update id="updateCardChargeLogNX" parameterClass="cardChargeLog">
+		 UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, CARDNUMBER=#cardnumber#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmdd hh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, TERMINALSEQ=#terminalSeq#, RECDATE=TO_DATE(#recdate#, 'yyyymmddhh24:mi:ss'), STATUS = #status#, 
+		   	   DESCRIPTION = #description#, BANKNO=#bankno#
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- 更新开户日志 -->
+	<update id="updateInstallLog" parameterClass="logInstallPO">
+	    UPDATE SH_LOG_INSTALL_NX 
+	       SET CHARGEID=#chargeId#, CHARGETYPE=#chargeType#, TOFEE=#toFee#, STATUSDATE=sysdate, WRITECARDSTATUS=#writeCardStatus#, 
+	       		PAYSTATUS=#payStatus#, INSTALLSTATUS=#installStatus#,FORMNUM=#formnum#
+	     WHERE OID=#oid#
+	</update>
+	
+	<!-- 更新缴费日志状态 -->
+	<update id="updateCardChargeLogStatus" parameterClass="cardChargeLog">
+		 UPDATE SH_CHARGE_LOG 
+		   SET STATUS = #status#, DESCRIPTION = #description#
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- 更新开户日志备注 -->
+	<update id="updateInstallLogNotes" parameterClass="logInstallPO">
+		 UPDATE SH_LOG_INSTALL_NX 
+	       SET  NOTES=#notes#
+	     WHERE OID=#oid#
+	</update>
+</sqlMap>

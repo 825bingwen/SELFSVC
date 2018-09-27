@@ -1,0 +1,40 @@
+/*
+ * 文 件 名:  PrivilegeDaoImpl.java
+ * 版    权:  Huawei Technologies Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
+ * 描    述:  <描述>
+ * 修 改 人:  hWX5316476
+ * 修改时间:  Apr 29, 2015
+ * 跟踪单号:  OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+ * 修改单号:  <修改单号>
+ * 修改内容:  <修改内容>
+ */
+package com.gmcc.boss.selfsvc.privilege.dao;
+
+import java.util.List;
+
+import com.gmcc.boss.selfsvc.common.BaseDaoImpl;
+import com.gmcc.boss.selfsvc.privilege.model.GroupNcodePO;
+
+/**
+ * 业务查询dao
+ * 
+ * @author  hWX5316476
+ * @version  [版本号, Apr 29, 2015]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class PrivilegeDaoImpl extends BaseDaoImpl
+{
+    /**
+     * 根据组ID查询业务编码Ncode
+     * <功能详细描述>
+     * @param groupId
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    @SuppressWarnings("unchecked")
+    public List<GroupNcodePO> qryGroupNcodeInfo(GroupNcodePO groupNcodePO)
+    {
+        return (List<GroupNcodePO>)sqlMapClientTemplate.queryForList("privilege.qryGroupNcodeInfo", groupNcodePO);
+    }
+}

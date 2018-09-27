@@ -1,0 +1,120 @@
+<project name="SelfSvc" default="dist" basedir=".">
+
+	<property name="src" value="../../src"/>
+   	
+    <property name="webapp" value="../../webapp"/>
+	
+	<property name="WEB-INF" value="${webapp}/WEB-INF" />
+	
+	<property name="spring" value="${WEB-INF}/spring" />
+    
+    <property name="lib" value="${WEB-INF}/lib"/>
+    	
+    <property name="dist" value="${WEB-INF}/classes/"/>
+     
+    <property name="SelfSvcWar" value="../../selfsvc.war"/>
+	
+	<property name="css" value="${webapp}/css"/>
+	
+	<property name="images" value="${webapp}/images"/>
+
+    <target name="init">
+            <tstamp>
+                    <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss aa" />
+            </tstamp>
+            <echo message="build time : ${build.time}" />
+            <concat destfile="${webapp}/build.log">build time : ${build.time}</concat>
+    </target>
+    
+    <target name="clean" depends="init">
+        <delete dir="${dist}"/>
+        <delete file="${SelfSvcWar}"/>
+    </target>
+    
+    <target name="prepare" depends="clean">
+        <mkdir dir="${dist}"/>
+    	
+    	<copy tofile="${src}/com/gmcc/boss/selfsvc/common/Constants.java" overwrite="true">
+    		<fileset file="Constants.java"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/selfsvc.properties" overwrite="true">
+    	    <fileset file="selfsvc.properties"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/sql-map-config.xml" overwrite="true">
+    	   	<fileset file="sql-map-config.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/struts.xml" overwrite="true">
+    	   	<fileset file="struts.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${src}/struts.xml" overwrite="true">
+    	   <fileset file="struts.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${WEB-INF}/web.xml" overwrite="true">
+    	    <fileset file="web.xml"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${spring}/applicationContext-base.xml" overwrite="true">
+    	    <fileset file="applicationContext-base.xml"></fileset>
+    	</copy>
+    	
+    	<!-- 复制newAdd.css-->
+    	<copy tofile="${css}/newAdd.css" overwrite="true">
+    	    <fileset file="newAdd.css"></fileset>
+    	</copy>
+    	
+    	<!--  复制css -->
+    	<copy tofile="${css}/style.css" overwrite="true">
+    	    <fileset file="style.css"></fileset>
+    	</copy>
+    	
+    	<copy tofile="${css}/reset.css" overwrite="true">
+    	    <fileset file="reset.css"></fileset>
+    	</copy>
+    	
+    	<!-- 删除webapp/images文件夹下的文件及文件夹 -->
+    	<delete verbose="true" includeemptydirs="true">
+	    	<fileset dir="${images}">
+	    		<include name="**/*"/>
+	    	</fileset>
+    	</delete>
+    	
+    	<!--将build下images复制到webapp/images下-->
+		<copy todir="${images}" overwrite="true">
+				<fileset dir="images">
+					<include name="**/*" />
+				</fileset>
+		</copy>
+    	
+    </target>
+  
+    <target name="compile" depends="prepare">       
+        <javac encoding="GBK" srcdir="${src}" destdir="${dist}" debug="true" debuglevel="lines,vars,source"> 
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+        <copy todir="${dist}">
+            <fileset dir="${src}">
+                <exclude name="**/*.java"/>
+                <exclude name="**/vssver.scc"/>
+                <exclude name="**/CVS/**"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar jarfile="${SelfSvcWar}">
+        	<fileset dir="${webapp}">
+        		<exclude name="ssResources/**/*.*" />
+        	</fileset>
+        </jar>
+    </target>
+    
+</project>

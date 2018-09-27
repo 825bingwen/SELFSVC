@@ -1,0 +1,15 @@
+脚本使用说明：
+一、首先参考脚本001和002 使用DBA用户创建表空间和用户
+001_SS_DDL_DBA_createtablespace.sql
+002_SS_DDL_DBA_createuse.sql
+
+二、用创建的新用户登录数据库，然后按如下顺序执行脚本
+NG自助终端同义词_NGSH_DDL.sql
+
+103_SS_DDL_NGSH_createTable.sql
+104_SS_DDL_NGSH_createView.sql
+105_SS_DDL_NGSH_createSequence.sql
+106_SS_DDL_NGSH_createProcedure.sql
+
+
+

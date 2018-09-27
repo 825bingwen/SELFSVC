@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 实名认证办理5选2 -->
+	<package name="realNameReg" extends="struts-common" namespace="/realNameReg">
+	    
+		<!-- 查询身份认证方式 -->
+		<action name="qryIdentityAuthMethods" class="RealNameRegAction" method="qryIdentityAuthMethods">
+			<result name="identityAuthMethods">/jsp/customize/sd/realNameReg/identityAuthMethods.jsp</result>
+		</action>
+		
+		<!-- 发短信随机码 -->
+		<action name="sendRandomPwd" class="RealNameRegAction" method="sendRandomPwd">
+		</action>
+		
+		<!-- 初次密码验证 -->
+		<action name="verifyPwd" class="RealNameRegAction" method="verifyPwd">
+			<result name="failed">/jsp/customize/sd/realNameReg/identityAuthMethods.jsp</result>
+			<result name="success">/jsp/customize/sd/realNameReg/secondAuthMethods.jsp</result>
+		</action>
+		
+		<!-- 二次验证 -->
+		<action name="secondAuthMethods" class="RealNameRegAction" method="secondAuthMethods">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/secondAuthMethods.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 实名认证办理5选3 -->
+		<action name="showRealNameRegAccess" class="RealNameRegAction" method="showRealNameRegAccess">
+			<result name="realNameRegAccess">/jsp/customize/sd/realNameReg/firstRealNameAccessShow53.jsp</result>
+		</action>
+		
+		<!-- 实名制第一种认证方式 -->
+		<action name="regRealNameFirstAccess" class="RealNameRegAction" method="regRealNameFirstAccess">
+			<result name="success">/jsp/customize/sd/realNameReg/secondRealNameRegAccess53.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/firstRealNameAccessShow53.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 实名制第二种认证方式 -->
+		<action name="regRealNameSecondAccess" class="RealNameRegAction" method="regRealNameSecondAccess">
+			<result name="success">/jsp/customize/sd/realNameReg/thirdRealNameRegAccess53.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/secondRealNameRegAccess53.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 实名制第三种认证方式 -->
+		<action name="regRealNameThirdAccess" class="RealNameRegAction" method="regRealNameThirdAccess">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/thirdRealNameRegAccess53.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+	</package>
+	
+	<package name="noRealNameReg" extends="struts-common" namespace="/noRealNameReg" >
+		
+		<!-- 非实名制认证补卡 -->
+		<!-- 展示输入两遍手机号码的页面 -->
+		<action name="inputNumber" class="noRealNameRegAction" method="inputNumber">
+			<result name="inputNumber">/jsp/customize/sd/realNameReg/noRealNameInputNumber.jsp</result>
+		    <result name="inputNumber2">/jsp/customize/sd/feeChargeKeyboard/inputNumber2.jsp</result>
+		</action>
+		
+		<!-- 展示5种认证方式的页面 -->
+		<action name="showRegisterAccess" class="noRealNameRegAction" method="showRegisterAccess">
+			<result name="success">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+		</action>
+		
+		<!-- 生成随机密码 -->
+		<action name="sendRandomPwd" class="noRealNameRegAction" method="sendRandomPwd">
+		</action>
+		
+		<!-- 验证短信随机密码 -->
+		<action name="checkRandomPwd" class="noRealNameRegAction" method="checkRandomPwd">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 验证个人密码 -->
+		<action name="checkUserPwd" class="noRealNameRegAction" method="checkUserPwd">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- SIM卡卡号验证 -->
+		<action name="checkSIMCardNo" class="noRealNameRegAction" method="checkSIMCardNo">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 交费记录验证 -->
+		<action name="checkChargeRecord" class="noRealNameRegAction" method="checkChargeRecord">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 通话记录验证 -->
+		<action name="checkCallRecord" class="noRealNameRegAction" method="checkCallRecord">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/jsp/customize/sd/realNameReg/noRealNameAccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+	</package>
+	
+</struts>

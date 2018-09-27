@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="rectel">	
+	<select id="getRectelInfoWithTermid" resultClass="hashmap" parameterClass="String">
+		SELECT TERMID, TELNUMBER
+  	      FROM SH_INFO_RECTEL
+  	     WHERE TERMID = #termid#
+	</select>
+	
+	<insert id="insertRectelWithTermid" parameterClass="hashmap">
+		INSERT INTO SH_INFO_RECTEL(TERMID, TELNUMBER, CREATEDATE)
+  		VALUES(#termid#, #telnumber#, SYSDATE)
+	</insert>
+	
+	<delete id="deleteRectelWithTermid" parameterClass="java.lang.String">
+		DELETE FROM SH_INFO_RECTEL WHERE TERMID = #termid#
+	</delete>
+</sqlMap>

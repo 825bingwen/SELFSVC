@@ -1,0 +1,664 @@
+package com.customize.hub.selfsvc.bean;
+
+import com.customize.hub.selfsvc.bean.impl.BaseBeanHubImpl;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.call.IntMsgUtil;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
+
+/**
+ * 话费充值缴费
+ * 
+ * @author xkf29026
+ * 
+ */
+public class FeeChargeHubBean extends BaseBeanHubImpl
+{
+	/**
+     * 湖北接入EBUS改造后话费充值账户信息查询
+     * 
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号码
+     * @param curMenuId 当前菜单
+     * @return map
+     * @remark create hWX5316476 2014-05-15 V200R003C10LG0501 OR_huawei_201405_234  自助终端接入EBUS一阶段_缴费
+     */
+    public Map qryfeeChargeAccountNew(TerminalInfoPO termInfo, String servnumber, String curMenuId)
+    {
+    	Map<String,String> paramMap = new HashMap<String,String>();
+    	
+    	// 手机号
+        paramMap.put("telnumber", servnumber);
+        
+        // 操作员id
+        paramMap.put("curOper", termInfo.getOperid());
+        
+        // 终端机id
+        paramMap.put("atsvNum", termInfo.getTermid());
+        
+        // 触摸流水
+        paramMap.put("touchoid", "");
+        
+        // 菜单id
+        paramMap.put("menuid", curMenuId);
+        
+        // 调用查询用户信息接口
+        ReturnWrap retUserInfo = this.getSelfSvcCall().getUserInfoHub(paramMap);
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        if (retUserInfo == null)
+        {
+        	map.put("returnMsg", "账户信息查询失败!");
+            return map;
+        }
+        else if(retUserInfo.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("returnMsg", retUserInfo.getReturnMsg());
+        	return map;
+        }
+        
+        // 账户信息
+        CTagSet ctsUserInfo = (CTagSet)retUserInfo.getReturnObject();
+        
+        // 将用户信息中获取的账户id放入入参中
+        paramMap.put("acctID", ctsUserInfo.GetValue("acctID"));
+        
+        // 将用户信息中获取的地区编码放入入参中
+        paramMap.put("region", ctsUserInfo.GetValue("region"));
+        
+        // 支付方式 默认传：sttpBank
+        paramMap.put("payType", "sttpBank");
+        
+        // 调用账户缴费方式接口（判断账户是否为托收账户，托收账户不能进行自助缴费）
+        ReturnWrap accSettle = this.getSelfSvcCallHub().getAccSettleTypeByPayType(paramMap);
+        
+        if (accSettle == null)
+        {
+        	map.put("returnMsg", "账户缴费方式查询失败!");
+            return map;
+        }
+        else if(accSettle.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("returnMsg", accSettle.getReturnMsg());
+        	return map;
+        }
+        else
+        {
+        	CRSet accaccSettleInfo = (CRSet)accSettle.getReturnObject();
+        	
+        	// 如果有数据表示该账户为托收账户，不能进行自助缴费
+        	if(accaccSettleInfo != null && accaccSettleInfo.GetRowCount()>0 )
+        	{
+        		map.put("returnMsg", "此用户号码的帐户为托收帐户,不能进行自助缴费");
+            	return map;
+        	}
+        }
+        
+        paramMap.put("operid", termInfo.getOperid());
+        
+        // 调用查询账户余额接口
+        ReturnWrap accBalance = this.getSelfSvcCallHub().queryBalance(paramMap);
+       
+        if (accBalance == null)
+        {
+        	map.put("returnMsg", "账户余额信息查询失败!");
+            return map;
+        }
+        else if(accBalance.getStatus() == SSReturnCode.ERROR)
+        {
+        	map.put("returnMsg", accBalance.getReturnMsg());
+        	return map;
+        }
+
+        // 余额信息
+        CTagSet accBalanceInfo = (CTagSet)accBalance.getReturnObject();
+        
+        // 获取品牌id
+        String brandID = ctsUserInfo.GetValue("brand");
+        String brandName = "";
+        
+        // 新改造的用户信息查询接口只返回给品牌id，不返回品牌名称，除动感地带和全球通品牌，其余全是神州行
+    	if("BrandMzone".equals(brandID))
+    	{
+    		brandName = "动感地带";
+    	}
+    	else if("BrandGotone".equals(brandID))
+    	{
+    		brandName = "全球通";
+    	}
+    	else
+    	{
+    		brandID = "BrandSzx";
+    		brandName = "神州行";
+    	}
+    	
+        // 账户余额信息与用户信息合并到一个CTagSet中 应缴话费
+        ctsUserInfo.SetValue("balance", accBalanceInfo.GetValue("receiveMoney"));
+        ctsUserInfo.SetValue("productid", brandID);
+        ctsUserInfo.SetValue("productname", brandName);
+        
+        // 设置返回结果
+        map.put("returnObj", ctsUserInfo);
+        
+        // 设置返回信息
+        map.put("returnMsg", retUserInfo.getReturnMsg());
+        return map;
+        
+    }
+    
+    /**
+     * 话费充值账户信息查询
+     * 
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号码
+     * @param curMenuId 当前菜单
+     * @return
+     */
+    public Map qryfeeChargeAccount(TerminalInfoPO termInfo, String servnumber, String curMenuId)
+    {
+    	// 统一接口平台转EBUS开启
+        if(IntMsgUtil.isTransEBUS("Atsv_Qry_Fee_Hub"))
+        {
+        	return qryfeeChargeAccountNew(termInfo, servnumber, curMenuId);
+        }
+        
+        Map<String, String> paramMap = new HashMap<String, String>();
+        
+        // 设置操作员id
+        paramMap.put("operid", termInfo.getOperid());
+        
+        // 设置终端机id
+        paramMap.put("atsvNum", termInfo.getTermid());
+        
+        // 设置客户手机号
+        paramMap.put("servnumber", servnumber);
+        
+        // 设置客户接触id
+        paramMap.put("touchoid", "");
+        
+        // 设置当前菜单id
+        paramMap.put("menuid", curMenuId);
+        
+        // 获取结果
+        ReturnWrap rw = this.getSelfSvcCallHub().qryfeeChargeAccount(paramMap);
+        Map map = new HashMap();
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        else if (rw != null)
+        {
+        	map.put("returnMsg", rw.getReturnMsg());
+        	return map;
+        }
+        else
+        {
+            map.put("returnMsg", "账户信息查询失败");
+            return map;
+        }
+    }
+    
+    /**
+     * 话费充值缴费
+     * 
+     * @param termInfo 终端机信息
+     * @param curMenuId 当前菜单
+     * @param servnumber 手机号码
+     * @param money 缴费金额
+     * @param payType 缴费方式
+     * @param presentFee 赠送金额 分
+     * @param taskoid 支付流水号
+     * @return
+     * @remark modify by sWX219697 2014-12-23 17:12:10 OR_HUB_201412_399_HUB
+     * @remark modify by lwx439898 2017-12-13 R005C20LG2201 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造   新增参数taskoid
+     */
+    public Map chargeCommit(String taskoid,TerminalInfoPO termInfo, String curMenuId, String servnumber, 
+    		String money, String payType, String chargeLogOID, String presentFee)
+    {
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put("operid", termInfo.getOperid());
+        paramMap.put("termid", termInfo.getTermid());
+        paramMap.put("menuid", curMenuId);
+        paramMap.put("servnumber", servnumber);
+        paramMap.put("money", money);
+        paramMap.put("payType", payType);
+        paramMap.put("touchoid", "");
+        paramMap.put("taskoid", taskoid);
+        
+        // add begin jWX216858 2014-07-14 DR_HUB_201405_887_自助终端-银联对账整改2014
+        // 缴费日志流水
+        paramMap.put("chargelogoid", chargeLogOID);
+        // add end jWX216858 2014-07-14 DR_HUB_201405_887_自助终端-银联对账整改2014 
+        
+        //add begin sWX219697　2014-12-23 17:14:44 OR_HUB_201412_399_HUB
+        //赠送话费金额 单位 分
+        paramMap.put("presentFee", presentFee);
+        
+        //赠送科目
+        paramMap.put("presentSubject", CommonUtil.getParamValue("SH_PRESENT_SUBJECT"));
+        //add end sWX219697　2014-12-23 17:14:44 OR_HUB_201412_399_HUB
+        
+        ReturnWrap rw = this.getSelfSvcCallHub().chargeCommit(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    
+    /**
+     * //更新表 ar_bank_task 的 recoid
+     * <功能详细描述>
+     * @param taskoid
+     * @param cecoid
+     * @param status
+     * @see [类、类#方法、类#成员]
+     * @remark create by lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造
+     */
+    public void updateBankRecoid(TerminalInfoPO termInfo,String currNumber,String curMenuId,String taskoid,String recoid,String status)
+    {
+        this.getSelfSvcCallHub().updateBankRecoid(termInfo,currNumber,currNumber,taskoid,recoid,status);     
+    }
+    
+    /**
+     * 查询支付交易
+     * <功能详细描述>
+     * @param termInfo
+     * @param taskoid
+     * @param currNumber
+     * @param curMenuId
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造
+     */
+    public Map qryPayChargeInfo(TerminalInfoPO termInfo,String taskoid,String currNumber,String curMenuId)
+    {
+        ReturnWrap rw = this.getSelfSvcCallHub().qryPayChargeInfo(termInfo,taskoid,currNumber,curMenuId);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        
+       return null;   
+    }
+    /**
+     *创建支付任务，记录ar_bank_task表
+     * 
+     * @param termInfo
+     * @param isTelNum
+     * @param currNumber
+     * @param selfPayLog
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造
+     */
+    public Map createPayCenterTrans(NserCustomerSimp customerSimp,String curMenuId,TerminalInfoPO termInfo, String isTelNum, String currNumber,Map<String,String> selfPayLog)
+    {             
+        ReturnWrap rw = this.getSelfSvcCallHub().createPayCenterTrans(customerSimp,curMenuId,termInfo,isTelNum,currNumber,selfPayLog);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        
+       return null;        
+    }
+    
+    /**
+     * 更新银行支付状态
+     * <功能详细描述>
+     * @param payTransMsg
+     * @param payCenterParam
+     * @see [类、类#方法、类#成员]
+     * @remark create by lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造
+     */
+    public void updateBankPaymentStatus(String payCenterParamInfo,String respMsg,String payTransMsg,TerminalInfoPO termInfo,String curMenuId,String currNumber)
+    {     
+        this.getSelfSvcCallHub().updateBankPaymentStatus(payCenterParamInfo,respMsg,payTransMsg,termInfo,curMenuId,currNumber);       
+    }
+    
+    /**
+     * 话费充值缴费(代理商的自助终端)
+     * 
+     * @param termInfo 终端机信息
+     * @param curMenuId 当前菜单
+     * @param servnumber 手机号码
+     * @param money 缴费金额
+     * @param payType 缴费方式
+     * @param businessid 业务编码
+     * @param presentFee 赠送金额 分
+     * @return
+     * @remark modify by sWX219697 2015-1-7 11:27:50 OR_HUB_201412_399_HUB
+     */
+    public Map chargeCommitByAgent(TerminalInfoPO termInfo, String curMenuId, String servnumber, String money, String payType,
+    		String businessid, String chargeLogOID, String presentFee)
+    {
+        Map<String, String> paramMap = new HashMap<String, String>();
+        
+        // 设置操作员编码
+        paramMap.put("operid", termInfo.getOperid());
+        
+        // 设置终端ID
+        paramMap.put("termid", termInfo.getTermid());
+        
+        // 设置菜单id
+        paramMap.put("menuid", curMenuId);
+        
+        // 设置手机号
+        paramMap.put("servnumber", servnumber);
+        
+        // 设置缴费金额
+        paramMap.put("money", money);
+        
+        // 设置缴费类型
+        paramMap.put("payType", payType);
+        
+        // 设置客户触摸id
+        paramMap.put("touchoid", "");
+        
+        // 设置业务编码
+        paramMap.put("businessid",businessid);
+        
+        // 设置代理商组织结构编码
+        paramMap.put("orgid",termInfo.getOrgid());
+        
+        // 设置外围流水ID
+        paramMap.put("recoid","");
+        
+        // 设置发起业务的渠道ID
+        paramMap.put("plattype","bsacAtsv"); 
+        
+        // modify begin hWX5316476 2014-08-25 V200R003C10LG0801 OR_huawei_201408_934 自助终端-银联对账整改2014(切换为EBUS协议)
+        paramMap.put("chargelogoid", chargeLogOID);
+        // modify end hWX5316476 2014-08-25 V200R003C10LG0801 OR_huawei_201408_934 自助终端-银联对账整改2014(切换为EBUS协议)
+        
+        //add begin sWX219697　2014-12-23 17:14:44 OR_HUB_201412_399_HUB
+        //赠送话费金额 单位 分
+        paramMap.put("presentFee", presentFee);
+        
+        //赠送科目
+        paramMap.put("presentSubject", CommonUtil.getParamValue("SH_PRESENT_SUBJECT"));
+        //add end sWX219697　2014-12-23 17:14:44 OR_HUB_201412_399_HUB
+        
+        ReturnWrap rw = this.getSelfSvcCallHub().chargeCommitByAgent(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    
+    /**
+     * 湖北取系统参数接口
+     * 
+     * @param termInfo 终端机信息
+     * @param curMenuId 当前菜单
+     * @param paramid 参数ID
+     * @return
+     */
+    public Map getParamValue(TerminalInfoPO termInfo, String curMenuId, String paramid)
+    {
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put("operid", termInfo.getOperid());
+        paramMap.put("termid", termInfo.getTermid());
+        paramMap.put("menuid", curMenuId);
+        paramMap.put("region", termInfo.getRegion());
+        paramMap.put("paramid", paramid);
+        paramMap.put("touchoid", "");
+        
+        ReturnWrap rw = this.getSelfSvcCallHub().getParamValue(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CTagSet v = (CTagSet)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    
+    /**
+     * 向用户发送随机密码短信
+     * 
+     * @param servNumber，手机号码
+     * @param termInfo，终端机信息
+     * @param shortMessage，短信内容
+     * @param curMenuId，当前菜单
+     * @return
+     * @see
+     */
+    public boolean sendRandomPwd(String servNumber, TerminalInfoPO termInfo, String shortMessage, String curMenuId)
+    {
+        Map paramMap = new HashMap();
+        paramMap.put("telnumber", servNumber);
+        paramMap.put("smsContent", shortMessage);
+        paramMap.put("priority", "5");
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("touchOID", "");
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        
+        ReturnWrap rw = this.getSelfSvcCallHub().sendSMS(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public Map getInvoiceData(TerminalInfoPO termInfo, String curMenuId, String servnumber, String formnum)
+    {
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put("operID", termInfo.getOperid());
+        paramMap.put("termID", termInfo.getTermid());
+        paramMap.put("menuID", curMenuId);
+        paramMap.put("telnumber", servnumber);
+        paramMap.put("formnum", formnum);
+        paramMap.put("touchOID", "");
+        
+        ReturnWrap rw = this.getSelfSvcCallHub().getInvoiceData(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            Vector v = (Vector)rw.getReturnObject();
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            // 设置返回结果
+            map.put("returnObj", v);
+            
+            // 设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    /**
+     * 资助终端账单协同查询之139email
+     * @remark create yKF73963 2012-10-09 OR_HUB_201204_533 关于在自助终端及网厅上实现多渠道协同查询账单功能
+     */
+    public CTagSet mianFeiChouJiang(NserCustomerSimp customerSimp,TerminalInfoPO terminalInfo,String actId,String curMenuId)
+     {
+         Map map = new HashMap();
+         map.put("SERVNUM", customerSimp.getServNumber());
+         map.put("ACTID", actId);
+         map.put("menuID", curMenuId);
+         map.put("touchOID", customerSimp.getContactId());
+         map.put("operID", terminalInfo.getOperid());
+         map.put("termID", terminalInfo.getTermid());
+         map.put("CHANNELID","bsacAtsv");
+        
+         
+         ReturnWrap rw = getSelfSvcCallHub().mianFeiChouJiang(map);
+         
+         if (rw != null && rw.getStatus() == 1)
+         {
+             return (CTagSet)rw.getReturnObject();
+         }
+         
+         return null;
+         
+     }
+    /**
+     * 
+     * @remark create yKF73963 2012-10-09 OR_HUB_201304_824 自助终端-积分专区 
+     */
+    public ReturnWrap mianFeiChouJiangNew(NserCustomerSimp customerSimp,TerminalInfoPO terminalInfo,String actId,String curMenuId)
+     {
+         Map map = new HashMap();
+         map.put("SERVNUM", customerSimp.getServNumber());
+         map.put("ACTID", actId);
+         map.put("menuID", curMenuId);
+         map.put("touchOID", customerSimp.getContactId());
+         map.put("operID", terminalInfo.getOperid());
+         map.put("termID", terminalInfo.getTermid());
+         map.put("CHANNELID","bsacAtsv");
+        
+         
+         ReturnWrap rw = getSelfSvcCallHub().mianFeiChouJiang(map);
+         
+        
+         
+         return rw;
+         
+     }
+    /**
+     * 查询是否4G卡
+     *
+     * @param termInfo 终端机信息
+     * @param servnumber 手机号码
+     * @param curMenuId 当前菜单
+     * liutao00194861 2016-8-16 OR_HUB_201603_1191 【BOSS常规需求】自助终端显示内容优化需求（张德伟）
+     * @return
+     */
+    public String qryIs4GCard(TerminalInfoPO termInfo, String servnumber, String curMenuId)
+    {
+        // 统一接口平台转EBUS开启
+        if(IntMsgUtil.isTransEBUS("BLCSCheckIs4GCardByTelnum"))
+        {
+            // 组装报文头信息
+            MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+                    "",MsgHeaderPO.ROUTETYPE_TELNUM, servnumber);
+
+            // 调用查询用户信息接口
+            ReturnWrap retCardInfo = this.getSelfSvcCall().getIs4GCard(msgHeader);
+            Map<String, String> map = new HashMap<String, String>();
+
+            CTagSet tagset =null;
+            if (retCardInfo == null)
+            {
+                return "error";
+            }
+            else if(retCardInfo.getStatus() == SSReturnCode.ERROR)
+            {
+                map.put("returnMsg", retCardInfo.getReturnMsg());
+                return "error";
+            }else {
+                tagset = (CTagSet)retCardInfo.getReturnObject();
+                String ss= (String)tagset.get("result");
+                return ss;
+            }
+        }
+        return "error";
+
+    }
+
+    public String qryAvilInteral(TerminalInfoPO termInfo, String servnumber, String curMenuId)
+    {
+        // 统一接口平台转EBUS开启
+        //if(IntMsgUtil.isTransEBUS("getAvailIntegralEbus"))
+        {
+            // 组装报文头信息
+            MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfo.getOperid(), termInfo.getTermid(),
+                    "",MsgHeaderPO.ROUTETYPE_TELNUM, servnumber);
+
+            // 调用查询用户信息接口
+            ReturnWrap retCardInfo = this.getSelfSvcCall().getAvailIntegralEbus(msgHeader);
+            Map<String, String> map = new HashMap<String, String>();
+
+            CTagSet tagset =null;
+            if (retCardInfo == null)
+            {
+                return "error";
+            }
+            else if(retCardInfo.getStatus() == SSReturnCode.ERROR)
+            {
+                map.put("returnMsg", retCardInfo.getReturnMsg());
+                return "error";
+            }else {
+                tagset = (CTagSet)retCardInfo.getReturnObject();
+                String ss= (String)tagset.get("result");
+                return ss;
+            }
+
+        }
+       // return "error";
+
+    }
+}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="invoice" extends="struts-common" namespace="/invoice">
+		
+		<!-- 检测发票打印机状态 -->
+		<action name="valiPrint" class="invoicePrintAction" method="validatePrinTerm">
+			<result name="success">/jsp/customize/hub/invoice/validatePrinTerm.jsp</result>
+		    <result name="error">/jsp/customize/hub/invoice/valiError.jsp</result>
+		</action> 
+		
+		<!-- 读取要打印的记录信息 -->
+		<action name="invoiceList" class="invoicePrintAction" method="invoiceList">
+			<result name="success">/jsp/customize/hub/invoice/invoiceList.jsp</result>
+		</action>
+		
+		<!-- 湖北打印发票需要随机密码验证 -->
+		<action name="validateByRandomPwd" class="invoicePrintAction" method="validateByRandomPwd">
+			<result name="success">/jsp/customize/hub/invoice/randomPwd.jsp</result>
+			<result name="successPrin">/jsp/customize/hub/invoice/printInvoice.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 随机密码验证通过后打印发票 -->
+		<action name="printInvoiceWithPwd" class="invoicePrintAction" method="printInvoiceWithPwd">
+			<result name="success">/jsp/customize/hub/invoice/printInvoice.jsp</result>
+		    <result name="errors">/jsp/customize/hub/invoice/randomPwd.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="invoicePrintAction" method="insertInvoiceLog">
+		</action>
+	</package>	
+	
+	<!-- 打印月结发票 -->
+	<package name="monInvoice" namespace="/monInvoice" extends="struts-common">
+        <!-- 查询近六个月月份 -->
+        <action name="qryCurrentMonth" class="monInvoPrintAction" method="qryCurrentMonth">
+            <result name="qryCurrentMonth">
+                /jsp/customize/hub/invoice/currentMonthInvoice.jsp
+            </result>
+        </action>
+        
+        <!-- 查询账期 -->
+        <action name="qryBillCycle" class="monInvoPrintAction" method="qryBillCycle">
+            <result name="qryBillCycle">
+                /jsp/customize/hub/invoice/showCycle.jsp
+            </result>
+            <result name="error">/commonError.jsp</result>
+        </action>
+        
+        <!-- 打印发票 -->
+        <action name="printMonInvoice" class="monInvoPrintAction" method="printMonInvoice">
+            <result name="printMonInvoice">
+                /jsp/customize/hub/invoice/printMonInvoice.jsp
+            </result>
+            <result name="error">/commonError.jsp</result>
+        </action>
+    </package>
+</struts>

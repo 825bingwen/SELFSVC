@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.objectFactory" value="spring"/>
+	<constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+	<constant name="struts.messages.upload.error.InvalidContentTypeException" value="exception"></constant>
+	<include file="struts-default.xml"></include>
+	<include file="struts/struts-common.xml"></include>
+	<include file="struts/struts-privilege.xml"></include>
+	<include file="struts/struts-feeservice.xml"></include>
+	<include file="struts/struts-login.xml"></include>
+	<include file="struts/struts-media.xml"></include>
+	<include file="struts/struts-charge.xml"></include>
+	<include file="struts/struts-serviceInfo.xml"></include>
+	<include file="struts/struts-baseService.xml"></include>
+	<include file="struts/struts-reception.xml"></include>
+	<include file="struts/struts-managerOperation.xml"></include>
+	<include file="struts/struts-mpaycharge.xml"></include>
+	<include file="struts/struts-valuecard.xml"></include>
+	<include file="struts/customize/sd/struts-charge-sd.xml"></include>
+	<include file="struts/customize/sd/struts-chooseTel-sd.xml"></include>
+	<include file="struts/customize/sd/struts-monthFee-sd.xml"></include>
+	<include file="struts/customize/sd/struts-mailBillSend-sd.xml"></include>
+	<include file="struts/customize/sd/struts-qryComboInfo-sd.xml"></include>
+	<include file="struts/customize/sd/struts-feeBalance-sd.xml"></include>
+	<include file="struts/customize/sd/struts-cdrquery-sd.xml"></include>
+	<include file="struts/struts-quickpublish.xml"></include>
+	<include file="struts/customize/sd/struts-bindBankCard-sd.xml"></include>
+	<include file="struts/customize/sd/struts-invoice-sd.xml"></include>
+	<include file="struts/customize/sd/struts-agentCharge-sd.xml"></include>
+	<include file="struts/customize/sd/struts-monthlyAmount-sd.xml"></include>
+	<include file="struts/customize/sd/struts-prodChange-sd.xml"></include>
+	<include file="struts/customize/sd/struts-realNameReg-sd.xml"></include>
+	<include file="struts/customize/sd/struts-isss-sd.xml"></include>
+	<include file="struts/customize/sd/struts-telProdDiy-sd.xml"></include>
+	<include file="struts/customize/sd/struts-prestoredReward-sd.xml"></include>
+	<include file="struts/customize/sd/struts-recommend4G-sd.xml"></include>
+	<include file="struts/customize/sd/struts-packageservice-sd.xml"></include>
+	<include file="struts/customize/sd/struts-cardbusi-sd.xml"></include>
+	<include file="struts/customize/sd/struts-nonlocalCharge-sd.xml"></include>
+	<include file="struts/customize/sd/struts-usim-sd.xml"></include>
+	<include file="struts/customize/sd/struts-scoreExchange-sd.xml"></include>
+	<include file="struts/struts-valuecard.xml"></include>
+	<include file="struts/customize/sd/struts-hotAppDownload-sd.xml"></include>
+</struts>

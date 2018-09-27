@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TerminalInfo">
+	<typeAlias alias="termInfoPO" type="com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO" />
+	<typeAlias alias="pluginPO" type="com.gmcc.boss.selfsvc.terminfo.model.CShPluginVO" />
+	<!-- modify begin cKF48754 2011/11/10 R003C11L11n01 OR_SD_201111_371 -->
+	<select id="getTerminalInfoByIP" parameterClass="java.lang.String" resultClass="termInfoPO">
+		SELECT B.TERMGRPID,A.TERMID, A.TERMNAME, A.IPADDR, A.MAC, A.OPERID, A.UNIONUSERID, A.UNIONPAYCODE, A.BROWSERTYPE, A.TERMSPECIAL, A.SOCKADDR, A.REGION, A.ORGID, A.ORGNAME, A.PROVIDERCODE, A.MACHINEMODEL, A.TRMCODE,
+		  (SELECT C.DICTNAME FROM SH_DICT_ITEM C WHERE A.PROVIDERCODE = C.DICTID) AS BANKNO,
+		       A.ISLOCKED
+		  FROM SH_TERM_CONFIG A,SH_TERM_GROUP B
+		 WHERE IPADDR = #ip#  AND A.TERMID = B.TERMID AND A.STATUS = 1 AND B.STATUS = 1
+	</select>
+	<!-- modify end cKF48754 2011/11/10 R003C11L11n01 OR_SD_201111_371 -->
+	
+	<!--add begin g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_149 -->
+	<select id="getTerminalInfoByMAC" parameterClass="java.lang.String" resultClass="termInfoPO">
+		SELECT B.TERMGRPID,A.TERMID, A.TERMNAME, A.IPADDR, A.MAC, A.OPERID, A.UNIONUSERID, A.UNIONPAYCODE, A.BROWSERTYPE, A.TERMSPECIAL, A.SOCKADDR, A.REGION, A.ORGID, A.ORGNAME, A.PROVIDERCODE, A.MACHINEMODEL, A.TRMCODE,
+		       A.ISLOCKED
+		  FROM SH_TERM_CONFIG A,SH_TERM_GROUP B
+		 WHERE MAC = #mac#  AND A.TERMID = B.TERMID AND A.STATUS = 1 AND B.STATUS = 1
+	</select>
+	<!--add end g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_149 -->
+	
+	<!-- modified by yKF73963 -->
+	<select id="getPluginInfo" parameterClass="termInfoPO" resultClass="pluginPO">
+		SELECT PROVIDERID, BROWSERTYPE, PRINTERVER, PRTFTPADDR, PRTPLUGINFLAG, INVPRINTERVER, INVPRTFTPADDR,
+		       INVPRTPLUGINFLAG, KEYBOARDVER, KEYBRDFTPADDR, KEYBRDPLUGINFLAG, CASHVER, CASHFTPADDR,
+		       CASHPLUGINFLAG, CARDVER, CARDFTPADDR, CARDPLUGINFLAG, MANAGERVER, MGRFTPADDR, MGRPLUGINFLAG,
+		       MOVECARDVER,MOVECARDADDR,MOVECARDFLAG simcardpluginidflag,MOVECARDFLAG,
+		       WRITECARDVER,WRITECARDADDR,WRITECARDFLAG writecardpluginflag,
+		       IDCARDVER, IDCARDADDR, IDCARDFLAG idcardpluginflag, UNIONVER, UNIONFTPADDR, UNIONPLUGINFLAG, PURSEVER,
+		       PURSEFTPADDR, PURSEPLUGINFLAG, SELLGOODSVER, SELLGOODSFTPADDR, SELLGOODSPLUGINFLAG
+		  FROM SH_INFO_PLUGIN
+		 WHERE PROVIDERID = #providercode# AND BROWSERTYPE = #browsertype#
+	</select>
+	
+	<select id="getMenuIDList" parameterClass="java.lang.String" resultClass="java.lang.String">
+		SELECT B.MENUID
+		  FROM SH_TERM_GROUP A, SH_GROUP_MENU B
+		 WHERE A.TERMID = #termid# AND B.TERMGRPID = A.TERMGRPID AND A.STATUS = 1 AND B.STATUS = 1
+  </select>
+  
+  <!--modify begin g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_149 -->
+  <update id="updateTermConfigIp" parameterClass="termInfoPO">
+		UPDATE SH_TERM_CONFIG M SET M.IPADDR = #ipaddr# WHERE M.MAC = #mac# AND M.STATUS = 1
+  </update>
+  
+  <!-- 判断ipaddr是否重复 -->
+  <select id="isIPAddrExisted" parameterClass="termInfoPO" resultClass="String">
+  		SELECT 1 FROM SH_TERM_CONFIG A WHERE A.IPADDR = #ipaddr# AND A.MAC != #mac# AND A.STATUS = 1
+  </select>
+  <!--modify end g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_149 -->
+  
+  <!-- add begion yKF28472 OR_huawei_201305_474 -->
+  <select id="getCityOrgId" parameterClass="java.lang.String" resultClass="java.lang.String">
+  		SELECT t.PARWAYID FROM SH_ORGANIZATION_CHILD T WHERE T.SUBWAYID = #orgId# AND length(t.PARWAYID) = 5
+  </select>
+  <!-- add end yKF28472 OR_huawei_201305_474 -->
+  
+  <!-- add begin hWX5316476 OR_huawei_201305_1248 -->
+  <!-- 根据orgid获取orgtype字段值 -->
+  <select id="getOrgtype" parameterClass="termInfoPO" resultClass="java.lang.String">
+  		SELECT T.ORGTYPE FROM SH_ORGANIZATION T WHERE T.ORGID = #orgid#
+  </select>
+  <!-- add end hWX5316476 OR_huawei_201305_1248 -->
+  
+</sqlMap>

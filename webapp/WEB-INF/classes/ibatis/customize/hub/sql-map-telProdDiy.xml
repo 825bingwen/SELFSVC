@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="telProdDiy">
+	
+	<typeAlias alias="telProdPO" type="com.customize.hub.selfsvc.telProdDiy.model.TelProdPO" />
+	
+	<!-- 根据用户的当前归属地区、品牌查询可转换的主体产品信息列表 -->	
+	<select id="qryTelProdList" resultClass="telProdPO" parameterClass="telProdPO">	
+	SELECT A.GOODS_ID        GOODS_ID,
+		   A.GOODS_TYPE      GOODS_TYPE,
+	       A.NCODE           NCODE,
+	       A.ADDPRODID       ADDPRODID,
+	       A.PACKAGEID       PACKAGEID,
+	       A.PRIVID          PRIVID,
+	       A.SPID            SPID,
+	       A.SPBUSID         SPBUSID,
+	       A.BUSDESC         BUSDESC,
+	       A.SUITABLE_PEOPLE SUITABLE_PEOPLE,
+	       A.FEESTANDARD     FEESTANDARD,
+	       A.PRICE           PRICE,
+	       A.ITEM_NAME       ITEM_NAME,
+	       A.TCDESC          TCDESC
+	  FROM SH_GOODS_TELPRODINFO_DIY A
+	 WHERE A.STATUS = '1'
+	   AND A.EFF_DATE &lt;= SYSDATE
+	   AND A.EXF_DATE &gt;= SYSDATE
+	   AND A.BELONGBRANDS IN (#belongBrands#, 'ALL')
+	   AND (A.BELONG_REGION LIKE '%$belong_region$%' OR A.BELONG_REGION = '999')
+	   <dynamic>
+	    <isEqual prepend="AND" property="qryType" compareValue="MAINPROD">
+			A.GOODS_TYPE IN ('1','2')
+		</isEqual>
+	    <isEqual prepend="AND" property="qryType" compareValue="GPRSWLAN">
+			A.GOODS_TYPE IN ('3','4')
+		</isEqual>
+		<isEqual prepend="AND" property="qryType" compareValue="SP">
+			A.GOODS_TYPE = '5'
+		</isEqual>
+	</dynamic>
+	</select>
+</sqlMap>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 基础服务办理 -->
+	<package name="billSend" extends="struts-common" namespace="/billSend">
+
+        <!-- 转到账单寄送页面 -->
+        <action name="billSendPage" class="billSendAction" method="billSendPage">
+                <result name="selectBillSendType">/jsp/customize/cq/billSend/selectBillSendType.jsp</result>
+        </action>
+        
+        <!-- 账单寄送 -->
+        <action name="billSendCommit" class="billSendAction" method="billSendCommit">
+                <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+        </action>
+	</package>	
+</struts>

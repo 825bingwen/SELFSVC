@@ -1,0 +1,396 @@
+/*
+ * 文件名：MenuInfoPO.java
+ * 版权：CopyRight 2010-2015 Huawei Technologies Co., Ltd.All Righs Reserved.
+ * 描述：
+ * 修改人：g00140516
+ * 修改时间：2010-11-30
+ * 修改内容：新增
+ */
+package com.gmcc.boss.selfsvc.resdata.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import com.gmcc.boss.selfsvc.common.BasePO;
+import com.gmcc.boss.selfsvc.quickpublish.model.ProdConfigPO;
+
+/**
+ * 菜单
+ * 
+ * @author g00140516
+ * 
+ */
+public class MenuInfoPO extends BasePO
+{
+    private static final long serialVersionUID = 1L;
+    
+    private String termgrpid;
+    
+    private String menuid = "";
+    
+    private String menuname = "";
+    
+    private String shortMenuname = ""; // 短菜单名，当菜单长度大于6位时，截取前6位加省略号
+    
+    private BigDecimal menulevel;
+    
+    private String parentid = "";
+    
+    private String guiobj = "";
+    
+    private String tiptext = "";
+    
+    private String busidetail = "";
+    
+    private BigDecimal sortorder;
+    
+    private String imgpath = "";
+    
+    private String region = "";
+    
+    // begin zKF66389 findbus清零
+    private String brandID = "";
+    // end zKF66389 findbus清零
+    
+    private String authcode = "";
+    
+    private Date createdate = new Date();
+    
+    private BigDecimal status;
+    
+    private Date statusdate = new Date();
+    
+    private String position = "";
+    
+    private String imgpath2 = "";
+    
+    //add begin g00140516 2011/10/25 R003C11L10n01 功能增加温馨提示    
+    private String additionalInfo = "";   
+    //add end g00140516 2011/10/25 R003C11L10n01 功能增加温馨提示
+    
+    private String iscall = "";
+    
+    // add begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649
+    /**
+     * 生效方式
+     */
+    private String effectType = "";
+    // add end g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649
+    
+    // 是否是产品配置表里的产品 1：是
+    private String isProd = "";
+    
+    // 产品配置表PO
+    private ProdConfigPO prodConfigPO = new ProdConfigPO();
+    
+    // add begin m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式
+    // 宁夏增加可选认证方式
+    private String availableAuthCode = "";
+    // add end m00227318 2013/02/06 R003C13L01n01 宁夏，修改，增加可选认证方式
+    
+    //add begin sWX219697 2014-9-15 11:26:30 OR_SD_201409_556_自助终端营销功能优化
+    //对应ISSS智能营销平台的offercode
+    private String iSSSCode;
+    //add begin sWX219697 2014-9-15 11:26:30 OR_SD_201409_556_自助终端营销功能优化
+    
+    // add begin wWX217192 2014-10-20 OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求
+    // 山东业务办理菜单按照分类查询的标志 1:语音与套餐类 2:增值业务类 3:国际业务类
+    private String type;
+    // add begin wWX217192 2014-10-20 OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求
+    
+    public String getAdditionalInfo()
+    {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(String additionalInfo)
+    {
+        this.additionalInfo = additionalInfo;
+    }
+
+    public String getPosition()
+    {
+        return position;
+    }
+
+    public void setPosition(String position)
+    {
+        this.position = position;
+    }
+
+    public static long getSerialVersionUID()
+    {
+        return serialVersionUID;
+    }
+    
+    public Date getCreatedate()
+    {
+        return (Date)createdate.clone();
+    }
+    
+    public void setCreatedate(Date createdate)
+    {
+        this.createdate = (Date)createdate.clone();
+    }
+    
+    public String getMenuid()
+    {
+        return menuid;
+    }
+    
+    public void setMenuid(String menuid)
+    {
+        this.menuid = menuid;
+    }
+    
+    public String getMenuname()
+    {
+        return menuname;
+    }
+    
+    public void setMenuname(String menuname)
+    {
+        this.menuname = menuname;
+    }
+    
+    public String getParentid()
+    {
+        return parentid;
+    }
+    
+    public void setParentid(String parentid)
+    {
+        this.parentid = parentid;
+    }
+    
+    public String getRegion()
+    {
+        return region;
+    }
+    
+    public void setRegion(String region)
+    {
+        this.region = region;
+    }
+    
+    public BigDecimal getSortorder()
+    {
+        return sortorder;
+    }
+    
+    public void setSortorder(BigDecimal sortorder)
+    {
+        this.sortorder = sortorder;
+    }
+    
+    public BigDecimal getStatus()
+    {
+        return status;
+    }
+    
+    public void setStatus(BigDecimal status)
+    {
+        this.status = status;
+    }
+    
+    public BigDecimal getMenulevel()
+    {
+        return menulevel;
+    }
+    
+    public void setMenulevel(BigDecimal menulevel)
+    {
+        this.menulevel = menulevel;
+    }
+    
+    public String getGuiobj()
+    {
+        return guiobj;
+    }
+    
+    public void setGuiobj(String guiobj)
+    {
+        this.guiobj = guiobj;
+    }
+    
+    public String getTiptext()
+    {
+        return tiptext;
+    }
+    
+    public void setTiptext(String tiptext)
+    {
+        this.tiptext = tiptext;
+    }
+    
+    public String getImgpath()
+    {
+        return imgpath;
+    }
+    
+    public void setImgpath(String imgpath)
+    {
+        this.imgpath = imgpath;
+    }
+    
+    public String getAuthcode()
+    {
+        return authcode;
+    }
+    
+    public void setAuthcode(String authcode)
+    {
+        this.authcode = authcode;
+    }
+    
+    public Date getStatusdate()
+    {
+        return (Date)statusdate.clone();
+    }
+    
+    public void setStatusdate(Date statusdate)
+    {
+        this.statusdate = (Date)statusdate.clone();
+    }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[" + this.getClass() + "[");
+        sb.append(", menuid:" + this.getMenuid());
+        sb.append(", menuname:" + this.getMenuname());
+        sb.append(", level:" + this.getMenulevel());
+        sb.append(", parentid:" + this.getParentid());
+        sb.append(", guiobj:" + this.getGuiobj());
+        sb.append(", tiptext:" + this.getTiptext());
+        sb.append(", sortorder:" + this.getSortorder());
+        sb.append(", imgpath:" + this.getImgpath());
+        sb.append(", region:" + this.getRegion());
+        sb.append(", brandid:" + this.getBrandID());
+        sb.append(", authcode:" + this.getAuthcode());
+        sb.append(", createdate:" + this.getCreatedate());
+        sb.append(", status:" + this.getStatus());
+        sb.append(", statusdate:" + this.getStatusdate());
+        sb.append(", availableauthcode:" + this.getAvailableAuthCode());
+        sb.append(", iSSSCode:" + this.getISSSCode());
+        sb.append("]]");
+        
+        return super.toString();
+    }
+    
+    public String getShortMenuname()
+    {
+        return shortMenuname;
+    }
+    
+    public void setShortMenuname(String shortMenuname)
+    {
+        this.shortMenuname = shortMenuname;
+    }
+    
+    public String getBusidetail()
+    {
+        return busidetail;
+    }
+    
+    public void setBusidetail(String busidetail)
+    {
+        this.busidetail = busidetail;
+    }
+
+    public String getImgpath2()
+    {
+        return imgpath2;
+    }
+
+    public void setImgpath2(String imgpath2)
+    {
+        this.imgpath2 = imgpath2;
+    }
+
+	public String getTermgrpid() 
+	{
+		return termgrpid;
+	}
+
+	public void setTermgrpid(String termgrpid) 
+	{
+		this.termgrpid = termgrpid;
+	}
+
+    public String getIscall()
+    {
+        return iscall;
+    }
+
+    public void setIscall(String iscall)
+    {
+        this.iscall = iscall;
+    }
+
+    public String getEffectType()
+    {
+        return effectType;
+    }
+
+    public void setEffectType(String effectType)
+    {
+        this.effectType = effectType;
+    }
+
+    public String getIsProd()
+    {
+        return isProd;
+    }
+
+    public ProdConfigPO getProdConfigPO()
+    {
+        return prodConfigPO;
+    }
+
+    public void setIsProd(String isProd)
+    {
+        this.isProd = isProd;
+    }
+
+    public void setProdConfigPO(ProdConfigPO prodConfigPO)
+    {
+        this.prodConfigPO = prodConfigPO;
+    }
+
+	public String getAvailableAuthCode()
+	{
+		return availableAuthCode;
+	}
+
+	public void setAvailableAuthCode(String availableAuthCode)
+	{
+		this.availableAuthCode = availableAuthCode;
+	}
+
+	public String getISSSCode() {
+		return iSSSCode;
+	}
+
+	public void setISSSCode(String code) {
+		iSSSCode = code;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getBrandID() {
+		return brandID;
+	}
+
+	public void setBrandID(String brandID) {
+		this.brandID = brandID;
+	}
+
+    
+}

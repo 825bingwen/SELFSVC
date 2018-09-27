@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 基础服务办理 -->
+	<package name="baseService" extends="struts-common" namespace="/baseService">
+	    
+	    <!-- 显示功能列表 
+		<action name="baseServiceFunc" class="baseServiceAction" method="initFunctionList">
+			<result name="funclist">/index.jsp</result>
+		</action>
+		-->
+		<!-- 设置余额提醒值页面 -->
+		<action name="chgBalanceUrgePage" class="chgBalanceUrgeAction" method="balanceUrgePage">
+		    <result name="changeOrCancel">/jsp/baseService/balanceNotify/changeOrCancel.jsp</result>
+		    <result name="noBalanceUrge">/jsp/baseService/balanceNotify/noBalanceUrgeYet.jsp</result>
+		</action>
+		
+		<!-- 进入余额提醒值选择界面 -->
+		<action name="chgBalanceUrgeSelect" class="chgBalanceUrgeAction" method="balanceUrgeSelect">
+		    <result name="selectBalancePage">/jsp/baseService/balanceNotify/selectBalance.jsp</result>
+		</action>
+		
+		<!-- 余额提醒和设置余额提醒值 -->
+		<action name="chgBalanceUrgeDef" class="chgBalanceUrgeAction" method="balanceUrgeDef">
+		    <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>   
+		</action>
+		
+		<!-- 转向通用受理页面 -->
+		<action name="commonServPage" class="commonServPageAction" method="commonServPage">
+		    <result name="commonServPage">/jsp/baseService/recCommonServ.jsp</result>
+		</action>
+		
+		<!-- 基础业务办理提示费用信息页面 -->
+		<action name="feeMessage" class="feeMessageAction" method="displayFeeMessage">
+		</action>
+		
+		<!-- 停开机处理Action -->
+		<action name="recOpenAndStopSubs" class="recOpenAndStopSubsAction">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		    <!-- 调用用户登陆随机码验证功能 -->
+		    <result name="toValidate" type="chain">randomPwd</result>
+		    <result name="toValidateNX" type="redirect">/login/randomPwd.action?CurMenuid=${CurMenuid}&amp;selectReason=${selectReason}</result>
+		</action>
+		
+		<!-- 转到修改密码页面 -->
+		<action name="changePasswordPage" class="changePasswordAction" method="changePasswordPage">
+		    <result name="changePasswordPage">/jsp/baseService/recChangePassword.jsp</result>
+		</action>
+		
+		<!-- 修改密码 -->
+		<action name="changePassword" class="changePasswordAction" method="changePassword">
+		    <result name="success">/commonSuccess.jsp</result>
+		</action>
+		
+		<!-- 转到梦网业务查询订购或退订页面_湖北 -->
+		<action name="querySP" class="SPAction" method="querySP">
+		    <result name="qrySPinfo">/jsp/baseService/recSpDetail.jsp</result>
+		    <result name="spAvailList">/jsp/baseService/recSpOrder.jsp</result>
+		</action>
+		
+		<!-- 跟据spcode+operatorcode查询梦网业务_湖北 -->
+		<action name="querySpByCode" class="SPAction" method="querySpByCode">
+		    <result name="querySpByCode">/jsp/baseService/recSpOrderByCode.jsp</result>
+		</action>
+		
+		<!-- 梦网业务查询退订_湖北 -->
+		<action name="cancelSP" class="SPAction" method="cancelSP">
+		    <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>
+		
+		<!-- 转到业务查询退订页面_山东，宁夏 -->
+		<action name="recSpService" class="recSpAction" method="querySP">
+		    <result name="qrySPinfo">/jsp/baseService/busiInfo/recSpDetail.jsp</result>
+		</action>
+		
+		<!-- 梦网业务查询退订_山东，宁夏 -->
+		<action name="cancelRecSP" class="recSpAction" method="cancelSP">
+		    <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>
+		
+		<!-- 密码重置，发送随即密码 -->
+		<action name="sendRandomPwd" class="passwordResetAction" method="sendRandomPwd">
+			<result name="randomPwdPage">/jsp/baseService/randomPwdPage.jsp</result>
+			<result name="randomPwdPageHub">/jsp/baseService/randomPwdPageHub.jsp</result>
+		</action>
+		
+		<!-- 使用随机密码进行密码重置 -->
+		<action name="resetPassword" class="passwordResetAction" method="resetPassword">
+			<result name="success">/commonSuccess.jsp</result>
+			<result name="randomPwdError">/jsp/baseService/randomPwdPage.jsp</result>
+			<result name="randomPwdErrorHub">/jsp/baseService/randomPwdPageHub.jsp</result>
+		</action>
+		
+		<!-- add begin hWX5316476 2014-2-21 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求 -->
+		<!-- 使用随机密码进行密码重置(宁夏) -->
+		<action name="resetPasswordNewNX" class="passwordResetAction" method="resetPasswordNewNX">
+			<result name="success">/commonSuccess.jsp</result>
+			<result name="randomPwdError">/jsp/baseService/randomPwdPage.jsp</result>
+		</action>
+		<!-- add end hWX5316476 2014-2-21 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求 -->
+		
+		<!-- 重置密码电子协议书 -->
+		<action name="resetPwdProtocol" class="passwordResetAction" method="resetPwdProtocol">
+			<result name="resetPwdProtocol">/jsp/baseService/resetPwdProtocol.jsp</result>
+		</action>
+		
+		<!-- 转向停开机原因选择页面（宁夏） -->
+		<action name="selectReason" class="recOpenAndStopSubsAction" method="selectReason">
+		    <result name="selectReason">/jsp/baseService/selectReason.jsp</result>
+		</action>
+		
+		<!-- 家庭网成员添加 -->
+		<action name="checkTelNumAndQryFamilyMem" class="addFamilyMemAction" method="checkTelNumAndQryFamilyMem">
+		    <result name="queryFamilyMemSuccess">/jsp/baseService/familymem/showFamilyMem.jsp</result>
+		</action>
+		<action name="initAddFamilyMem" class="addFamilyMemAction" method="initAddFamilyMem">
+		    <result name="initAddFamilyMemSuccess">/jsp/baseService/familymem/addFamilyMem.jsp</result>
+		</action>
+		<action name="addFamilyMem" class="addFamilyMemAction" method="addFamilyMem">
+		</action>
+		
+		<!-- 家庭网取消 -->
+		<action name="deleteFamilyMem" class="addFamilyMemAction" method="deleteFamilyMem">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 删除家庭网成员 -->
+		<action name="delMemByTelNum" class="addFamilyMemAction" method="delMemByTelNum">
+			<result name="queryFamilyMemSuccess">/jsp/baseService/familymem/showFamilyMem.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+	</package>	
+</struts>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                    http://www.springframework.org/schema/beans/spring-beans.xsd
+	                    http://code.alibabatech.com/schema/dubbo
+	                    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	                    
+	<!-- 10.164.132.222:2181  zookeeper：//IP需看服务IP改动  -->
+	<dubbo:application name="selfsvc" />
+	<dubbo:registry address="zookeeper://10.164.132.222:2181" />
+	
+	<!-- 多个zookeeper 形式 -->
+	<!-- 
+	<dubbo:registry protocol="zookeeper" address="10.19.202.20:2181,10.19.202.21:2181,10.19.202.22:2181" />
+	 -->
+	<dubbo:protocol name="dubbo" port="20880" />
+	
+	<dubbo:reference id="dubbolet" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface"
+	timeout="60000" retries="0"  group="paymentService">
+	</dubbo:reference>
+	
+	<!-- 缴费服务大类 -->
+	<dubbo:reference id="paymentService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="paymentService">
+	</dubbo:reference>
+	
+	<!-- 账单服务大类 -->
+	<dubbo:reference id="billService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="billService">
+	</dubbo:reference>
+	
+	<!-- 信息查询大类 -->
+	<dubbo:reference id="informationInquiryService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="informationInquiryService">
+	</dubbo:reference>
+	
+	<!-- 业务受理大类 -->
+	<dubbo:reference id="businessAcceptanceService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="businessAcceptanceService">
+	</dubbo:reference>
+	
+	<!-- 资源管理服务大类 -->
+	<dubbo:reference id="resourceManagementService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="resourceManagementService">
+	</dubbo:reference>
+	
+	<!-- 认证鉴权大类 -->
+	<dubbo:reference id="authenticateService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="authenticateService">
+	</dubbo:reference>
+	
+	<!-- 支付管理大类 -->
+	<dubbo:reference id="paymentManagementService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="paymentManagementService">
+	</dubbo:reference>
+	
+	<!-- 积分服务大类 -->
+	<dubbo:reference id="creditManagementService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="creditManagementService">
+	</dubbo:reference>
+	
+	<!-- 市场营销大类 -->
+	<dubbo:reference id="marketingService" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="marketingService">
+	</dubbo:reference>
+	
+	<!-- 客户资料管理大类 -->
+	<dubbo:reference id="customerDataManagementSercice" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="customerDataManagementSercice">
+	</dubbo:reference>
+	
+	<!-- 服务变更大类 -->
+	<dubbo:reference id="serviceChange" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="serviceChange">
+	</dubbo:reference>
+	
+	<!-- 渠道管理大类 -->
+	<dubbo:reference id="channelManagement" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="channelManagement">
+	</dubbo:reference>
+		
+	<!-- 渠道管理大类 -->
+	<dubbo:reference id="multimediaIssued" interface="com.huawei.ebus.connector.dubbo.IDubboletInterface" 
+	timeout="60000" retries="0"	group="multimediaIssued">
+	</dubbo:reference>	
+</beans>

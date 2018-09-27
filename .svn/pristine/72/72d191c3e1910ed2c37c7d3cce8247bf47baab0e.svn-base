@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="prodChange">
+	<!-- 优惠产品添加日志 -->
+	
+	<typeAlias alias="prodLogVO" type="com.customize.nx.selfsvc.prodChange.model.ProdLogVO" />
+	<typeAlias alias="mainProdTempletInfoPO" type="com.customize.nx.selfsvc.prodChange.model.MainProdTempletInfoPO" />
+	<typeAlias alias="mainProdTempletPO" type="com.customize.nx.selfsvc.prodChange.model.MainProdTempletPO" />	
+
+	<!-- 根据用户的当前主体产品ID、归属地区、品牌查询可转换的主体产品信息列表 -->	
+	<select id="qryMainProdTempChangeList" resultClass="mainProdTempletInfoPO" parameterClass="mainProdTempletPO">		
+		SELECT * FROM
+		(
+		SELECT A.AREA region ,A.NEWPRODID newPordID,B.TEMPLETNO,B.BRAND,B.NEWPRODNAME,B.PRIVNAME,B.MONTHCOST,B.CALLDURING,
+			   B.FREECALLED,B.GPRSFLUX ,B.OUTPACKAGEFEE,B.DATABASESERVICE,B.REMARK, B.NCODE
+		FROM  SH_PROD_TEMPLET  A,sh_prod_templetinfo B  
+		WHERE A.NEWPRODID IN
+		      (
+	               <iterate property="newPodArray" conjunction = ",">
+	                	#newPodArray[]#
+	               </iterate>
+               )
+              AND B.SORTORDER='0' AND A.STATUS='1' AND A.AREA IN (#region# ,999) AND A.TEMPLETNO = B.TEMPLETNO
+		<isNotEmpty prepend="AND" property="brand"> 
+				A.BRAND=#brand#
+		</isNotEmpty>
+		ORDER BY A.SORTORDER 
+		)c
+		union
+		(SELECT A.AREA region ,A.NEWPRODID newPordID,B.TEMPLETNO,B.BRAND,B.NEWPRODNAME,B.PRIVNAME,B.MONTHCOST,B.CALLDURING,
+			   B.FREECALLED,B.GPRSFLUX ,B.OUTPACKAGEFEE,B.DATABASESERVICE,B.REMARK, B.NCODE
+		FROM  SH_PROD_TEMPLET  A,sh_prod_templetinfo B  
+		WHERE A.NEWPRODID=#oldProdID#
+              AND B.SORTORDER = '1' AND A.STATUS='1' AND A.AREA IN (#region# ,999) AND A.TEMPLETNO = B.TEMPLETNO
+		<isNotEmpty prepend="AND" property="brand"> 
+				A.BRAND=#brand#
+		</isNotEmpty>
+		)
+	</select>	
+	
+	<!-- 添加主体产品变更日志记录 -->
+	<insert id="insertProdChangeLog" parameterClass="prodLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="prodLogOID">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		    INSERT INTO SH_LOG_PRODCHANGE(PRODLOGOID,PRODSN,REGION,SERVNUMBER,FROMPRODID,TOPRODID,
+					OPTYPE,PRODTYPE,CHANGEID,RECDATE,RECSTAUTS,CHGDESP)
+	        VALUES(
+	             #prodLogOID#, #prodSn#,#region#,#servnumber#,#fromProdId#,#toProdId#,#opType#,
+	             #prodType#,#changeId#,to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'),#recStauts#,#chgdesp#)
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 服务信息查询 -->
+	<package name="mailBillSend" extends="struts-common" namespace="/mailBillSend">
+	    
+		<!-- 账/详单139邮箱定制 用户定制状态查询 -->
+		<action name="mailBillSend" class="mailBillSendAction" method="qryBillMailInfo">
+			<result name="qryResults">/jsp/customize/sd/mailBillSend/qryResults.jsp</result>
+			<!-- add begin m00227318 2012/10/11 V200R003C12L10 OR_SD_201209_443 -->
+			<!-- 账单彩信定制 -->
+			<result name="qryResultsMMS">/jsp/customize/sd/mailBillSend/qryResults-MMS.jsp</result>
+			<result name="error">/commonError.jsp</result>
+			<!-- add end m00227318 2012/10/11 V200R003C12L10 OR_SD_201209_443 -->
+		</action>
+		<!-- 账/详单139邮箱定制 定制邮箱变更为139邮箱 -->
+		<action name="changeToBillMail" class="mailBillSendAction" method="changeBillOrDetailMail">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- 账/详单139邮箱定制 开通139邮箱账/详单寄送 -->
+		<action name="openBillOrDetailMail" class="mailBillSendAction" method="openBillOrDetailMail">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- add begin m00227318 2012/10/13 V200R003C12L10 OR_SD_201209_443 -->
+		<!-- 取消账单或详单的邮箱或彩信寄送 -->
+		<action name="cancleBillOrDetailMail" class="mailBillSendAction" method="cancleBillOrDetailMail">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		<!-- add end m00227318 2012/10/13 V200R003C12L10 OR_SD_201209_443 -->
+		
+	</package>
+</struts>

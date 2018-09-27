@@ -1,0 +1,328 @@
+package com.gmcc.boss.selfsvc.serviceinfo.action;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.selfsvc.bean.ServiceHistoryBean;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.call.IntMsgUtil;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.BusinessIdConstants;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+import com.huawei.alert.bean.AlertMsgDefine;
+import org.apache.commons.lang.StringUtils;
+
+public class ServiceHistoryAction extends BaseAction
+{
+    
+    private static Log logger = LogFactory.getLog(ServiceHistoryAction.class);
+    
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+    
+    // 当前菜单id
+    private String curMenuId = "";
+    
+    // 开始日期
+    private String startDate;
+    
+    // 结束日期
+    private String endDate;
+    
+    // 错误信息
+    private String errormessage = "";
+    
+    // 结果列表标题
+    private String[] servicetitle;
+    
+    // 查询结果
+    private List result;
+    
+    // 调用接口bean
+    private ServiceHistoryBean qryServiceHistoryBean;
+
+    /**
+     * 输入查询日期 <功能详细描述>
+     * 
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String qryServiceHistoryInput()
+    {
+        return "qryServiceHistoryInput";
+    }
+    
+    /**
+     * 业务查询-->受理历史查询
+     */
+    public String qryHistory()
+    {
+        // 记录开始日志
+        logger.debug("queryHistory Starting...");
+        
+        // 获取session
+        HttpSession session = getRequest().getSession();
+        
+        // add begin g00140516 2012/05/31 R003C12L05n01 OR_huawei_201201_94 出错时返回上一页面
+        getRequest().setAttribute("backStep", "-1");
+        // add end g00140516 2012/05/31 R003C12L05n01 OR_huawei_201201_94 出错时返回上一页面
+        
+        // 获取终端机信息
+        TerminalInfoPO terminalInfoPO = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+        
+        // 获取客户信息
+        NserCustomerSimp customer = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);
+        
+        // 客户手机号
+        String servnumber = customer.getServNumber();
+        
+        // 定位到错误页面
+        String forward = "error";
+        
+        // 受理日志查询
+        Map mapResult = qryServiceHistoryBean.qryAllServiceHistory(startDate,
+                endDate,
+                terminalInfoPO,
+                customer,
+                curMenuId);
+        if (mapResult.get("returnObj") != null)
+        {
+            Vector vec = (Vector)(mapResult.get("returnObj"));
+            
+            String servicetitle = (String)vec.get(0);
+            
+            // 对标题字符串进行分解后放入数组返回页面
+            if (StringUtils.isNotEmpty(servicetitle))
+            {
+                String[] titles = servicetitle.split("=");
+                
+                // 设置结果标题
+                setServicetitle(titles);
+            }
+            
+            String province = (String) PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID);            
+            
+            // content(List)
+            Vector servicecont = new Vector();
+            
+            //add begin sWX219697 2014-8-21 17:00:40 bug_74185 查询未受理过业务的历史记录时返回空指针
+            if (!(vec.get(1) instanceof CRSet))
+            {
+            	setErrormessage("该时间段内受理记录为空");
+            	return forward;
+            }
+            //add end sWX219697 2014-8-21 17:00:40 bug_74185 查询未受理过业务的历史记录时返回空指针
+            
+            CRSet cr = (CRSet)vec.get(1);
+
+            // 拼装数据
+            for (int i = 0; i < cr.GetRowCount(); i++)
+            {
+                String s = "";                                
+                
+                if (CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_RECHISTORY))
+                {                   
+                    s = cr.GetValue(i, 4) + "=" + cr.GetValue(i, 3) + "="
+                            + ("".equals(cr.GetValue(i, 1)) ? "&nbsp;" : cr.GetValue(i, 1));
+                }
+                else
+                {
+                    if (Constants.PROOPERORGID_NX.equalsIgnoreCase(province))
+                    {
+                        s = cr.GetValue(i, 0) + "=" + cr.GetValue(i, 1) + "="
+                                + ("".equals(cr.GetValue(i, 3)) ? "&nbsp;" : cr.GetValue(i, 3));
+                    }
+                    else
+                    {
+                        if(IntMsgUtil.isTransEBUS("BLCSQryReceptionSimple"))
+                        {
+                            s = cr.GetValue(i, 0) + "=" + cr.GetValue(i, 1) + "="
+                                    + ("".equals(cr.GetValue(i, 3)) ? "&nbsp;" : cr.GetValue(i, 3));
+                        }
+                        else
+                        {
+                            s = CommonUtil.formatTime(cr.GetValue(i, 0)) + "=" + cr.GetValue(i, 1) + "="
+                                    + ("".equals(cr.GetValue(i, 3)) ? "&nbsp;" : cr.GetValue(i, 3));
+                        }
+                    }
+                }
+                
+                servicecont.add(s);
+            }
+            
+            List listOuter = new ArrayList();
+            
+            // 对分页查询后的数据进行分解后返回页面
+            for (int i = 0; servicecont.size() != 0 && i < servicecont.size(); i++)
+            {
+                List listInner = new ArrayList();
+                
+                String[] content = servicecont.get(i).toString().split("=");
+                for (int j = 0; j < content.length; j++)
+                {
+                    listInner.add(content[j]);
+                }
+                listOuter.add(listInner);
+            }
+            
+            // 设置结果
+            setResult(listOuter);
+            
+            forward = "qryServiceHistory";
+            
+            // 创建成功日志记录
+            this.createRecLog(Constants.BUSITYPE_SUBSQRYRECHISTORY, "0", "0", "0", "业务信息查询:受理历史查询成功!");
+        }
+        else if (mapResult.get("returnObj") == null)
+        {
+            // 从session中移除清单数据
+            session.removeAttribute(Constants.LIST_DATA_SESSION_NAME + servnumber);
+            
+            String resultMsg = (String) mapResult.get("returnMsg");
+            
+            // 湖北统一接口平台转EBUS开关开启
+        	if(!IntMsgUtil.isTransEBUS("BLCSQryReceptionSimple"))
+        	{
+        		//modify by sWX219697 2014-7-11 70057_统一接口平台“受理历史查询”失败 
+        		if (resultMsg != null && resultMsg.indexOf("information") >= 0)
+        		{
+        			resultMsg = "无受理记录，请返回继续查询";
+        		}
+        		else
+        		{
+        			resultMsg = "受理历史查询失败，请稍候再试。给您带来的不便，敬请原谅。";
+        			resultMsg = getConvertMsg(resultMsg, "zz_04_15_000001", null, null);
+        		}
+        		//modify end sWX219697 2014-7-11 70057_统一接口平台“受理历史查询”失败 
+        	}
+        	
+            setErrormessage(resultMsg);
+            
+            // 创建错误日志记录
+            this.createRecLog(Constants.BUSITYPE_SUBSQRYRECHISTORY, "0", "0", "1", resultMsg);
+        }
+        
+        logger.debug("queryHistory End!");
+        return forward;
+    }
+    
+    /**
+     * 获取查询单页数据
+     * 
+     * @param request
+     * @param dataM
+     * @param listType
+     * @return
+     */
+    public Vector getQueryPageData(HttpServletRequest request, Vector dataV)
+    {
+        
+        // Vector dataV = (Vector)dataM.get(listType);
+        
+        Vector result = new Vector();
+        // if (dataV != null && dataV.size() > 0)
+        // {
+        // String page = request.getParameter("pageNo");
+        // if (page == null || page.trim().length() < 1)
+        // {
+        // page = "1";
+        // }
+        // int iPage = Integer.parseInt(page);
+        // int maxSize = iPage * Constants.DEFAULT_PAGE_SIZE;
+        // maxSize = maxSize <= dataV.size() ? maxSize : dataV.size();
+        // for (int i = (iPage - 1) * Constants.DEFAULT_PAGE_SIZE; i < maxSize; i++)
+        // {
+        // result.add(dataV.get(i));
+        // }
+        //            
+        // // String pageSize = (String)request.getAttribute("pageSize");
+        // request.setAttribute("total", String.valueOf(dataV.size()));
+        // request.setAttribute("pageSize", String.valueOf(Constants.DEFAULT_PAGE_SIZE));
+        // }
+        
+        request.setAttribute("total", String.valueOf(dataV.size()));
+        return dataV;
+    }
+    
+    public String getCurMenuId() {
+		return curMenuId;
+	}
+
+	public void setCurMenuId(String curMenuId) {
+		this.curMenuId = curMenuId;
+	}
+
+	public String getStartDate()
+    {
+        return startDate;
+    }
+    
+    public void setStartDate(String startDate)
+    {
+        this.startDate = startDate;
+    }
+    
+    public String getEndDate()
+    {
+        return endDate;
+    }
+    
+    public void setEndDate(String endDate)
+    {
+        this.endDate = endDate;
+    }
+    
+    public ServiceHistoryBean getQryServiceHistoryBean()
+    {
+        return qryServiceHistoryBean;
+    }
+    
+    public void setQryServiceHistoryBean(ServiceHistoryBean qryServiceHistoryBean)
+    {
+        this.qryServiceHistoryBean = qryServiceHistoryBean;
+    }
+    
+    public String[] getServicetitle()
+    {
+        return servicetitle;
+    }
+    
+    public void setServicetitle(String[] servicetitle)
+    {
+        this.servicetitle = servicetitle;
+    }
+    
+    public List getResult()
+    {
+        return result;
+    }
+    
+    public void setResult(List result)
+    {
+        this.result = result;
+    }
+    
+    public String getErrormessage()
+    {
+        return errormessage;
+    }
+    
+    public void setErrormessage(String errormessage)
+    {
+        this.errormessage = errormessage;
+    }
+}

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="charge" extends="struts-common" namespace="/charge">		
+		<!-- 话费充值 -->
+		<action name="feeCharge" class="feeChargeAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/customize/sd/feeCharge/inputNumber.jsp</result>
+		    <!--  add begin YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		     <result name="inputNumber2">/jsp/customize/sd/feeChargeKeyboard/inputNumber2.jsp</result>
+		    <!--  add end YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		</action>
+		
+		<!-- 话费充值（账户信息+支付方式） -->
+		<action name="qryfeeChargeAccount" class="feeChargeAction" method="qryfeeChargeAccount">
+		    <result name="success">/jsp/customize/sd/feeCharge/accountInfo.jsp</result>		   	     
+		    <result name="failed">/commonError.jsp</result>
+		     <!--  add begin YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->		    
+		     <result name="success2">/jsp/customize/sd/feeChargeKeyboard/accountInfo2.jsp</result>
+		    <!--  add end YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		</action>
+		
+		<!-- 话费充值投币 -->
+		<action name="cashCharge" class="feeChargeAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/customize/sd/feeCharge/cash/cashChargePage.jsp</result>
+		    <!--  add begin YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->		    
+		    <result name="cashChargePage2">/jsp/customize/sd/feeChargeKeyboard/cash/cashChargePage2.jsp</result>
+		    <!--  add end YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->		    
+		</action>
+		
+		<!-- add begin zKF69263 2015-4-17 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+		<!-- 现金投币后，更新交费日志 -->
+		<action name="updateCashChargeLog" class="feeChargeAction" method="updateCashChargeLog">			
+		</action>
+		<!-- add end zKF69263 2015-4-17 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+		
+		<!-- 话费充值投币提交 -->
+		<action name="cashChargeCommit" class="feeChargeAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/sd/feeCharge/finish.jsp</result>		   
+		    <result name="error">/jsp/customize/sd/feeCharge/cash/cashErrorPage.jsp</result>
+		     <!--  add begin YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		     <result name="success2">/jsp/customize/sd/feeChargeKeyboard/finish2.jsp</result>
+		     <result name="error2">/jsp/customize/sd/feeChargeKeyboard/cash/cashErrorPage2.jsp</result>
+		   <!--  add end YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		</action>
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="feeChargeAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/sd/feeCharge/cash/cashErrorPage.jsp</result>
+			<result name="cashErrorPage2">/jsp/customize/sd/feeChargeKeyboard/cash/cashErrorPage2.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡选择金额页面 -->
+		<action name="cardCharge" class="feeChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/sd/feeCharge/otherFee.jsp</result>
+			<result name="otherFee2">/jsp/customize/sd/feeChargeKeyboard/otherFee2.jsp</result>
+			<result name="dutyInfo">/jsp/customize/sd/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 手工输入缴费金额页面 -->
+		<action name="toInputMoney" class="feeChargeAction" method="toInputMoney">
+		    <result name="toInputMoney">/jsp/customize/sd/feeCharge/inputMoney.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡免责声明页面 -->
+		<action name="dutyInfo" class="feeChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/sd/feeCharge/card/dutyInfo.jsp</result>
+		    <result name="error">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="feeChargeAction" method="toReadCard">
+			<result name="error">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+		    <result name="toReadCard">/jsp/customize/sd/feeCharge/card/readCard.jsp</result>
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="feeChargeAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="feeChargeAction" method="cardChargeCommit">
+		    <result name="success">/jsp/customize/sd/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+		    <result name="success2">/jsp/customize/sd/feeChargeKeyboard/finish2.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="feeChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+		</action>		
+		
+		<!-- 无需进行随机密码验证，直接打印发票 -->
+		<action name="printInvoiceWithoutPwd" class="feeChargeAction" method="printInvoiceWithoutPwd">
+			<result name="print">/jsp/customize/sd/feeCharge/printInvoice.jsp</result>
+			<!--  add begin YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+			<result name="print2">/jsp/customize/sd/feeChargeKeyboard/printInvoice2.jsp</result>
+			<!--  add end YKF70747 2012/04/08 R003C12L04n01    OR_SD_201203_818 -->
+		</action>
+
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="feeChargeAction" method="insertInvoiceLog">
+		</action>
+		
+		<action name="checkTime" class="feeChargeAction" method="checkTime">
+		</action>
+		<!-- 查询账期数据 -->
+		<action name="qryBillCycle" class="invoicePrintAction" method="qryBillCycle">
+			<result name="selectCycle">/jsp/customize/sd/feeCharge/monthInvoiceResult.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		<action name="printInvoice" class="invoicePrintAction" method="printInvoice">
+			<result name="success">/jsp/customize/sd/feeCharge/printInvoice.jsp</result>
+		</action>
+		
+		<!-- add begin jWX216858 2015-3-30 OR_SD_201501_1063 自助终端支撑连缴功能优化 -->
+        <!-- 话费连缴 -->
+        <action name="morePhone" class="feeChargeAction" method="morePhone">
+            <result name="inputNumber">/jsp/customize/sd/feeCharge/morePhone/inputNumberMorePhone.jsp</result>
+        </action>
+        
+        <!-- 查询用户信息 -->
+		<action name="qryUserStatusMorePhone" class="feeChargeAction" method="qryUserStatusMorePhone"></action>
+		
+		<!-- 话费连缴充值账户信息查询 -->
+		<action name="qryAcountMorePhone" class="feeChargeAction" method="qryAcountMorePhone">
+		    <result name="qryAcountMorePhone">/jsp/customize/sd/feeCharge/morePhone/accountInfo.jsp</result>
+		    <result name="failed">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 话费连缴转到银联卡页面 -->
+		<action name="readCardMorePhone" class="feeChargeAction" method="readCardMorePhone">
+            <result name="error">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+            <result name="readCardMorePhone">/jsp/customize/sd/feeCharge/morePhone/readCardMorePhone.jsp</result>
+        </action>
+        
+        <!-- 更新话费连缴日志 -->
+        <action name="updateMoreChargeLog" class="feeChargeAction" method="updateMoreChargeLog">
+        </action>
+        
+        <!-- 话费连缴提交 -->
+        <action name="morePhoneCommit" class="feeChargeAction" method="morePhoneCommit">
+            <result name="success">/jsp/customize/sd/feeCharge/morePhone/finish.jsp</result>
+            <result name="failed">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+        </action>
+        
+        <!-- 银联卡缴费异常处理 -->
+        <action name="goMorePhoneError" class="feeChargeAction" method="goMorePhoneError">
+            <result name="goMorePhoneError">/jsp/customize/sd/feeCharge/card/cardErrorPage.jsp</result>
+        </action>
+        
+        <!-- 打印全部发票 -->
+        <action name="printAllInvoice" class="feeChargeAction" method="printAllInvoice">
+            <result name="success">/jsp/customize/sd/feeCharge/printInvoice.jsp</result>
+        </action>
+        
+        <!-- 返回缴费完成页面，主要用于打印发票时使用 -->
+        <action name="finish" class="feeChargeAction" method="finish">
+            <result name="finish">/jsp/customize/sd/feeCharge/morePhone/finish.jsp</result>
+        </action>
+		<!-- add end jWX216858 2015-3-30 OR_SD_201501_1063 自助终端支撑连缴功能优化 -->
+		
+		<!-- add begin zKF69263 2015-06-03 OR_SD_201504_1108_山东_自助终端缴费后的‘异常’提示信息拿到缴费前就进行提示 -->
+		<!-- 返回错误页面 -->
+		<action name="goToError" class="feeChargeAction" method="goToError">
+		</action>
+		<!-- add end zKF69263 2015-06-03 OR_SD_201504_1108_山东_自助终端缴费后的‘异常’提示信息拿到缴费前就进行提示 -->
+		
+		<!-- modify begin by qWX279398 2015-11-25  OR_SD_201511_30_山东_自助终端缴费时直接打印发票的优化 -->
+		<!-- 服务密码页面 -->
+		<action name="goServicePwdPage" class="feeChargeAction" method="goServicePwdPage">
+			<result name="goServicePwdPage">/jsp/login/printServicePwd.jsp</result>
+		</action>
+		<!-- 随机密码页面 -->
+		<action name="goRandomPwdPage" class="feeChargeAction" method="goRandomPwdPage">
+			<result name="goRandomPwdPage">/jsp/login/printRandomPwd.jsp</result>
+		</action>
+		<!-- 服务密码校验 -->
+		<action name="userLoginWithPwd" class="feeChargeAction" method="loginWithPwd">
+			<result name="success" type="chain">printInvoiceWithoutPwd</result>
+			<result name="failed">/jsp/login/printServicePwd.jsp</result>
+		</action>
+		<!-- 随机密码校验 -->
+		<action name="loginWithRandomPwdNew" class="feeChargeAction" method="loginWithRandomPwdNew">
+			<result name="success" type="chain">printInvoiceWithoutPwd</result>
+			<result name="failed">/jsp/login/printRandomPwd.jsp</result>
+		</action>
+		<!-- 月结 服务密码 -->
+		<action name="userLoginWithPwdYJ" class="feeChargeAction" method="loginWithPwd">
+			<result name="success" type="chain">qryBillCycle</result>
+			<result name="failed">/jsp/login/printServicePwd.jsp</result>
+		</action>
+		<!-- 月结 随机密码 -->
+		<action name="loginWithRandomPwdNewYJ" class="feeChargeAction" method="loginWithRandomPwdNew">
+			<result name="success" type="chain">qryBillCycle</result>
+			<result name="failed">/jsp/login/printRandomPwd.jsp</result>
+		</action>
+		<!-- modify end by qWX279398 2015-11-25  OR_SD_201511_30_山东_自助终端缴费时直接打印发票的优化 -->
+		
+	</package>	
+</struts>

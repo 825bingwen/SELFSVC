@@ -1,0 +1,396 @@
+/*
+ * 文件名：ProdChangeBean.java
+ * 描述：套餐资费变更bean类
+ * 创建人：jWX216858
+ */
+package com.customize.sd.selfsvc.bean;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+
+import com.customize.sd.selfsvc.bean.impl.BaseBeanSDImpl;
+import com.customize.sd.selfsvc.prodChange.model.ProdChangePO;
+import com.customize.sd.selfsvc.prodChange.model.ProdTemplatePO;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.selfsvc.common.BusinessIdConstants;
+import com.gmcc.boss.selfsvc.common.MsgHeaderPO;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * 套餐资费变更bean
+ * @author jWX216858
+ * 创建时间：2014-5-6
+ */
+public class ProdChangeBean extends BaseBeanSDImpl
+{
+	/**
+	 * 查询可转换主体产品信息
+	 * @param termInfoPO
+	 * @param customer
+	 * @param curMenuId
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark modify by hWX5316476 2015-1-5 OR_SD_201411_411_SD_关于自助终端产品受理功能优化的需求
+	 */
+	public List<ProdChangePO> qryMainProdInfo(TerminalInfoPO termInfoPO, NserCustomerSimp customer, String curMenuId)
+	{
+		// 参数
+		Map<String,String> paramMap = new HashMap<String, String>();
+		
+		// 操作员id
+		paramMap.put("operId", termInfoPO.getOperid());
+		
+		// 终端机id
+		paramMap.put("termId", termInfoPO.getTermid());
+		
+		// 当前菜单
+		paramMap.put("menuId", curMenuId);
+		
+		// 客户接触id
+		paramMap.put("touchId", customer.getContactId());
+		
+		// 区域编码
+		paramMap.put("region", customer.getRegionID());
+		
+		// 产品编码
+		paramMap.put("prodId", customer.getProductID());
+		
+		// 渠道类型
+		paramMap.put("accessType", "bsacAtsv");
+		
+		ReturnWrap rw = getSelfSvcCallSD().qryMainProdInfo(paramMap);
+		
+		if(rw.getStatus() == SSReturnCode.ERROR)
+		{
+		    throw new ReceptionException(rw.getReturnMsg());
+		}
+		
+		CRSet crset = (CRSet) rw.getReturnObject();
+			
+		List<ProdChangePO> prodChangeList = new ArrayList<ProdChangePO>();
+			
+        // 遍历crset，取得返回信息
+		//modify begin lWX431760 2017-06-14 OR_huawei_201704_376_【山东移动接口迁移专题】-自助终端业务办理1
+		if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_CONVERTPRODINFO))
+		{
+		    for (int i = 0; i < crset.GetRowCount(); i++)
+	        {
+	            ProdChangePO prodChangePO = new ProdChangePO();
+	            
+	            // 产品编码
+	            prodChangePO.setNewProdId(crset.GetValue(i, 0));
+	            
+	            // 产品名称
+	            prodChangePO.setNewProdName(crset.GetValue(i, 1));
+	            
+	            // 产品描述
+	            prodChangePO.setNewProdDescr(crset.GetValue(i, 3));
+	            
+	            prodChangeList.add(prodChangePO);
+	        }
+		}
+		else
+		{
+		    for (int i = 0; i < crset.GetRowCount(); i++)
+	        {
+	            ProdChangePO prodChangePO = new ProdChangePO();
+	            
+	            // 产品编码
+	            prodChangePO.setNewProdId(crset.GetValue(i, 1));
+	            
+	            // 产品名称
+	            prodChangePO.setNewProdName(crset.GetValue(i, 3));
+	            
+	            // 产品描述
+	            prodChangePO.setNewProdDescr(crset.GetValue(i, 5));
+	            
+	            prodChangeList.add(prodChangePO);
+	        }
+		}
+		//modify end lWX431760 2017-06-14 OR_huawei_201704_376_【山东移动接口迁移专题】-自助终端业务办理1
+        
+		
+		return prodChangeList;
+	}
+	
+	/**
+	 * 查询主体产品模板信息
+	 * @param termInfoPO
+	 * @param customer
+	 * @param curMenuId
+	 * @param newProdId
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark modify by hWX5316476 2015-1-5 OR_SD_201411_411_SD_关于自助终端产品受理功能优化的需求
+	 */
+	public List<ProdTemplatePO> mainProdTemplateInfo(TerminalInfoPO termInfoPO, NserCustomerSimp customer, String curMenuId, String newProdId)
+	{
+		// 参数
+		Map<String, String> paramMap = new HashMap<String, String>();
+		
+		// 终端id
+		paramMap.put("termId", termInfoPO.getTermid());
+		
+		// 操作员id
+		paramMap.put("operId", termInfoPO.getOperid());
+		
+		// 菜单id
+		paramMap.put("menuId", curMenuId);
+		
+		// 客户接触id
+		paramMap.put("touchId", customer.getContactId());
+		
+		// 区域编码
+		paramMap.put("region", customer.getRegionID());
+		
+		// 产品编码
+		paramMap.put("prodId", newProdId);
+		
+		// 受理类型
+		paramMap.put("recType", "ChangeProduct");
+		
+		// 受理渠道
+		paramMap.put("channel", "bsacAtsv");
+		
+		// 查询时是否精确匹配
+		paramMap.put("ruleType", "PRECISEQRY");
+		
+		ReturnWrap rw = getSelfSvcCallSD().qryProdTemplateInfo(paramMap);
+		
+		if(rw.getStatus() == SSReturnCode.ERROR)
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+		
+		CRSet crset = (CRSet) rw.getReturnObject();
+		
+		List<ProdTemplatePO> prodTemplateList = new ArrayList<ProdTemplatePO>();
+		
+		// 遍历crset，取得返回信息
+        for (int i = 0; i < crset.GetRowCount(); i++)
+        {
+            ProdTemplatePO prodTemplatePO = new ProdTemplatePO();
+
+            // 模板编码
+            prodTemplatePO.setTemplateId(crset.GetValue(i, 0));
+            
+            // 模板名称
+            prodTemplatePO.setTemplateName(crset.GetValue(i, 1));
+            
+            // 模板描述
+            prodTemplatePO.setTemplateDescr(crset.GetValue(i, 2));
+
+            // 产品编码
+            prodTemplatePO.setProdid(crset.GetValue(i, 3));
+            
+            // 产品名称
+            prodTemplatePO.setProdname(crset.GetValue(i, 4));
+
+            prodTemplateList.add(prodTemplatePO);
+        }
+		
+		return prodTemplateList;
+	}
+	
+	/**
+	 * 执行主体产品变更
+	 * @param termInfoPO
+	 * @param customer
+	 * @param curMenuId
+	 * @param pretreatment
+	 * @param newProdId
+	 * @param templateId
+	 * @return map
+	 * @remark add by jWX216858 2014-5-8 OR_huawei_201404_1116_山东_营业厅全业务流程优化-业务分流(自助终端)_转套餐产品
+	 */
+	public Map<String, Object> mainProdChangeRec(TerminalInfoPO termInfoPO, NserCustomerSimp customer, String curMenuId, boolean pretreatment, String templateId,String newProdId)
+	{
+		Map<String, String> paramMap = new HashMap<String, String>();
+		
+		// 终端id
+		paramMap.put("termId", termInfoPO.getTermid());
+		
+		// 操作员id
+		paramMap.put("operId", termInfoPO.getOperid());
+		
+		// 菜单id
+		paramMap.put("menuId", curMenuId);
+		
+		// 客户接触id
+		paramMap.put("touchId", customer.getContactId());
+		 
+		// 手机号
+		paramMap.put("telnum", customer.getServNumber());
+		
+		// 是否使用NOCDE 1：不使用 0:使用
+		paramMap.put("NOTEXENCODE", "1");
+		
+		// 主体产品编码
+		paramMap.put("MAINPRODID", newProdId);
+		
+		if (pretreatment)
+		{
+			// 主体产品变更预处理  PreBsacNBChgMainProd：预处理
+			paramMap.put("PREPAREBUSI", "PreBsacNBChgMainProd");
+			
+			// add begin jWX216858 2015-6-16 OR_SD_201505_294 关于对MO包月客户变更业务时增加提醒的需求 
+			// MO套餐提醒键值，预处理时传固定值message
+			paramMap.put("MOPrivTips", "message");
+			
+			// 是否提交,0不提交
+			paramMap.put("ISSUBMIT", "0");
+			// add end jWX216858 2015-6-16 OR_SD_201505_294 关于对MO包月客户变更业务时增加提醒的需求 
+		}
+		else
+		{
+			// 传空为执行主体产品变更
+			paramMap.put("PREPAREBUSI", "");
+			
+			// add begin jWX216858 2015-6-16 OR_SD_201505_294 关于对MO包月客户变更业务时增加提醒的需求 
+			// MO套餐提醒键值，执行主体产品变更时传空
+			paramMap.put("MOPrivTips", "");
+			
+			// 是否提交,1提交
+			paramMap.put("ISSUBMIT", "1");
+			// add end jWX216858 2015-6-16 OR_SD_201505_294 关于对MO包月客户变更业务时增加提醒的需求
+		}
+		
+		// 生效方式:Type_Immediate 立即 Type_NextCycle 下月 EffectType_Time 指定生效时间
+		paramMap.put("affecttype", "Type_NextCycle");
+		
+		// 操作类型:PCOpRec 开通  PCOpDel 退订
+		paramMap.put("opertype", "PCOpRec");
+		
+		// 对象类型:固定值PCIntObjMain（主体产品）
+		paramMap.put("objtype", "PCIntObjMain");
+		
+		// 优惠名称:没有此项，传空
+		paramMap.put("privname", "");
+		
+		// 模板编码
+		paramMap.put("templateId", templateId);
+		
+		ReturnWrap rw = getSelfSvcCallSD().mainProdChangeRec(paramMap);
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 根据rw中的信息设置返回信息
+		if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+			Vector<Object> v = null;
+			if (pretreatment)
+			{
+				v = (Vector<Object>)rw.getReturnObject();
+			}
+				
+			//设置返回结果
+			map.put("returnObj", v);
+            
+            //设置返回信息
+            map.put("returnMsg", rw.getReturnMsg());
+            
+            return map;
+        }
+		else if (null != rw)
+		{
+			// 设置返回信息
+			map.put("returnMsg", rw.getReturnMsg());
+			
+			return map;
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 根据主体产品ID查询主体产品信息
+	 * @param termInfoPO 终端机信息
+	 * @param customer 用户信息
+	 * @param curMenuId 菜单ID
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by hWX5316476 2015-1-5  OR_SD_201411_411_SD_关于自助终端产品受理功能优化的需求
+	 */
+	public ProdChangePO qryProdInfoById(TerminalInfoPO termInfoPO, NserCustomerSimp customer, String curMenuId)
+    {
+	    // 组装请求报文头
+        MsgHeaderPO msgHeader = new MsgHeaderPO(curMenuId, termInfoPO.getOperid(), termInfoPO.getTermid(),
+                customer.getContactId(), "1", customer.getServNumber());
+
+        //modify by lWX431760 2017-09-29 OR_huawei_201706_781_【山东移动接口迁移专题】-自助终端新业务办理(同组业务)
+        String type = "PRODTYPE";
+        
+        // 调用接口查询主体产品信息
+        ReturnWrap rw = getSelfSvcCallSD().qryProdInfoById(msgHeader, customer.getProductID(),type);
+        //modify by lWX431760 2017-09-29 OR_huawei_201706_781_【山东移动接口迁移专题】-自助终端新业务办理(同组业务)
+        
+        // 根据rw中的信息设置返回信息
+        if (SSReturnCode.SUCCESS == rw.getStatus())
+        {
+            CRSet crset = (CRSet) rw.getReturnObject();
+            
+            // 获取crset第一行信息
+            if(0 < crset.GetRowCount())
+            {
+                ProdChangePO prodChangePO = new ProdChangePO();
+                
+                // 产品编码
+                prodChangePO.setNewProdId(crset.GetValue(0, 0));
+                
+                // 产品名称
+                prodChangePO.setNewProdName(crset.GetValue(0, 1));
+                
+                // 产品描述
+                prodChangePO.setNewProdDescr(crset.GetValue(0, 2));
+                
+                return prodChangePO;
+            }
+        }
+        else
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+        
+        return null;
+    }
+	
+	/**
+	 * 组内档次转换
+	 * @param termInfoPO
+	 * @param customer
+	 * @param ncode 对应产品内模板
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by hWX5316476 2015-1-9 OR_SD_201411_411_SD_关于自助终端产品受理功能优化的需求
+	 */
+	public void chgLevelInGroup(TerminalInfoPO termInfoPO, NserCustomerSimp customer,String curMenuId, String ncode)
+	{
+	    // 组装报文头信息
+        MsgHeaderPO header = new MsgHeaderPO(curMenuId, termInfoPO.getOperid(), termInfoPO.getTermid(),
+                customer.getContactId(), "1", customer.getServNumber());
+        
+        // 操作类型 ADD 增加 DEL 删除 MOD 修改 QRY 查询
+        String stype = "ADD";
+        
+        // 预受理 固定传BsacNBSubmit
+        String preparebusi = "BsacNBSubmit";
+        
+        // 是否将互斥或依赖的进行关联删除,NEEDPREMUTEX删除，传空不删除
+        String premutex = "";
+        
+        // 调用接口查询主体产品信息
+        ReturnWrap rw = getSelfSvcCallSD().chgLevelInGroup(header, ncode, stype, preparebusi, premutex);
+        
+        if(SSReturnCode.ERROR == rw.getStatus())
+        {
+            throw new ReceptionException(rw.getReturnMsg());
+        }
+	}
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	 <!-- 返回信息 -->
+    <bean id="backInfoAction" parent="baseAction" class="com.customize.hub.selfsvc.backInfo.action.BackInfoAction" scope="prototype">
+    	<property name="backInfoBean" ref="backInfoBean"></property>
+    </bean>
+     <!-- 电子券返还信息查询 add begin by yKF73963 20130317  OR_HUB_201301_780 关于BOSS触发手机支付电子券的分月赠送的需-->
+         <bean id="ecashReturnInfoQueryAction" parent="baseAction" class="com.customize.hub.selfsvc.backInfo.action.EcashRetInfoQueryAction" scope="prototype">
+    	<property name="backInfoBean" ref="backInfoBean"></property>
+    </bean>
+     
+    <!--电子券返还信息查询add end by yKF73963 20130317  OR_HUB_201301_780 关于BOSS触发手机支付电子券的分月赠送的需 -->
+    <bean id="backInfoBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.BackInfoBean"></bean>
+    
+	 <!-- 账单寄送 -->
+    <bean id="billSendAction" parent="baseAction" class="com.customize.hub.selfsvc.billSend.action.BillSendAction" scope="prototype">
+    	<property name="billSendBean" ref="billSendBean"></property>
+    </bean>
+    
+    <!-- 账单寄送Bean -->
+    <bean id="billSendBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.BillSendBean"></bean>
+    
+	 
+</beans>

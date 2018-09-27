@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 山东热门APP下载 -->
+	<package name="hotAppDownload" extends="struts-common" namespace="/hotAppDownload">
+	    
+		<!-- 展示所有的App -->
+		<action name="hotAppShow" class="hotAPPDownloadAction" method="hotAppShow">
+			<result name="hotAppShow">/jsp/customize/sd/hotAppDownload/hotAppShow.jsp</result>
+		</action>
+		
+		<!-- 展示app图片 -->
+		<action name="showAppImg" class="hotAPPDownloadAction" method="showAppImg"></action>
+		
+		<!-- 根据appId获取应用信息 -->
+        <action name="showDetail" class="hotAPPDownloadAction" method="showDetail">
+            <result name="showDetail">/jsp/customize/sd/hotAppDownload/showDetail.jsp</result>
+        </action>
+        
+        <!-- 跳转到用户登录页面 -->
+        <action name="inputNumber" class="hotAPPDownloadAction" method="inputNumber">
+            <result name="inputNumber">/jsp/customize/sd/hotAppDownload/inputNumber.jsp</result>
+        </action>
+        
+        <!-- 发送app下载地址 -->
+        <action name="sendAdress" class="hotAPPDownloadAction" method="sendAdress"></action>
+        
+        <!-- 用户登录验证 -->
+        <action name="customerLogin" class="hotAPPDownloadAction" method="customerLogin">
+        	<result name="failed">/jsp/customize/sd/hotAppDownload/inputNumber.jsp</result>
+        </action>
+	</package>
+</struts>

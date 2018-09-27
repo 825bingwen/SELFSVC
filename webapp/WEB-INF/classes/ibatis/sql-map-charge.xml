@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="charge">
+	<typeAlias alias="cardChargeLog" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	<typeAlias alias="cashLog" type="com.gmcc.boss.selfsvc.charge.model.SelfCashReturnLogVO"/>
+	<typeAlias alias="invoiceLog" type="com.gmcc.boss.selfsvc.charge.model.InvoicePrintRecord"/>
+	<typeAlias alias="cashDetailLog" type="com.gmcc.boss.selfsvc.charge.model.CashDetailLogPO" />
+	
+	<!-- 主账户充值日志记录 -->
+	<insert id="insertCmpayLog" parameterClass="cardChargeLog">
+		insert into sh_charge_log(chargelogoid,
+                                region, 
+                                termid, 
+                                operid, 
+                                servnumber, 
+                                paytype, 
+                                fee,                                
+                                terminalseq,
+                                recdate, 
+                                status, 
+                                description, 
+                                dealnum, 
+                                accepttype,
+                                SERVREGION,
+                                ORGID,
+                                RECTYPE,
+                                MPAYSEQ
+                                )
+         			       values(#chargeLogOID#,
+                          		#region#,
+                          		#termID#,
+                          		#operID#,
+                        		#servnumber#,
+                        		#payType#,
+                        		#fee#,
+                        		#terminalSeq#,
+                        		to_date(#recdate#, 'yyyymmddhh24:mi:ss'),
+                        		#status#,
+                        		#description#,
+                        		#dealnum#,
+        	              		#acceptType#,
+					            #servRegion#,
+					            #orgID#,
+					            #recType#,
+                        		#mpayseq#
+					            )
+	</insert>
+	
+	<!-- 更新主账户充值日志记录 -->
+	<insert id="updateCmpayLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG 
+		   SET RECDATE=to_date(#recdate#, 'yyyymmddhh24:mi:ss'), STATUS = #status#, DESCRIPTION = #description#, DEALNUM = #dealnum#, MPAYSEQ = #mpayseq#
+         WHERE CHARGELOGOID = #chargeLogOID#
+	</insert>
+	
+	<!-- modify begin cKF48754 2011/11/10 R003C11L11n01 OR_SD_201111_371 -->
+	<!-- 银行卡缴费日志记录 -->
+	<insert id="insertChargeLog" parameterClass="cardChargeLog">
+	    insert into sh_charge_log(chargelogoid,
+	                              region, 
+	                              termid, 
+	                              operid, 
+	                              servnumber, 
+	                              paytype, 
+	                              fee, 
+	                              unionpayuser,
+	                              unionpaycode, 
+	                              busitype, 
+	                              cardnumber, 
+	                              batchnum, 
+	                              authorizationcode, 
+	                              businessreferencenum,
+	                              unionpaytime,
+	                              vouchernum, 
+	                              unionpayfee, 
+	                              terminalseq,
+	                              recdate, 
+	                              status, 
+	                              description, 
+	                              dealnum, 
+	                              accepttype,
+	                              SERVREGION,
+	                              ORGID,
+	                              POSNUM,
+	                              BATCHNUMBEFOREKOUKUAN,
+	                              RECTYPE,
+	                              BANKNO,
+	                              PRESENTFEE,
+	                              PRESENTSTATUS,
+	                              MORECHARGEOID)
+				           values(
+				                  #chargeLogOID#,
+				                  #region#,
+				                  #termID#,
+				                  #operID#,
+					              #servnumber#,
+					              #payType#,
+					              #fee#,
+					              #unionpayuser#,
+					              #unionpaycode#,
+					              #busiType#,
+					              #cardnumber#,
+					              #batchnum#,
+					              #authorizationcode#,
+					              #businessreferencenum#,
+					              to_date(#unionpaytime#, 'yyyymmddhh24:mi:ss'),
+					              #vouchernum#,
+					              #unionpayfee#,
+					              #terminalSeq#,
+					              to_date(#recdate#, 'yyyymmddhh24:mi:ss'),
+					              #status#,
+					              #description#,
+					              #dealnum#,
+					              #acceptType#,
+					              #servRegion#,
+					              #orgID#,
+					              #posNum#,
+					              #batchNumBeforeKoukuan#,
+					              #recType#,
+					              #bankno#,
+					              #presentFee#,
+					              #presentStatus#,
+					              #moreChargeOID#)
+	</insert>
+	<!-- modify end cKF48754 2011/11/10 R003C11L11n01 OR_SD_201111_371 -->
+	<!-- Change by LiFeng 修改SQL语句,不对分区字段进行UPDATE操作 20110909 begin -->
+	<update id="updateCardChargeLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmddhh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, STATUS = #status#, 
+		   	   DESCRIPTION = #description# 
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	<!-- Change by LiFeng 修改SQL语句,不对分区字段进行UPDATE操作 20110909 end -->
+	
+	<update id="updateCardChargeLogSD" parameterClass="cardChargeLog">
+		 UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, CARDNUMBER=#cardnumber#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmdd hh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, TERMINALSEQ=#terminalSeq#, RECDATE=to_date(#recdate#, 'yyyymmddhh24:mi:ss'), STATUS = #status#, 
+		   	   DESCRIPTION = #description# 
+		 WHERE CHARGELOGOID = #chargeLogOID# AND ORGID = #orgID# AND REGION = #region#
+	</update>
+	
+	<update id="updateCardChargeLogNX" parameterClass="cardChargeLog">
+		 UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, UNIONPAYCODE=#unionpaycode#, BUSITYPE=#busiType#, CARDNUMBER=#cardnumber#, BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, BUSINESSREFERENCENUM=#businessreferencenum#, UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmdd hh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, UNIONPAYFEE=#unionpayfee#, TERMINALSEQ=#terminalSeq#, RECDATE=to_date(#recdate#, 'yyyymmddhh24:mi:ss'), STATUS = #status#, 
+		   	   DESCRIPTION = #description#, BANKNO=#bankno#
+		 WHERE CHARGELOGOID = #chargeLogOID#
+	</update>
+	
+	<!-- Change by LiFeng 修改SQL语句,不对分区字段进行UPDATE操作,修改不退卡问题 20110909 begin -->
+	<update id="updateChargeLog" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG SET STATUS = #status#, DESCRIPTION = #description#, DEALNUM = #dealnum# 
+		WHERE CHARGELOGOID = #chargeLogOID# 
+		<isNotEmpty prepend="AND" property="orgID"> 
+				ORGID = #orgID#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="region"> 
+				REGION = #region#
+		</isNotEmpty>
+	</update>
+	<!-- Change by LiFeng 修改SQL语句,不对分区字段进行UPDATE操作,修改不退卡问题 20110909 end -->
+	
+	<insert id="insertToubiLog" parameterClass="cashLog">
+		INSERT INTO SH_LOG_CASHRETURN(CASHRETURNID, TERMID, SERVNUMBER, FEE, RECDATA, STATUS, TOUCHOID, TERMINALSEQ)
+		VALUES(SEQ_SH_RECOID.NEXTVAL, #termId#, #serverNumber#, #fee#, SYSDATE, #status#, #touchOid#, #terminalSeq#)
+	</insert>
+	
+	<insert id="insertInvoiceLog" parameterClass="invoiceLog">
+		INSERT INTO SH_LOG_PRINTINVOICE(SERVNUMBER, CYCLE, RECDATE, TERMID)
+        VALUES(#servNumber#, #cycle#, SYSDATE, #termID#)
+	</insert>
+	
+	<select id="getChargeLogOID" resultClass="java.lang.String">
+		SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL
+	</select>
+	
+	<!-- add begin g00140516 2012/03/09 R003C12L03n01 OR_NX_201201_312 -->
+	<insert id="insertCashDetailLog" parameterClass="cashDetailLog">
+		INSERT INTO SH_CHARGE_CASHINFO(TERMID, FORMNUM, SERVNUM, CASHFEE, CREATEDATE)
+		VALUES(#termID#, #formNum#, #servNum#, #cashFee#, SYSDATE)
+	</insert>
+	<!-- add end g00140516 2012/03/09 R003C12L03n01 OR_NX_201201_312 -->
+	
+	<!-- modify begin zKF69263 2015/04/17 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	<!-- modify by sWX219697 2015-6-24 10:01:11 修改bug92806，去掉FEE = FEE + #cashDetail# * 100 -->
+	<update id="updateChargeLogSD" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG SET STATUS = #status#, DESCRIPTION = #description#, DEALNUM = #dealnum#, UNIONRETCODE = #posResCode#
+			<isNotEmpty prepend="," property="terminalSeq">
+	           TERMINALSEQ = #terminalSeq#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="," property="recdate">
+	           RECDATE = to_date(#recdate#, 'yyyymmddhh24:mi:ss')
+	        </isNotEmpty>
+	        <isNotEmpty prepend="," property="fee">
+	           FEE = #fee#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="," property="cashDetail">
+	           CASHDETAIL = CASHDETAIL || #cashDetail# || '~'
+	        </isNotEmpty>
+		WHERE CHARGELOGOID = #chargeLogOID# AND ORGID = #orgID# AND REGION = #region#
+	</update>
+	<!-- modify end zKF69263 2015/04/17 OR_SD_201502_169_山东_自助终端实现现金稽核功能 -->
+	
+	<!-- add begin sWX219697 2015-7-1 修改bug93196 更新投币明细时，只更新CASHDETAIL -->
+	<update id="updateCashDetailSD" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG SET CASHDETAIL = CASHDETAIL || #cashDetail# || '~' 
+		WHERE CHARGELOGOID = #chargeLogOID# AND ORGID = #orgID# AND REGION = #region#
+	</update>
+	<!-- add end sWX219697 2015-7-1 修改bug93196 更新投币明细时，只更新CASHDETAIL -->
+	
+	<!-- add begin sWX219697 2014-7-29 17:04:26 OR_huawei_201406_1125_山东_支撑跨区缴费-->
+	<select id="isSdTelnum" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	SELECT COUNT(A.REGION) FROM SH_INFO_REGIONLIST A WHERE A.REGION = #VALUE#
+	</select>
+	<!-- add begin sWX219697 2014-7-29 17:04:26 OR_huawei_201406_1125_山东_支撑跨区缴费-->
+	
+	<!-- add begin sWX219697 2015-3-23 15:32:13 OR_NX_201501_1030 跨省异地缴费 -->
+	<update id="updateChargeStatus" parameterClass="cardChargeLog">
+		UPDATE SH_CHARGE_LOG 
+		   SET STATUS       = #status#, 
+		       DESCRIPTION  = #description#, 
+		       DEALNUM      = #dealnum# 
+		 	   <isNotEmpty prepend="," property="posResCode">
+		           UNIONRETCODE = #posResCode#
+		       </isNotEmpty>
+		       <isNotEmpty prepend="," property="unionpayuser">
+		           UNIONPAYUSER = #unionpayuser#
+		       </isNotEmpty>
+		       <isNotEmpty prepend="," property="unionpaycode">
+		           UNIONPAYCODE = #unionpaycode#
+		       </isNotEmpty>
+		 WHERE CHARGELOGOID = #chargeLogOID# AND REGION = #region#
+	</update>
+	
+	<update id="updateCardChargeLogAfterPay" parameterClass="cardChargeLog">
+		 UPDATE SH_CHARGE_LOG 
+		   SET UNIONPAYUSER=#unionpayuser#, 
+		   	   UNIONPAYCODE=#unionpaycode#, 
+		   	   BUSITYPE=#busiType#, 
+		   	   BATCHNUM=#batchnum#, 
+		   	   AUTHORIZATIONCODE=#authorizationcode#, 
+		   	   BUSINESSREFERENCENUM=#businessreferencenum#, 
+		   	   UNIONPAYTIME=to_date(#unionpaytime#, 'yyyymmdd hh24miss'), 
+		   	   VOUCHERNUM=#vouchernum#, 
+		   	   UNIONPAYFEE=#unionpayfee#, 
+		   	   RECDATE=to_date(#recdate#, 'yyyymmddhh24:mi:ss'), 
+		   	   STATUS = #status#, 
+		   	   DESCRIPTION = #description#
+		   	   <isNotEmpty prepend="," property="posResCode"> 
+		   	   UNIONRETCODE = #posResCode# 
+		   	   </isNotEmpty>
+		   	   <isNotEmpty prepend="," property="terminalSeq">
+		   	   TERMINALSEQ=#terminalSeq# 
+		   	   </isNotEmpty>
+		   	   <isNotEmpty prepend="," property="cardnumber">
+		   	   CARDNUMBER=#cardnumber# 
+		   	   </isNotEmpty>
+		   	   <isNotEmpty prepend="," property="bankno">
+		   	   BANKNO=#bankno# 
+		   	   </isNotEmpty>
+		 WHERE CHARGELOGOID = #chargeLogOID# AND REGION = #region#
+	</update>
+	
+	<select id="getNonlocalChargeID" resultClass="java.lang.String">
+		SELECT SEQ_NONLOCALCHARGE_OID.NEXTVAL FROM DUAL
+	</select>
+	
+	<insert id="insertNonlocalChargeLog" parameterClass="cardChargeLog">
+    insert into sh_charge_log(chargelogoid,
+                              region, 
+                              termid, 
+                              operid, 
+                              servnumber, 
+                              paytype, 
+                              fee, 
+                              unionpayuser,
+                              unionpaycode, 
+                              busitype, 
+                              cardnumber, 
+                              batchnum, 
+                              authorizationcode, 
+                              businessreferencenum,
+                              unionpaytime,
+                              vouchernum, 
+                              unionpayfee, 
+                              terminalseq,
+                              recdate, 
+                              status, 
+                              description, 
+                              dealnum, 
+                              accepttype,
+                              SERVREGION,
+                              ORGID,
+                              POSNUM,
+                              BATCHNUMBEFOREKOUKUAN,
+                              RECTYPE,
+                              BANKNO,
+                              PRESENTFEE,
+                              PRESENTSTATUS,
+                              PROVINCECODE)
+			           values(
+			                  #chargeLogOID#,
+			                  #region#,
+			                  #termID#,
+			                  #operID#,
+				              #servnumber#,
+				              #payType#,
+				              #fee#,
+				              #unionpayuser#,
+				              #unionpaycode#,
+				              #busiType#,
+				              #cardnumber#,
+				              #batchnum#,
+				              #authorizationcode#,
+				              #businessreferencenum#,
+				              to_date(#unionpaytime#, 'yyyymmddhh24:mi:ss'),
+				              #vouchernum#,
+				              #unionpayfee#,
+				              #terminalSeq#,
+				              to_date(#recdate#, 'yyyymmddhh24:mi:ss'),
+				              #status#,
+				              #description#,
+				              #dealnum#,
+				              #acceptType#,
+				              #servRegion#,
+				              #orgID#,
+				              #posNum#,
+				              #batchNumBeforeKoukuan#,
+				              #recType#,
+				              #bankno#,
+				              #presentFee#,
+				              #presentStatus#,
+				              #provinceCode#)
+	</insert>
+	<!-- add end sWX219697 2015-3-23 15:32:13 OR_NX_201501_1030 跨省异地缴费 -->
+	
+	<!-- add begin hWX5316476 2015-3-31 OR_NX_201501_1030_宁夏_关于跨区服务业务支撑系统改造的通知 -->
+	<!-- 查询手机号码归属地市 -->
+	<select id="qryServRegion" resultClass="java.lang.String" parameterClass="cardChargeLog">
+		SELECT T.LONGDISTANCEID SERVREGION
+		FROM SH_INFO_BELONG T
+		WHERE T.PROVINCEID = #provinceCode# and #servnumber# between T.BEGINNO and T.ENDNO
+	</select>
+	<!-- add end hWX5316476 2015-3-31 OR_NX_201501_1030_宁夏_关于跨区服务业务支撑系统改造的通知 -->
+</sqlMap>

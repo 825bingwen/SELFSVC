@@ -1,0 +1,282 @@
+<%@ page language="java" import="java.util.*" pageEncoding="GBK"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+//add begin by cwx456134 2017-05-11 OR_SD_201703_234_山东_电子发票优化需求
+//获取电子发票特性参数，true为开启
+TerminalInfoPO termInfo = (TerminalInfoPO)request.getSession().getAttribute(Constants.TERMINAL_INFO);
+String isElectronInvoice = CommonUtil.getDictNameById(termInfo.getRegion(), "SH_ELECTRON_INVOICE");
+//add end by cwx456134 2017-05-11 OR_SD_201703_234_山东_电子发票优化需求
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<base href="<%=basePath%>">
+
+		<title>移动自助终端</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+		<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+		<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+		<META HTTP-EQUIV="Expires" CONTENT="0">
+		<link href="${sessionScope.basePath }css/reset.css" type="text/css"
+			rel="stylesheet" />
+		<link href="${sessionScope.basePath }css/style.css" type="text/css"
+			rel="stylesheet" />
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/public.js"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/script.js"></script>
+		<script type="text/javascript"
+			src="${sessionScope.basePath }js/dialyzer.js"></script>
+		<script type="text/javascript">
+		
+		// 提交的标志位
+		var submitFlag = 0;
+		
+		// 调用查询接口
+		function selectType(startdate, enddate, cycle, acctid)
+		{
+			// 发票打印机设备
+			var prtObj;
+			var isElectronInvoice = "<%=isElectronInvoice %>";
+	        if ("true" != isElectronInvoice)
+	        {
+				try {
+					
+					prtObj = window.parent.document.getElementById("invprtpluginid");
+					
+				    // 打开发票打印机串口
+					var openCom = prtObj.OpenCom();
+					if (openCom == 1) 
+					{
+						alertRedErrorMsg("警告:发票打印机串口故障!");
+						return;
+					} 
+					else 
+					{
+						if (openCom == 61) 
+						{
+							alertRedErrorMsg("错误:发票打印机故障,无法初始化!");
+							return;
+						} 
+						else if (openCom == 65) 
+						{
+							alertRedErrorMsg("警告:发票打印机缺纸!");
+							return;
+						} 
+						else if (openCom != 0) 
+						{
+							alertRedErrorMsg("错误:打开设备异常,无法初始化发票打印机!");
+							return;
+						}
+					}
+					
+					// 初始化发票打印机
+					var initInvoicePrt = prtObj.InitVoicePrint();
+					if (initInvoicePrt == 61) 
+					{
+						alertRedErrorMsg("错误:发票打印机故障,无法初始化!");
+						return;
+					} 
+					else if (initInvoicePrt == 65) 
+					{
+						alertRedErrorMsg("警告:发票打印机缺纸!");
+						return;
+					}
+					else if (openCom != 0) 
+					{
+						alertRedErrorMsg("错误:打开设备异常,无法初始化发票打印机!");
+						return;
+					}
+					
+					// 检查发票打印机缺纸
+					var v = prtObj.CheckPaper();
+					if (v != 0 )
+					{
+						alertRedErrorMsg("警告:发票打印机缺纸或故障!");
+					    return;
+					}
+				}
+				catch (e) 
+				{
+					alertRedErrorMsg("警告:发票打印机初故障,无法打印发票!");
+					return;
+				}
+	        }		
+			//防止重复提交
+			if (submitFlag == 0) 
+			{
+				submitFlag = 1;	
+				document.getElementById("cycle").value = cycle;
+				document.getElementById("startdate").value = startdate;
+				document.getElementById("enddate").value = enddate;
+				document.getElementById("acctid").value = acctid;
+				
+				document.actform.target = "_self";
+				document.actform.action = "${sessionScope.basePath }charge/printInvoice.action";
+				document.actform.submit();
+			}  
+		}
+		
+	</script>
+	</head>
+
+	<body scroll="no">
+		<form action="" name="actform" method="post">
+
+			<!-- 客户电话-->
+			<input type="hidden" id="servnumber" name="servnumber"
+				value="<s:property value='servnumber' />">
+			<!-- 月份 -->
+			<input type="hidden" id="month" name="month"
+				value="<s:property value='#request.month' />" />
+
+			<!-- 账期信息 -->
+
+			<!-- 账期 -->
+			<input type="hidden" id="cycle" name="invoicePrint.billCycle"
+				value="" />
+			<!-- 开始时间 -->
+			<input type="hidden" id="startdate" name="invoicePrint.startdate"
+				value="" />
+			<!-- 结束时间 -->
+			<input type="hidden" id="enddate" name="invoicePrint.enddate"
+				value="" />
+			<!-- 主账号 -->
+			<input type="hidden" id="acctid" name="invoicePrint.acctId" value="" />
+			
+			<%-- add begin jWX216858 2015-4-16 OR_SD_201501_1063 自助终端支撑连缴功能优化 --%>
+			<%-- 发票打印类型 --%>
+			<input type="hidden" id="invoiceType" name="invoiceType" value="Last"/>
+			
+			<!-- 打印月结发票标志，1：打印月结发票 -->
+            <s:hidden id="monthInvoiceFlag" name="monthInvoiceFlag"/>
+            
+            <!-- 话费连缴标志，1：话费连缴 -->
+            <s:hidden id="morePhoneFlag" name="morePhoneFlag" />
+            
+            <!-- 缴费总金额 -->
+            <s:hidden name="totalFee" id="totalFee" />
+            
+            <!-- 凭条打印标记，1：已打印 -->
+            <s:hidden name="printPayProFlag" id="printPayProFlag"/>
+            
+            <!-- 用户信息字符串 -->
+            <s:hidden id="morePhoneInfo" name="morePhoneInfo"/>
+            
+            <!-- 打印全部发票标志，1:正打印 2：已打印 -->
+            <s:hidden name="printAllInvFlag" id="printAllInvFlag"/>
+            
+            <!-- 已打印手机号码字符串 -->
+            <s:hidden id="printInvTelnum" name="printInvTelnum"/>
+            
+            <%--多人缴费标识  "morePhones" 多人缴费         ""单人缴费  --%>
+			<input type="hidden" name="morePhonesFlag" id="morePhonesFlag" value="<s:property value='morePhonesFlag' />"/>
+            <%-- add end jWX216858 2015-4-16 OR_SD_201501_1063 自助终端支撑连缴功能优化 --%>
+    
+			<%@include file="/titleinc.jsp"%>
+
+			<div class="main" id="main">
+
+				<%@ include file="/customer.jsp"%>
+				<div class="pl30">
+					<div class="b257 ">
+						<div class="bg bg257"></div>
+						<h2>
+							充值交费流程：
+						</h2>
+						<div class="blank10"></div>
+						<a href="#">1. 输入手机号码</a>
+						<a href="#">2. 选择支付方式</a>
+						<a href="#">3. 选择金额</a>
+						<a href="#">4. 支付</a>
+						<a href="#" class="on">5. 完成</a>
+					</div>
+
+					<div class="box710W fl ml10 relative" style="margin-top: 10px;">
+						<div class="bg"></div>
+						<div class="top"></div>
+						<div class="con relative">
+							<div
+								style="height: 444px; float: left; padding: 0px 0px 5px 0px; width: 610px; overflow: hidden;" id="inn">
+								<table width="100%" class="tb_blue">
+									<tr class="tr_color">
+										<th width="20%" class='list_title'>
+											账 期
+										</th>
+										<th width="30%" class='list_title'>
+											账期开始时间
+										</th>
+										<th width="30%" class='list_title'>
+											账期结束时间
+										</th>
+										<th width="20%" class='list_title'>
+											操 作
+										</th>
+									</tr>
+									<s:iterator value="cycleList" id="list" status="st">
+										<tr class="tr_color">
+											<td class="tc">
+												<s:property value='#list.cycle' />
+											</td>
+											<td class="tc">
+												<s:property value='#list.startdate' />
+											</td>
+											<td class="tc">
+												<s:property value='#list.enddate' />
+											</td>
+											<td>
+												<span class=" mr10 inline_block "> <a
+													class="btn_bg_146" href="javascript:void(0);"
+													onclick="selectType('<s:property value='#list.startdate' />', '<s:property value='#list.enddate' />', '<s:property value='#list.cycle' />', '<s:property value='#list.acctid' />' );return false;"
+													onmousedown="" onmouseup="">打印</a> </span>
+											</td>
+										</tr>
+									</s:iterator>
+								</table>
+							</div>
+		                    <%-- 滚动条 --%>
+	                       <div class="box70W fr">
+	                            <input type="button" class="btnUp" onclick="myScroll.moveUp(30)" />
+	                            <div class="boxPage" style="width:75px; height:400px; ">
+	                                <div class="blank10px"></div>
+	                                <div class="box66W tc f16 lh30" id="gunDom" style="width:66px; height:36px; position:absolute; cursor:move;  left: 633px; top:52px; line-height:36px" >0%</div>
+	                            </div>
+	                            <input type="button" class="btnDown" onclick="myScroll.moveDown(30)"/>
+	                        </div>
+	                        <div class="clear"></div>
+	                    </div>
+	                    <div class="btm"></div>
+	                </div>
+	                <script type="text/javascript">
+	                  myScroll = new virtualScroll("inn","gunDom");
+	                </script>
+                </div>
+            </div>
+			<%@include file="/backinc.jsp"%>
+		</form>
+
+	</body>
+</html>
+<script type="text/javascript">
+// 返回缴费完成页面
+function goback(menuid)
+{
+    // 话费连缴才可以返回
+    if ("1" == '<s:property value="morePhoneFlag"/>')
+    {
+	    if (submitFlag == 0)
+	    {
+	        document.getElementById("curMenuId").value = menuid;
+	        
+	        document.forms[0].target = "_self";
+	        
+	        document.forms[0].action = "${sessionScope.basePath }charge/finish.action";
+	        document.forms[0].submit();
+	    }
+    }   
+}
+</script>
+

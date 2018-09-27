@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 山东包月量查询 -->
+	<package name="monthlyAmount" extends="struts-common" namespace="/monthlyAmount">   
+		<!-- 查询所选月份账期信息 --> 
+	    <action name="qryMonthCycle" class="monthlyAmountAction" method="qryMonthCycle">
+	    	<result name="selectCycle">/jsp/customize/sd/monthlyAmount/selectCycle.jsp</result>
+	    	<result name="monthlyAmountDetail">/jsp/customize/sd/monthlyAmount/monthlyAmountDetail.jsp</result>
+	    	<result name="currMonthlyAmountDetail">/jsp/customize/sd/monthlyAmount/currMonthlyAmountDetail.jsp</result>
+	    	<result name="error">/commonError.jsp</result>
+	    </action> 
+		
+		<!-- 查询包月量信息 -->
+		<action name="qryMonthlyAmount" class="monthlyAmountAction" method="qryMonthlyAmount">
+		    <result name="monthlyAmountDetail">/jsp/customize/sd/monthlyAmount/monthlyAmountDetail.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 发送包月量信息短信到手机 -->
+		<action name="sendMonthlyMsg" class="monthlyAmountAction" method="sendMonthlyMsg"></action>
+	</package>
+</struts>

@@ -1,0 +1,25 @@
+<%@page contentType="text/html; charset=GBK"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>移动自助终端</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+		<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+		<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+		<META HTTP-EQUIV="Expires" CONTENT="0">
+		<link href="${sessionScope.basePath }css/reset.css" type="text/css" rel="stylesheet" />
+		<link href="${sessionScope.basePath }css/style.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="${sessionScope.basePath }js/public.js"></script>
+		<script type="text/javascript" src="${sessionScope.basePath }js/script.js"></script>
+		<script type="text/javascript" src="${sessionScope.basePath }js/dialyzer.js"></script>
+    </head>
+<form id="actForm" method="post" action="<s:property value='redirectUrl' />">
+	<input type="hidden" id="yingjiaoFee" name="yingjiaoFee" value="0">	
+	
+</form>
+<script type="text/javascript">
+		document.getElementById("actForm").submit();	
+</script>
+</html>

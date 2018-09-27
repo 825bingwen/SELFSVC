@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="telProdDiy">
+    <typeAlias alias="telProdPO" type="com.customize.sd.selfsvc.telProdDiy.model.TelProdPO" />
+    
+    <!-- modify begin sWX219697 2015-5-6 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+    <!-- 查询语音通话套餐信息 -->
+    <select id="qryVoiceProdList"  resultClass="telProdPO" parameterClass="telProdPO">
+    SELECT DISTINCT A.VOICEPRIVID VOICEPRIVID, A.VOICENAME VOICENAME, A.VOICEFEESTAN VOICEFEESTAN, A.VOICEPRICE VOICEPRICE, 
+        A.VOICEDESC VOICEDESC, A.VOICESUITPER VOICESUITPER, A.VOICEBUSDESC VOICEBUSDESC
+    FROM SH_GOODS_TELPRODINFO A
+    WHERE A.STATUS = 1
+        AND <![CDATA[A.EFF_DATE <= SYSDATE]]>
+        AND <![CDATA[A.EXF_DATE >= SYSDATE]]>
+        AND A.BELONGBRAND IN (#belongBrand#, 'ALL')
+        AND A.BELONGREGION IN (#belongRegion#, '999') 
+        AND A.PRODID = #prodId# ORDER BY A.VOICEPRICE
+    </select>
+    
+    <!-- 查询上网流量套餐信息 -->
+    <select id="qryNetProdList"  resultClass="telProdPO" parameterClass="telProdPO">
+    SELECT DISTINCT A.NETPRIVID NETPRIVID, A.NETNAME NETNAME, A.NETFEESTAN NETFEESTAN, A.NETPRICE NETPRICE, 
+        A.NETDESC NETDESC, A.NETBUSDESC NETBUSDESC, A.NETSUITPER NETSUITPER
+    FROM SH_GOODS_TELPRODINFO A
+    WHERE A.STATUS = 1
+        AND <![CDATA[A.EFF_DATE <= SYSDATE]]>
+        AND <![CDATA[A.EXF_DATE >= SYSDATE]]>
+        AND A.BELONGBRAND IN (#belongBrand#, 'ALL')
+        AND A.BELONGREGION IN (#belongRegion#, '999') 
+       	AND A.PRODID = #prodId# ORDER BY A.NETPRICE
+    </select>
+    <!-- modify end sWX219697 2015-5-6 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+    
+    <!-- 根据id查询套餐信息 -->
+    <select id="qryProdById"  resultClass="java.lang.String" parameterClass="telProdPO">
+    SELECT A.NCODE NCODE
+    FROM SH_GOODS_TELPRODINFO A
+    WHERE A.VOICEPRIVID = #voicePrivId# AND A.NETPRIVID = #netPrivId#
+    </select>
+    
+    <!-- add begin sWX219697 2015-5-6 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+    <select id="qryProdList"  resultClass="telProdPO" parameterClass="telProdPO">
+	    SELECT DISTINCT A.PRODID, B.PRODNAME, B.PRODDESC  
+	    FROM SH_GOODS_TELPRODINFO A LEFT JOIN SH_PROD_INFO B 
+	    ON A.PRODID = B.PRODID 
+	    WHERE A.STATUS = 1 
+	        AND <![CDATA[A.EFF_DATE <= SYSDATE]]>
+	        AND <![CDATA[A.EXF_DATE >= SYSDATE]]>
+	        AND A.BELONGBRAND IN (#belongBrand#, 'ALL')
+	        AND A.BELONGREGION IN (#belongRegion#, '999')
+    </select>
+    <!-- add end sWX219697 2015-5-6 OR_SD_201503_508_SD_自助终端增加主体产品自选套餐的办理 -->
+    
+</sqlMap>

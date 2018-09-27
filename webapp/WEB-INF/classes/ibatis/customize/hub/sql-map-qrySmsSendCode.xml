@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="qrySmsSendCode">
+	<!-- 防短信炸弹 -->
+	
+	<typeAlias alias="recordSmsCodePO" type="com.customize.hub.selfsvc.smsCode.model.RecordSmsCodePO" />
+	
+	<!-- 短信发送成功后记录表 -->
+	<insert id="insertSmsCode" parameterClass="recordSmsCodePO">
+		INSERT INTO SH_SMS_HISTORY 
+		(ID, TERMID, SERVNUM, CREATETIME, SMSCONTENT)
+        VALUES
+        (#id#, #termId#, #servNum#, SYSDATE, #smsContent#)
+	</insert>
+	
+	<!-- 查询一定时间内的短信成功下发次数 -->
+	<select id="getSmsCodeNum" resultClass="java.lang.Integer" parameterClass="recordSmsCodePO">
+		<![CDATA[
+		SELECT COUNT(*)
+		FROM SH_SMS_HISTORY 
+		WHERE SERVNUM = #servNum# 
+		AND CREATETIME BETWEEN SYSDATE - #smsNumTime#
+		AND SYSDATE
+		]]>
+	</select>
+</sqlMap>

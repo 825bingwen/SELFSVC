@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 银行卡无密绑定 -->
+	<package name="bindBankCard" extends="struts-common" namespace="/bindBankCard">
+		
+		<!-- 校验用户是否为真实身份登入 -->
+		<action name="checkLoginUserIsFactUser" class="bindBankCardAction" method="checkLoginUserIsFactUser">
+		    <result name="checkSuccess">/jsp/customize/sd/bindBankCard/userInfo.jsp</result>		   	     
+		    <result name="unBindCard">/jsp/customize/sd/bindBankCard/unBindCard.jsp</result>
+		    
+		    <!-- 
+		    易充值签约信息管理菜单页面 
+		    add by sWX219697 2014-10-10 14:35:12 
+		    -->
+		    <result name="easyPayMng">/jsp/customize/sd/bindBankCard/easyPayManage.jsp</result>
+		    
+		    <!-- modify begin wWX217192 2014-11-25 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+		    <result name="heBaoManage">/jsp/customize/sd/bindBankCard/heBaoEasyPayManage.jsp</result>
+		    <!-- modify end wWX217192 2014-11-25 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+		</action>
+		
+		<!-- 填写银行卡信息 -->
+		<action name="writeBankCardInfo" class="bindBankCardAction" method="writeBankCardInfo">
+		    <result name="debitCard">/jsp/customize/sd/bindBankCard/debitCard.jsp</result>	    
+		    <result name="creditCard">/jsp/customize/sd/bindBankCard/creditCard.jsp</result>	    
+		</action>
+		
+		<!-- 无密绑定银行卡提交 -->
+		<action name="noEncryptBindComit" class="bindBankCardAction" method="noEncryptBindComit">
+		    <result name="bindSuccess">/commonError.jsp</result>		   
+		    <result name="bindError">/commonError.jsp</result>
+		    <result name="validRandomError">/jsp/customize/sd/bindBankCard/randomPwd.jsp</result>
+		</action>
+		
+		<!-- 解约绑定提交 -->
+		<action name="unBindCommit" class="bindBankCardAction" method="unBindCommit">
+		    <result name="unBindSuccess">/commonError.jsp</result>		   
+		    <result name="unBindError">/commonError.jsp</result>
+		    <result name="unBindTip">/jsp/customize/sd/bindBankCard/unBindCardTip.jsp</result>
+		</action>
+		
+		<!-- delete begin wWX217192 2014-11-28 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+		<!-- 发送短信随机码 -->
+		<!-- <action name="sendRandomPwd" class="bindBankCardAction" method="sendRandomPwd">
+		    <result name="success">/jsp/customize/sd/bindBankCard/randomPwd.jsp</result>		   	     
+		</action> -->
+		<!-- delete end wWX217192 2014-11-28 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+		
+		<!-- 手工输入身份证号 -->
+		<action name="inputCertid" class="bindBankCardAction" method="inputCertid">
+		    <result name="inputCertid">/jsp/customize/sd/bindBankCard/inputCertid.jsp</result>		   	     
+		</action>
+		
+		<!-- 显示用户信息 -->
+		<action name="showUserInfo" class="bindBankCardAction" method="showUserInfo">
+		    <result name="userInfo">/jsp/customize/sd/bindBankCard/userInfo.jsp</result>		   	     
+		</action>
+		
+		<!-- Add begin wWX217192 2014-11-27 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+		<!-- 按照分配比例获取当前是易充值签约还是和包易充值签约 -->
+		<action name="getBindBankType" class="bindBankCardAction" method="getBindBankType">
+			<result name="success">/jsp/customize/sd/bindBankCard/randomPwd.jsp</result>
+			<result name="randomPwd">/jsp/customize/sd/bindBankCard/sendHeBaoRandomPwd.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 和包易充值短信随机码获取 -->
+		<action name="sendHeBaoRandom" class="bindBankCardAction" method="sendHeBaoRandom">
+			<result name="randomPwd">/jsp/customize/sd/bindBankCard/sendHeBaoRandomPwd.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 和包易充值签约 -->
+		<action name="signHeBaoCommit" class="bindBankCardAction" method="signHeBaoCommit">
+			<result name="signSuccess">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>
+		
+		<!-- 和包易充值解约 -->
+		<action name="unsignHeBao" class="bindBankCardAction" method="unsignHeBao">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 和包易充值自动交费设置 -->
+		<action name="setHeBaoAutoValue" class="bindBankCardAction" method="setHeBaoAutoValue">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 登录页面输入银行卡号 -->
+		<action name="inputNumAndCardNo" class="bindBankCardAction" method="inputNumAndCardNo">
+			<result name="success">/jsp/customize/sd/bindBankCard/inputNumAndCardNo.jsp</result>
+		</action>
+		
+		<action name="loginWithEasyPay" class="bindBankCardAction" method="loginWithEasyPay">
+			<result name="success" type="redirect">/bindBankCard/checkLoginUserIsFactUser.action?cardNo=${cardNo}&amp;CurMenuid=recBindBankCard</result>
+			<result name="failed">/jsp/customize/sd/bindBankCard/inputNumAndCardNo.jsp</result>
+		</action>
+		<!-- Add end wWX217192 2014-11-27 R003C10LG1101 OR_SD_201409_82_JT_和包易充值支撑需求 -->
+				
+		<!-- add begin sWX219697 2014-12-15 09:20:47 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求-->
+		<!-- 自动交费设置 -->
+		<action name="setAutoFee" class="bindBankCardAction" method="setAutoFee">
+		    <result name="easyPayMng">/jsp/customize/sd/bindBankCard/easyPayManage.jsp</result>
+		</action>
+		
+		<!-- 银行卡解除绑定 -->
+		<action name="cancelBind" class="bindBankCardAction" method="cancelBind">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>	
+			
+		<!-- 副号码添加、删除 -->
+		<action name="viceNumberMng" class="bindBankCardAction" method="viceNumberMng">
+		    <result name="easyPayMng">/jsp/customize/sd/bindBankCard/easyPayManage.jsp</result>
+		</action>
+		
+		<!-- 副号码输入页面 -->
+		<action name="inputViceNum" class="bindBankCardAction" method="inputViceNum">
+			<result name="inputViceNum">/jsp/customize/sd/bindBankCard/inputViceNum.jsp</result>
+		</action>
+		<!-- add end sWX219697 2014-12-15 09:20:52 OR_SD_201408_1190_山东_关于自助终端上易充值业务优化的需求-->
+	
+	</package>
+</struts>

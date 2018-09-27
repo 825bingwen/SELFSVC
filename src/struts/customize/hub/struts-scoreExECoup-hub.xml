@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="scoreExECoup" extends="struts-common" namespace="/scoreExECoup">	
+    <!-- 湖北，积分兑换电子券，查询奖品列表 -->
+    <action name = "getPrefRewardList" class="scoreExECoupAction" method="getPrefRewardList">
+        <result name="success">/jsp/customize/hub/scoreExECoup/scoreExECoupon.jsp</result>
+        <result name="error">/commonError.jsp</result>
+    </action>
+    
+    <!-- 湖北，积分兑换电子券，提交业务 -->
+    <action name="commitPrefRewardList" class="scoreExECoupAction" method="commitPrefRewardList">
+        <result name="success">/jsp/customize/hub/scoreExECoup/successScoreExECou.jsp</result>
+        <result name="error">/commonError.jsp</result>
+    </action>
+    
+    <!-- 湖北，积分兑换电子券，手动输入积分数 -->
+    <action name="inputScore" class="scoreExECoupAction" method="inputScore">
+        <result name="inputScore">/jsp/customize/hub/scoreExECoup/inputScore.jsp</result>
+    </action>
+     <!-- add begin by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+     
+     <action name="initSocoreSpecial" class="scoreExECoupAction" method="initSocoreSpecial">
+        <result name="initScoreSpecial">/jsp/customize/hub/scoreExECoup/scoreIndex_hub.jsp</result>
+    </action>
+     
+       <action name="canRewardList" class="scoreExECoupAction" method="canRewardList">
+        <result name="canRewardList">/jsp/customize/hub/scoreExECoup/canRewardList_hub.jsp</result>
+    </action>
+        <action name="ShowActiveList" class="scoreExECoupAction" method="ShowActiveList">
+        <result name="ShowActiveList">/jsp/customize/hub/scoreExECoup/canActiveList_hub.jsp</result>
+    </action>
+      <!-- add end  by yKF73963  2013-09-09 OR_HUB_201304_824  自助终端-积分专区 -->
+    </package> 
+</struts>
+

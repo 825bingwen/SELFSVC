@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="privilege">
+
+	<!-- 同组业务配置PO -->
+	<typeAlias alias="groupNcodePO" type="com.gmcc.boss.selfsvc.privilege.model.GroupNcodePO" />
+	
+	<!-- 根据组编码查询同组业务ncode列表 -->
+	<select id="qryGroupNcodeInfo" parameterClass="groupNcodePO" resultClass="groupNcodePO">
+		SELECT T.GROUPID,T.NCODE,T.NCODENAME,T.FEE/100 FEE,T.GROUPDESC,T.TIPS,T.NCODEDESC
+ 		FROM  SH_GROUPNCODE_CONF T
+ 		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="groupId">
+				T.GROUPID = #groupId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="ncode">
+				T.NCODE = #ncode#
+			</isNotEmpty>
+		</dynamic> 
+ 		ORDER BY T.FEE
+	</select>
+</sqlMap>

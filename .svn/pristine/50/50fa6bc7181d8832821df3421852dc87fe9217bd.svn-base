@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 我的个人信息Action -->
+	<bean id="qryPersionInfoAction" parent="baseAction" class="com.customize.cq.selfsvc.serviceinfo.action.PersionInfoAction">
+	    <property name="qryPersionInfoBean" ref="qryPersionInfoBean"></property>
+	    <!-- add by z90080209 查询开通业务与积分 20111107-->
+	    <property name="favourableBean" ref="qryFavourableBean"></property>
+	    <property name="qryScoreBean" ref="qryScoreBean"></property>
+	</bean>
+	
+	<!-- 我的个人信息Bean -->
+	<bean id="qryPersionInfoBean" parent="baseBeanCQ" class="com.customize.cq.selfsvc.bean.PersionInfoBean"></bean>
+	
+</beans>

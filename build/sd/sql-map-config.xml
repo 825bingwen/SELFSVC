@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">        
+<sqlMapConfig>	
+	<!-- ibatis总配置文件 -->
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="false" errorTracingEnabled="true" maxRequests="512"
+		maxSessions="1000" maxTransactions="50" useStatementNamespaces="true"/>
+		
+	<!-- 通版 -->
+	<sqlMap resource="ibatis/sql-map-base.xml"/>
+	<sqlMap resource="ibatis/sql-map-resData.xml"/>
+	<sqlMap resource="ibatis/sql-map-terminalInfo.xml"/>
+	<sqlMap resource="ibatis/sql-map-media.xml"/>
+	<sqlMap resource="ibatis/sql-map-login.xml"/>
+	<sqlMap resource="ibatis/sql-map-feeservice.xml"/>
+	<sqlMap resource="ibatis/sql-map-charge.xml"/>
+	<sqlMap resource="ibatis/sql-map-managerOperation.xml"/>
+	<sqlMap resource="ibatis/sql-map-quickpublish.xml"/>
+	<sqlMap resource="ibatis/sql-map-busiAcceptTime.xml"/>
+	<sqlMap resource="ibatis/sql-map-privilege.xml"/>
+	
+	<!-- 山东定制 -->
+	<sqlMap resource="ibatis/customize/sd/sql-map-sdQryOrderId.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-ChooseTel.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-telProdDiy.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-prestoredReward.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-packageservice.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-recommend4G.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-cardbusi-sd.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-prodchange.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-hotAPPDownload.xml"/>
+	<sqlMap resource="ibatis/customize/sd/sql-map-ncode.xml"/>
+</sqlMapConfig>
+

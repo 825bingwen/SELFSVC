@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="package4GDesc" extends="struts-common" namespace="/package4GDesc">		
+		
+		<!-- 4G套餐介绍 -->
+		<action name="qryPackage4GDesc" class="package4GDescAction" method="qryPackage4GDesc">
+		    <result name="qryPackage4GDesc">/jsp/customize/sd/packageservice/qryPackage4GDesc.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+	</package>
+	
+	<package name="privServPack" extends="struts-common" namespace="/privServPack">		
+		
+		<!-- 特惠业务包 -->
+		<action name="qryPrivServPack" class="privServPackAction" method="qryPrivServPack">
+		    <result name="qryPrivServPack">/jsp/customize/sd/packageservice/qryPrivServPackPage.jsp</result>
+		</action>
+		
+		<!-- 特惠业务包 -->
+		<action name="qryPrivServPackDetail" class="privServPackAction" method="qryPrivServPackDetail">
+		    <result name="privServPackDetail">/jsp/customize/sd/packageservice/privServPackDetail.jsp</result>
+		</action>
+		
+		<!-- 特惠业务包 -->
+		<action name="privServPackRec" class="privServPackAction" method="privServPackRec">
+		    <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+	</package>
+</struts>

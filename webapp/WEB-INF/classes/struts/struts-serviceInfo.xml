@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 服务信息查询 -->
+	<package name="serviceinfo" extends="struts-common">
+	    
+	    <!-- 显示功能列表 -->
+		<action name="serviceInfoFunc" class="serviceInfoAction" method="initFunctionList">
+			<result name="funclist">/jsp/serviceinfo/serviceinfoIndex.jsp</result>
+		</action>
+		
+		<!-- 本机品牌资费及已开通功能 -->
+		<action name="qryFavourable" class="qryFavourableAction" method="qryFavourable">
+		    <result name="qryFavourable">/jsp/serviceinfo/qryFavourable.jsp</result>
+		</action>
+		
+		<!-- PUK码查询 -->
+		<action name="qryPukCode" class="qryPukCodeAction" method="queryPukCode">
+		    <result name="qryPukQry">/jsp/serviceinfo/pukList.jsp</result>
+		</action>
+		
+		<!-- 当前状态查询 -->
+		<action name="qryCurrentStatus" class="qryCurrentStatusAction" method="qryCurrentStatus">
+		    <result name="qryCurrentStatus">/jsp/serviceinfo/qryCurrentStatus.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 号码归属地查询 -->
+		<action name="telNumInput" class="userRegionAction" method="telNumInput">
+		     <result name="telNumInput">/jsp/serviceinfo/telNumInput.jsp</result>
+		</action>
+		
+		<!-- 号码归属地查询 -->
+		<action name="userRegion" class="userRegionAction" method="queryUserRegionReq">
+		     <result name="userRegionList">/jsp/serviceinfo/userRegionList.jsp</result>
+		</action>
+		
+		<!-- 受理历史查询 -->
+		<action name="qryServiceHistoryInput" class="qryServiceHistoryAction" method="qryServiceHistoryInput">
+		    <result name="qryServiceHistoryInput">/jsp/serviceinfo/qryServiceHistoryInput.jsp</result>
+		</action>
+		
+		<!-- 受理历史查询 -->
+		<action name="qryServiceHistory" class="qryServiceHistoryAction" method="qryHistory">
+		    <result name="qryServiceHistory">/jsp/serviceinfo/qryServiceHistory.jsp</result>
+		</action>
+		
+		<!-- 积分查询 -->
+		<action name="qryScore" class="scoreAction" method="qryScore">
+		    <result name="qryScore">/jsp/serviceinfo/qryscore.jsp</result>
+		</action>
+		
+		<!-- 转向开始结束时间界面 -->
+		<action name="forStartAndEnd" class="scoreAction" method="forStartAndEnd">
+		    <result name="success">/jsp/serviceinfo/qryScoreByTelNumSN.jsp</result>
+		</action>
+		
+		<!-- 查询积分明细信息(山东和湖北) -->
+		<action name="qryScoreDetailHisForSd" class="scoreAction" method="qryScoreDetailHisForSd">
+		    <result name="showdetail">/jsp/serviceinfo/qryScoreShow.jsp</result>
+		</action>
+		
+		<!-- 查询积分兑换历史信息(山东) -->
+		<action name="queryScoreChangeHisForsd" class="scoreAction" method="queryScoreChangeHisForsd">
+		    <result name="showScoreChange">/jsp/serviceinfo/qryScoreShow.jsp</result>
+		</action>
+		
+		<!-- 查询积分兑换历史信息(湖北) -->
+		<action name="queryScorePrizeHisForhub" class="scoreAction" method="queryScorePrizeHisForhub">
+		    <result name="showScoreChange">/jsp/serviceinfo/qryScoreShow.jsp</result>
+		</action>
+		
+		<!-- add begin jWX216858 2014-10-08 V200R003C10LG1001 OR_SD_201407_498 山东移动促销回馈积分查询方案支撑需求 -->
+		<!-- 积分发放查询（山东） -->
+        <action name="qryScorePaymentSD" class="scoreAction" method="qryScorePaymentSD">
+            <result name="qryScorePaymentSD">/jsp/serviceinfo/qryScoreShow.jsp</result>
+        </action>
+		<!-- add end jWX216858 2014-10-08 V200R003C10LG1001 OR_SD_201407_498 山东移动促销回馈积分查询方案支撑需求 -->
+	</package>	
+</struts>

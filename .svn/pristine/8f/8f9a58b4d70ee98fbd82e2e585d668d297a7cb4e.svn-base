@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">        
+<sqlMapConfig>	
+	<!-- ibatis总配置文件 -->
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="false" errorTracingEnabled="true" maxRequests="512"
+		maxSessions="1000" maxTransactions="50" useStatementNamespaces="true"/>
+		
+	<!-- 通版 -->
+	<sqlMap resource="ibatis/sql-map-base.xml"/>
+	<sqlMap resource="ibatis/sql-map-resData.xml"/>
+	<sqlMap resource="ibatis/sql-map-terminalInfo.xml"/>
+	<sqlMap resource="ibatis/sql-map-media.xml"/>
+	<sqlMap resource="ibatis/sql-map-login.xml"/>
+	<sqlMap resource="ibatis/sql-map-feeservice.xml"/>
+	<sqlMap resource="ibatis/sql-map-charge.xml"/>
+	<sqlMap resource="ibatis/sql-map-managerOperation.xml"/>
+	<sqlMap resource="ibatis/sql-map-spService.xml"/>
+	
+	<sqlMap resource="ibatis/customize/hub/sql-map-chooseTel.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-privAccept.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-prodChange.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-charge-hub.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-menu-hub.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-activities.xml"/>
+	<sqlMap resource="ibatis/customize/hub/sql-map-invoice-hub.xml"/>
+	
+	<sqlMap resource="ibatis/customize/hub/sql-map-prodInsall-hub.xml"/>
+</sqlMapConfig>
+

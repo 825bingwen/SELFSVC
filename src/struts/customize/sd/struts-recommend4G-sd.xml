@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 4G终端推荐 -->
+    <package name="recommend4G" extends="struts-common" namespace="/recommend4G">
+        <!-- 手机列表展示 -->        
+        <action name="getPhoneList" class="recommend4GAction" method="getPhoneList">
+            <result name="success">/jsp/customize/sd/recommend4G/phoneListShow.jsp</result>
+            <result name="error">/commonError.jsp</result>
+        </action>
+        
+        <!-- 手机详情展示 -->
+        <action name="phoneDetail" class="recommend4GAction" method="phoneDetail">
+            <result name="success">/jsp/customize/sd/recommend4G/phoneDetail.jsp</result>
+        </action>
+    </package>
+    
+</struts>

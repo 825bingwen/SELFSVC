@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="idCardBook" extends="struts-common" namespace="/idCardBook">		
+		
+		<!-- 转到读身份证页面 -->
+		<action name="toReadCard" class="idCardBookAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/hub/idCardBook/readCard.jsp</result>
+		</action>	
+		
+		<!--异常处理 -->
+		<action name="goCardError" class="idCardBookAction" method="goCardError">
+			<result name="error">/jsp/customize/hub/idCardBook/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 展示身份证信息页面 -->
+		<action name="getCardInfor" class="idCardBookAction" method="getCardInfor">
+			<result name="cardInfor">/jsp/customize/hub/idCardBook/cardInfor.jsp</result>
+		</action>
+		
+		<!-- 返回身份证入网预约结果 -->
+		<action name="idCardBookCommit" class="idCardBookAction" method="idCardBookCommit">
+		    <result name="error">/commonError.jsp</result>
+		    <result name="success">/commonSuccess.jsp</result>
+		</action>
+		
+	</package>	
+</struts>

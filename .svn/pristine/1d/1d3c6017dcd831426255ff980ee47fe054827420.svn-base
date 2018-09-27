@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.objectFactory" value="spring"/>
+	<include file="struts-default.xml"></include>
+	<include file="struts/struts-common.xml"></include>
+	<include file="struts/struts-privilege.xml"></include>
+	<include file="struts/struts-feeservice.xml"></include>
+	<include file="struts/struts-login.xml"></include>
+	<include file="struts/struts-media.xml"></include>
+	<include file="struts/struts-charge.xml"></include>
+	<include file="struts/struts-serviceInfo.xml"></include>
+	<include file="struts/struts-baseService.xml"></include>
+	<include file="struts/struts-reception.xml"></include>
+	<include file="struts/struts-managerOperation.xml"></include>
+	<include file="struts/customize/hub/struts-charge-hub.xml"></include>
+	<include file="struts/customize/hub/struts-chooseTel-hub.xml"></include>
+	<include file="struts/customize/hub/struts-feeservice-hub.xml"></include>
+	<include file="struts/customize/hub/struts-qryComboInfo-hub.xml"></include>
+	<include file="struts/customize/hub/struts-qryPersionInfo-hub.xml"></include>
+	<include file="struts/customize/hub/struts-qryFavourableInfo-hub.xml"></include>
+	<include file="struts/customize/hub/struts-idCardBook-hub.xml"></include>
+	<include file="struts/customize/hub/struts-qryPersionInfo-hub.xml"></include>
+	<include file="struts/customize/hub/struts-idCardBook-hub.xml"></include>
+	<include file="struts/customize/hub/struts-privAccept-hub.xml"></include>
+	<include file="struts/customize/hub/struts-prodChange-hub.xml"></include>
+	<include file="struts/customize/hub/struts-billSend-hub.xml"></include>
+	<include file="struts/customize/hub/struts-familyNumber-hub.xml"></include>
+	<include file="struts/customize/hub/struts-cdrquery-hub.xml"></include>
+	<include file="struts/customize/hub/struts-activitiesRec-hub.xml"></include>
+	<include file="struts/customize/hub/struts-invoice-hub.xml"></include>
+	
+	<include file="struts/customize/hub/struts-prodInstall-hub.xml"></include>
+</struts>

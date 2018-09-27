@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="cdrquery" extends="struts-common" namespace="/cdrquery">		
+		
+		<action name="checkQueryAuth" class="newDetailedRecordsAction" method="checkQueryAuth">
+			<result name="success" type="redirect">/cdrquery/selectMonth.action?CurMenuid=${CurMenuid}</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="selectMonth" class="newDetailedRecordsAction" method="selectMonth">
+			<result name="months">/jsp/customize/hub/detailedRecords/months.jsp</result>
+		</action>
+		
+		<action name="selectType" class="newDetailedRecordsAction" method="selectType">
+			<result name="oldTypes">/jsp/customize/hub/detailedRecords/oldTypes.jsp</result>
+			<result name="types">/jsp/customize/hub/detailedRecords/types.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="selectGprsWlanType" class="newDetailedRecordsAction" method="selectGprsWlanType">
+			<result name="grpsWlanTypes">/jsp/customize/hub/detailedRecords/gprsWlanTypes.jsp</result>
+		</action>
+				
+		<action name="selectFeeType" class="newDetailedRecordsAction" method="selectFeeType">
+			<result name="feeTypes">/jsp/customize/hub/detailedRecords/feeTypes.jsp</result>
+		</action>
+				
+		<action name="qryDetailedRecords" class="newDetailedRecordsAction" method="qryDetailedRecords">
+			<result name="FIXFEE">/jsp/customize/hub/detailedRecords/fixfeeRecords.jsp</result>
+			<result name="GSM">/jsp/customize/hub/detailedRecords/gsmRecords.jsp</result>
+			<result name="SMS">/jsp/customize/hub/detailedRecords/smsRecords.jsp</result>
+			<result name="GPRSWLAN">/jsp/customize/hub/detailedRecords/gprswlanRecords.jsp</result>
+			<result name="ISMG">/jsp/customize/hub/detailedRecords/ismgRecords.jsp</result>
+			<result name="INFOFEE">/jsp/customize/hub/detailedRecords/infofeeRecords.jsp</result>
+			<result name="OTHERFEE">/jsp/customize/hub/detailedRecords/otherfeeRecords.jsp</result>
+			<result name="DISCOUNT">/jsp/customize/hub/detailedRecords/discountRecords.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+	</package>	
+</struts>

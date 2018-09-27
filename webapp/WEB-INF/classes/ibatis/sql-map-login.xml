@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="login">
+	<typeAlias alias="randomPwdPO" type="com.gmcc.boss.selfsvc.login.model.RandomPwdPO" />
+	<typeAlias alias="loginErrorPO" type="com.gmcc.boss.selfsvc.login.model.LoginErrorPO" />
+	<typeAlias alias="blackListPONX" type="com.gmcc.boss.selfsvc.login.model.BlackListPO" />
+	<typeAlias alias="terminalOnOffPO" type="com.gmcc.boss.selfsvc.login.model.TerminalOnOffPO" />
+	<typeAlias alias="loginCheckPO" type="com.gmcc.boss.selfsvc.login.model.LoginCheckPO" />
+	
+	<select id="qryErrorRecords" parameterClass="loginErrorPO" resultClass="loginErrorPO">
+	SELECT SERVNUMBER, AUTHTYPE, ERROR_TIMES AS ERRORTIMES, TO_CHAR(FIRST_TIME, 'yyyy-mm-dd hh24:mi:ss') AS FIRSTTIME, TO_CHAR(LAST_TIME, 'yyyy-mm-dd hh24:mi:ss') AS LASTTIME
+	  FROM SH_LOG_LOGINERRNUM
+	 WHERE ROWNUM = 1 AND AUTHTYPE = #authType# AND SERVNUMBER = #servNumber#
+	 ORDER BY FIRST_TIME DESC
+	</select>
+	
+	<insert id="insertErrorRecords" parameterClass="loginErrorPO">
+	INSERT INTO SH_LOG_LOGINERRNUM(SERVNUMBER, AUTHTYPE, ERROR_TIMES, FIRST_TIME, LAST_TIME)
+    VALUES(#servNumber#, #authType#, #errorTimes#, sysdate, sysdate)
+	</insert>
+	
+	<delete id="deleteErrorRecords" parameterClass="loginErrorPO">
+	DELETE FROM SH_LOG_LOGINERRNUM
+	 WHERE SERVNUMBER = #servNumber# AND AUTHTYPE = #authType#
+	</delete>
+	
+	<update id="resetErrorRecords" parameterClass="loginErrorPO">
+	UPDATE SH_LOG_LOGINERRNUM
+       SET ERROR_TIMES = 1, FIRST_TIME = SYSDATE, LAST_TIME = SYSDATE
+     WHERE SERVNUMBER = #servNumber# AND AUTHTYPE = #authType#
+	</update>
+	
+	<update id="updateErrorRecords" parameterClass="loginErrorPO">
+	UPDATE SH_LOG_LOGINERRNUM
+       SET ERROR_TIMES = ERROR_TIMES + 1, LAST_TIME = SYSDATE
+     WHERE SERVNUMBER = #servNumber# AND AUTHTYPE = #authType#
+	</update>
+	
+	<select id="qryBlackListByServNumber" resultClass="blackListPONX" parameterClass="blackListPONX">
+		SELECT T.OPERID, T.SERVNUMBER ,T.REASON,T.STATUSDATE  ,T.STATUS FROM SH_BLACK_LIST T
+		WHERE T.STATUS='1' AND T.SERVNUMBER=#servNumber#
+	</select>
+	
+	<!-- 终端开关机信息 -->
+	<!-- add begin lWX5316086 2013-9-3 终端监控平台 -->
+	
+	<!-- 查询开关机状态 -->
+	<select id="qryTermOnOff" resultClass="String" parameterClass="String">
+		SELECT ID FROM SH_TERM_ONOFF WHERE TERMID = #termId#
+	</select>
+	
+	<!-- 查询开关机历史状态 -->
+	<select id="qryTermOnOffHis" resultClass="String" parameterClass="String">
+		SELECT MAX(ID) FROM SH_TERM_ONOFF_HISTORY WHERE TERMID = #termId#
+	</select>
+	
+	<!-- 查询开关机历史状态  山东 -->
+	<!-- modify begin qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	<select id="qryTermOnOffHisSD" resultClass="String" parameterClass="terminalOnOffPO">
+	<![CDATA[ 
+		SELECT MAX(ID) FROM SH_TERM_ONOFF_HISTORY WHERE TERMID = #termId# AND REGION = #region# 
+		AND STARTDATE < SYSDATE   AND  STARTDATE > SYSDATE-30
+	]]>
+	</select>
+	<!-- modify end qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	
+	<!-- 查询心跳状态 -->
+	<select id="qryTermHeart" resultClass="String" parameterClass="String">
+		SELECT TERMID FROM SH_TERM_HEART WHERE TERMID = #termId#
+	</select>
+	
+	<!-- 更新开关机状态 -->
+	<update id="updateTermOnOff" parameterClass="terminalOnOffPO">
+		UPDATE SH_TERM_ONOFF
+		   SET STATUS = #status#, DETAIL = #detail#, STARTDATE = SYSDATE
+		 WHERE ID = #id#
+	</update>
+	
+	<!-- 更新开关机历史状态 -->
+	<update id="updateTermOnOffHis" parameterClass="String">
+		UPDATE SH_TERM_ONOFF_HISTORY SET ENDDATE = SYSDATE WHERE ID = #id#
+	</update>
+	
+	<!-- 更新开关机历史状态   山东 -->
+	<!-- modify begin qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	<update id="updateTermOnOffHisSD" parameterClass="terminalOnOffPO">
+	<![CDATA[ 
+		UPDATE SH_TERM_ONOFF_HISTORY SET ENDDATE = SYSDATE WHERE ID = #id# 
+		AND TERMID = #termId# AND REGION = #region# 
+		AND STARTDATE < SYSDATE AND  STARTDATE > SYSDATE-30
+	]]>	
+	</update>
+	<!-- modify end qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	
+	<!-- 更新心跳状态 -->
+	<update id="updateTermHeart" parameterClass="String">
+		UPDATE SH_TERM_HEART SET OPERATEDATE = SYSDATE WHERE TERMID = #termId#
+	</update>
+	
+	<!-- 插入开关机状态 -->
+	<insert id="insertTermOnOff" parameterClass="terminalOnOffPO">
+	INSERT INTO SH_TERM_ONOFF(ID,TERMID,STATUS,DETAIL,STARTDATE)
+	VALUES
+	  (SEQ_SH_RECOID.NEXTVAL, #termId#, #status#, #detail#, SYSDATE)
+	</insert>
+	
+	<!-- 插入开关机历史 -->
+	<insert id="insertTermOnOffHis" parameterClass="terminalOnOffPO">
+	INSERT INTO SH_TERM_ONOFF_HISTORY
+	  (ID, TERMID, STATUS, DETAIL, STARTDATE, ENDDATE)
+	VALUES
+	  (SEQ_SH_RECOID.NEXTVAL, #termId#, #status#, #detail#, SYSDATE, NULL)
+	</insert>
+	
+	<!-- 插入开关机历史   山东 -->
+	<!-- modify begin qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	<insert id="insertTermOnOffHisSD" parameterClass="terminalOnOffPO">
+	INSERT INTO SH_TERM_ONOFF_HISTORY
+	  (ID, TERMID, STATUS, DETAIL, STARTDATE, ENDDATE, REGION)
+	VALUES
+	  (SEQ_SH_RECOID.NEXTVAL, #termId#, #status#, #detail#, SYSDATE, NULL, #region#)
+	</insert>
+	<!-- modify end qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	
+	<!-- 插入心跳记录 -->
+	<insert id="insertTermHeart" parameterClass="String">
+	INSERT INTO SH_TERM_HEART(TERMID,OPERATEDATE)
+	VALUES
+	  (#termId#, SYSDATE)
+	</insert>
+	
+	<!-- add end lWX5316086 2013-9-3 终端监控平台 -->
+	
+	<!-- add begin lWX5316086 宁夏终端监控 限制同一号码同一渠道多次登录 -->
+	
+	<!-- 根据手机号查询记录 -->
+	<select id="qryLoginCheckByServNum" parameterClass="String" resultClass="loginCheckPO">
+	SELECT TERMID, SERVNUM SERVNUMBER, TO_CHAR(STATUSDATE, 'YYYY-MM-DD HH24:MI:SS') AS STATUSDATE
+	 FROM SH_LOGIN_CHECK WHERE SERVNUM = #servNumber#
+	</select>
+	
+	<select id="getDateInterval" parameterClass="String" resultClass="String">
+	SELECT ROUND((SYSDATE - TO_DATE(#statusDate#,'YYYY-MM-DD HH24:MI:SS'))*24*60,1) DATEINTERVAL
+	 FROM DUAL
+	</select>
+	
+	<!-- 插入登录记录 -->
+	<insert id="insertLoginCheck" parameterClass="loginCheckPO">
+	INSERT INTO SH_LOGIN_CHECK(TERMID, SERVNUM, STATUSDATE)
+    VALUES(#termId#, #servNumber#, sysdate)
+	</insert>
+	
+	<!-- 根据手机号删除记录 -->
+	<delete id="deleteLoginCheckByServNum" parameterClass="String">
+	DELETE FROM SH_LOGIN_CHECK
+	 WHERE SERVNUM = #servNumber#
+	</delete>
+	
+	<!-- 根据终端ID删除记录 -->
+	<delete id="deleteLoginCheckByTermId" parameterClass="String">
+	DELETE FROM SH_LOGIN_CHECK
+	 WHERE TERMID = #termId#
+	</delete>
+	
+	<!-- 更新登录信息 -->
+	<update id="updateLoginCheckByTermId" parameterClass="String">
+	UPDATE SH_LOGIN_CHECK
+       SET STATUSDATE = SYSDATE 
+     WHERE TERMID = #termId#
+	</update>
+	
+	<!-- add end lWX5316086 限制同一号码同一渠道多次登录 -->
+	
+	<!-- add begin hWX5316476 2014-12-5 OR_HUB_201408_628_湖北_新增自助终端上线提醒页面 -->
+	<!-- 查询系统升级开关 -->
+	<select id="qryParamValueById" parameterClass="java.lang.String" resultClass="java.lang.String">
+		SELECT B.PARAMVALUE
+		FROM SH_PARAM_VALUE B
+      	LEFT JOIN  SH_PARAM A  ON A.PARAMID = B.PARAMID
+		WHERE B.PARAMID = #paramId# AND A.STATUS = 1 AND B.STATUS = 1
+	</select>
+	<!-- add end hWX5316476 2014-12-5 OR_HUB_201408_628_湖北_新增自助终端上线提醒页面 -->
+	
+	<!-- add begin qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	<!-- 查询region -->
+	<select id="qryRegionByTermId" parameterClass="String" resultClass="java.lang.Integer">
+		SELECT t.region FROM sh_term_config t WHERE t.termid = #termId#	
+	</select>
+	<!-- add end qWX279398 2015-12-24 OR_SD_201511_596 开关机历史表新增region -->
+	
+</sqlMap>

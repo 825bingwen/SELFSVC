@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<!-- create by sWX219697 2014-6-5 20:07:56 OR_huawei_201404_1118 -->
+	<package name="agentCharge" extends="struts-common" namespace="/agentCharge">		
+		
+		<!-- 代理商空中充值账户续费页面 -->
+		<action name="agentChargePage" class="agentChargeAction" method="agentChargePage">
+			<result name="otherFee">/jsp/customize/sd/feeCharge/agent/otherFee.jsp</result>
+		</action>
+		
+		<!-- 代理商空中充值账户续费金额输入页面 -->
+		<action name="inputMoney" class="agentChargeAction" method="inputMoney">
+			<result name="inputMoney">/jsp/customize/sd/feeCharge/agent/inputMoney.jsp</result>
+		</action>
+		
+		<!-- 免责声明页面 -->
+		<action name="dutyInfo" class="agentChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/sd/feeCharge/agent/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 代理商充值插卡页面 -->
+		<action name="readAgentCard" class="agentChargeAction" method="readAgentCard">
+		    <result name="readAgentCard">/jsp/customize/sd/feeCharge/agent/readCard.jsp</result>
+		    <result name="cardErrorPage">/jsp/customize/sd/feeCharge/agent/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 代理商充值金额校验 -->
+		<action name="checkBeforeCharge" class="agentChargeAction" method="checkBeforeCharge">
+		</action>
+		
+		<!-- 代理商缴费前记录信息接口 -->
+		<action name="beforeAgentCharge" class="agentChargeAction" method="beforeAgentCharge">
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="agentChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/sd/feeCharge/agent/cardErrorPage.jsp</result>
+		</action>	
+		
+		<!-- 银联卡扣费后日志更新 -->
+		<action name="updateCardChargeLog" class="agentChargeAction" method="updateCardChargeLog">
+		</action>
+		
+		<!-- 代理商交费提交，用于银联扣款后对代理商进行交费 -->
+		<action name="cardChargeCommit" class="agentChargeAction" method="cardChargeCommit">
+			<result name="cardErrorPage">/jsp/customize/sd/feeCharge/agent/cardErrorPage.jsp</result>
+			<result name="success">/jsp/customize/sd/feeCharge/agent/finish.jsp</result>
+		</action>
+
+	</package>	
+</struts>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="reception" extends="struts-common">	
+		<!-- 移动业务办理(1:除湖北以外的业务办理菜单 2:湖北用户服务和产品开通菜单) -->
+		<action name="receptionFunc" class="receptionAction" method="initFunctionList">
+			<!-- 自定义图标 -->
+			<result name="funclist">/jsp/reception/common/receptionIndex.jsp</result>
+			<!-- 统一图片 -->
+			<result name="funclist_unify">/jsp/reception/common/receptionIndexUnify.jsp</result>
+		</action>	
+		
+		<!-- 移动业务办理(1:湖北业务办理菜单.热门业务推荐-用户服务-产品开通-资费变更-梦网业务订购) -->
+		<action name="receptionFunc_hub" class="receptionAction" method="initFunctionList_hub">
+			<!-- 固定样式 -->
+			<result name="funclist01">/jsp/reception/common/receptionIndex_hub.jsp</result>
+			<result name="funclist02">/jsp/reception/common/receptionIndex_hub_cards.jsp</result>
+			<result name="funclist03">/jsp/reception/common/receptionIndex_hub_letter.jsp</result>
+		</action>	
+		
+		<!-- 热门业务推荐(1:湖北热门业务推荐菜单) --> 
+		<action name="recHotspot_hub" class="receptionAction" method="initRecHotspot_hub">
+			<!-- 自定义图标 -->
+			<result name="funclist">/jsp/reception/common/recHotspot_hub.jsp</result>
+			<!-- 统一图标 -->
+			<result name="funclist_unify">/jsp/reception/common/recHotspotUnify_hub.jsp</result>
+		</action>
+		
+		<!-- 热门业务推荐下一级功能菜单 --> 
+		<action name="recHotspotNext_hub" class="receptionAction" method="initRecHotspotNext_hub">
+			<!-- 自定义图标 -->
+			<result name="funclist">/jsp/reception/common/recHotspot_hub.jsp</result>
+			<!-- 统一图标 -->
+			<result name="funclist_unify">/jsp/reception/common/recHotspotUnify_hub.jsp</result>
+		</action>
+		
+		<!-- 按品牌搜索业务名称 -->
+		<action name="searchCards_hub" class="receptionAction" method="searchCards_hub">
+			<result name="searchCards">/jsp/reception/common/receptionIndex_hub_cardShow.jsp</result>
+		</action>
+		
+		<!-- 按名称业务名称首字的拼音首字母搜索业务名称 -->
+		<action name="searchLetter_hub" class="receptionAction" method="searchLetter_hub">
+			<result name="searchLetter">/jsp/reception/common/receptionIndex_hub_letterShow.jsp</result>
+		</action>
+		
+		<action name="transferType" class="callTransferAction" method="selectType">
+			<result name="transferType">/jsp/reception/callTransfer/transferType.jsp</result>
+		</action>
+		
+		<action name="inputNumber" class="callTransferAction" method="inputNumber">
+			<result name="inputNumber">/jsp/reception/callTransfer/inputNumber.jsp</result>
+		</action>
+		
+		<action name="callTransfer" class="callTransferAction" method="commitReception">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- Add begin wWX217192 2014-10-09  OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求 -->
+		<!-- 业务办理下菜单的转向 -->
+		<action name="initFunctionList_sd" class="receptionAction" method="initFunctionList_sd">
+			<result name="funclist01">/jsp/reception/common/receptionIndex_sd_group.jsp</result>
+			<result name="funclist02">/jsp/reception/common/receptionIndex_sd_cards.jsp</result>
+			<result name="funclist03">/jsp/reception/common/receptionIndex_sd_letter.jsp</result>
+		</action>
+		
+		<!-- 按字母搜索业务名称 -->
+		<action name="searchLetter_sd" class="receptionAction" method="searchLetter_sd">
+			<result name="searchLetter">/jsp/reception/common/receptionIndex_sd_letterShow.jsp</result>
+		</action>
+		
+		<!-- 按品牌搜索业务名称 -->
+		<action name="searchCards_sd" class="receptionAction" method="searchCards_sd">
+			<result name="searchCards">/jsp/reception/common/receptionIndex_sd_cardShow.jsp</result>
+		</action>
+		
+		<!-- 按分类搜索业务名称 -->
+		<action name="searchGroups_sd" class="receptionAction" method="searchGroups_sd">
+			<result name="searchGroups">/jsp/reception/common/receptionIndex_sd_groupShow.jsp</result>
+		</action>
+		<!-- Add end wWX217192 2014-10-09  OR_SD_201402_795_山东_关于自助终端管理平台产品办理功能优化的需求 -->
+	        
+        <!-- add begin jWX216858 2014-12-01 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求  -->
+        <action name="nextLevelFuncList" class="receptionFuncActionSD" method="nextLevelFuncList">
+            <result name="funcList">
+                /jsp/reception/nextLevelFunctionListSD.jsp
+            </result>
+        </action>
+        <!-- add end jWX216858 2014-12-01 OR_SD_201410_482_关于自助终端增加预存赠送活动办理和终端销售推荐功能的需求  -->
+	</package>	
+	
+	<!-- 获取子菜单 -->
+</struts>

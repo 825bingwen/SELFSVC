@@ -1,0 +1,77 @@
+package com.gmcc.boss.selfsvc.common.service;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
+
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.call.SelfSvcCall;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.dao.SelfSvcDaoImpl;
+import com.gmcc.boss.selfsvc.common.model.SelfSvcLogVO;
+import com.gmcc.boss.selfsvc.common.model.UserSatfyVO;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.resdata.model.DictItemPO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.opensymphony.xwork2.ActionContext;
+
+/**
+ * 
+ * 公用serviceImpl
+ * <功能详细描述>
+ * 
+ * @author  yKF28472
+ * @version  [版本号, Dec 10, 2010]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class SelfSvcServiceImpl implements SelfSvcService
+{
+    private SelfSvcDaoImpl selfSvcDaoImpl;
+    
+    /**
+     * 业务日志
+     * <功能详细描述>
+     * @param selfSvcLogVO
+     * @see [类、类#方法、类#成员]
+     */
+    public void createRecLog(SelfSvcLogVO selfSvcLogVO)
+    {
+        selfSvcDaoImpl.createRecLog(selfSvcLogVO);
+    }
+    
+    /**
+     * 通过groupid获取字典表数据
+     * @param groupid
+     * @return
+     */
+    public List<DictItemPO> getDictItemByGrp(String groupid)
+    {
+    	return selfSvcDaoImpl.getDictItemByGrp(groupid);
+    }
+    
+    /**
+     * 将用户满意度调查情况存入数据库
+     * @param userSatfyVO：从jsp页面传入的用户满意度调查的属性及值
+     * @see
+     * @return 无
+     * @remark create m00227318 2012/09/11 eCommerce R003C12L08_EHUB OR_HUB_201205_1032
+     */
+    public void insertUserSatfy(UserSatfyVO userSatfyVO )
+    {
+    	selfSvcDaoImpl.insertUserSatfy(userSatfyVO);
+    }
+    
+    public void setSelfSvcDaoImpl(SelfSvcDaoImpl selfSvcDaoImpl)
+    {
+        this.selfSvcDaoImpl = selfSvcDaoImpl;
+    }
+
+}

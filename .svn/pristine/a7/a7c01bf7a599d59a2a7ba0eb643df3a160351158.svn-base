@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	
+	<!-- 移动业务办理 -->
+	
+	
+	
+	<!-- daoImpl -->
+	<bean id="quickPubDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.quickpublish.dao.QuickPubDaoImpl"/>
+	
+	<!-- serviceImpl -->
+	<bean id="quickPubServiceImpl" class="com.gmcc.boss.selfsvc.quickpublish.service.QuickPubServiceImpl">
+		<property name="quickPubDaoImpl"><ref bean="quickPubDaoImpl"/></property>
+	</bean>
+	
+	<!-- service -->
+	<bean id="quickPubService" parent="baseTransactionProxy">
+		<property name="target"><ref local="quickPubServiceImpl"/></property>
+	</bean>
+	
+	<bean id="quickPubBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.QuickPubBean"/>
+	
+	<!-- action -->
+	<bean id="quickPubAction" parent="baseAction" class="com.gmcc.boss.selfsvc.quickpublish.action.QuickPubAction" scope="prototype">
+		<property name="quickPubService"><ref bean="quickPubServiceImpl"/></property>
+		<property name="quickPubBean"><ref bean="quickPubBean" /></property>
+		<property name="receptionBean" ref="receptionBean"></property>
+	</bean>
+	
+
+</beans>

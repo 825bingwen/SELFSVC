@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- add start l00190940 2011/11/03 -->
+    <!-- 基础服务办理 -->
+	<package name="scoreExchange" extends="struts-common" namespace="/scoreExchange">
+
+        <!-- 转到积分兑换页面 -->
+        <action name="scoreExchangePage" class="scoreExchangeAction" method="scoreExchangePage">
+                <result name="selectScoreExchange">/jsp/customize/cq/scoreExchange/selectScoreExchange.jsp</result>
+                <result name="error">/commonError.jsp</result>
+        </action>
+        
+        <!-- 将积分兑换为话费 -->
+        <action name="scoreToBalance" class="scoreExchangeAction" method="scoreToBalance">
+                <result name="exchangeSucceed">/jsp/reception/common/receptionSuccess.jsp</result>
+                <result name="error">/commonError.jsp</result>
+        </action>
+        
+        
+	</package>
+	<!-- add end l00190940 2011/11/03 -->	
+</struts>

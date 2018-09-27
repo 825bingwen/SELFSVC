@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- 多媒体播放 -->
+	
+	<!-- daoImpl -->
+	<bean id="mediaDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.media.dao.MediaDaoImpl"/>
+	
+	<!-- serviceImpl -->
+	<bean id="mediaServiceImpl" class="com.gmcc.boss.selfsvc.media.service.MediaServiceImpl">
+		<property name="mediaDaoImpl"><ref bean="mediaDaoImpl"/></property>
+	</bean>
+	
+	<!-- service -->
+	<bean id="mediaService" parent="baseTransactionProxy">
+		<property name="target"><ref local="mediaServiceImpl"/></property>
+	</bean>
+	
+	<!-- action -->
+	<bean id="mediaAction" parent="baseAction" class="com.gmcc.boss.selfsvc.media.action.MediaAction" scope="prototype">
+		<property name="mediaService"><ref bean="mediaServiceImpl"/></property>
+	</bean>
+	
+</beans>

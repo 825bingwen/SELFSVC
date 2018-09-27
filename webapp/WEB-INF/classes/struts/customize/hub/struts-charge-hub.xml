@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="charge" extends="struts-common" namespace="/charge">		
+		<!-- 话费充值 -->
+		<action name="feeCharge" class="feeChargeAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/customize/hub/feeCharge/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 话费充值（账户信息+支付方式） -->
+		<action name="qryfeeChargeAccount" class="feeChargeAction" method="qryfeeChargeAccount">
+		    <result name="success">/jsp/customize/hub/feeCharge/accountInfo.jsp</result>
+		    <result name="failed">/commonError.jsp</result>
+		    <result name="inputNumber">/jsp/customize/hub/feeCharge/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 选择其它金额 -->
+		<action name="selectOtherFee" class="feeChargeAction" method="selectOtherFee">
+			<result name="selectOtherFee">/jsp/customize/hub/feeCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- 手工输入缴费金额页面 -->
+		<action name="toInputMoney" class="feeChargeAction" method="toInputMoney">
+		    <result name="toInputMoney">/jsp/customize/hub/feeCharge/inputMoney.jsp</result>
+		</action>
+		
+		<!-- 选择话费充值方式 -->
+		<action name="selectFeeChargeType" class="feeChargeAction" method="selectFeeChargeType">
+		    <result name="selectType">/jsp/customize/hub/feeCharge/selectType.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 话费充值投币 -->
+		<action name="cashCharge" class="feeChargeAction" method="cashCharge">
+		    <result name="cashChargePage">/jsp/customize/hub/feeCharge/cash/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- add begin lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造 -->
+		<!-- 支付中心支付 -->
+		<action name="intPayCetCharge" class="feeChargeAction" method="intPayCetCharge">
+		 	<result name="initPayCenter">/jsp/customize/hub/feeCharge/intPayCenterCharge.jsp</result>
+		 	<result name="error">/jsp/customize/hub/feeCharge/errorPayCenter.jsp</result>
+		</action>
+		
+		<!-- 支付中心支付成功 -->
+		<action name="intPayCetChargeCommt" class="feeChargeAction" method="payCetChargeCommit">
+		 	<result name="success">/jsp/customize/hub/feeCharge/payCenterFinish.jsp</result>
+		 	<result name="error">/jsp/customize/hub/feeCharge/errorPayCenter.jsp</result>
+		</action>
+		<!-- add end lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造 -->
+		
+		<!-- 话费充值投币提交 -->
+		<action name="cashChargeCommit" class="feeChargeAction" method="cashChargeCommit">
+		    <result name="success">/jsp/customize/hub/feeCharge/finish.jsp</result>
+		    <result name="error">/jsp/customize/hub/feeCharge/cash/cashErrorPage.jsp</result>
+		    <!-- Add by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111125 Begin -->
+		    <result name="repeatError">/jsp/customize/hub/feeCharge/repeatFeeCharge.jsp</result>
+		    <!-- Add by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111125 End -->
+		</action>
+		<!-- Add by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111125 Begin -->
+		<action name="goQryFeeHistory" class="feeChargeAction" method="goQryFeeHistory">
+		    <result name="success" type="redirect">/feeservice/chargeHistory.action?CurMenuid=qryFeeHistory</result>
+		</action>
+		<!-- Add by LiFeng [XQ[2011]_11_062]自助终端-重复缴费控制 20111125 End -->
+		
+		<!-- 现金缴费异常处理 -->
+		<action name="goCashError" class="feeChargeAction" method="goCashError">
+			<result name="cashErrorPage">/jsp/customize/hub/feeCharge/cash/cashErrorPage.jsp</result>
+		</action>
+		
+		<!-- 话费充值银行卡选择金额页面 -->
+		<action name="cardCharge" class="feeChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/hub/feeCharge/otherFee.jsp</result>
+		    <result name="cardChargePage">/jsp/customize/hub/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		
+		<!-- 支付中心支付选择金额页面 -->
+		<action name="paycetCharge" class="feeChargeAction" method="cardCharge">
+			<result name="otherFee">/jsp/customize/hub/feeCharge/otherFee.jsp</result>
+		</action>
+		
+		<!-- add begin lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造 -->
+		<!-- 话费充值银行卡免责声明页面 -->
+		<action name="dutyInfo" class="feeChargeAction" method="dutyInfo">
+		    <result name="dutyInfo">/jsp/customize/hub/feeCharge/card/dutyInfo.jsp</result>
+		</action>
+		<!-- add end lwx439898 2017-10-16 OR_HUB_201709_456_湖北_支付中心需要 自助终端配合接口改造 -->
+		
+		<!-- 转到读银行卡页面 -->
+		<action name="toReadCard" class="feeChargeAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/hub/feeCharge/card/readCard.jsp</result>
+		</action>	
+		
+		<!-- 银联卡密码输入页面 -->
+		<action name="inputCardPwd" class="feeChargeAction" method="inputCardPwd">
+			<result name="inputPwd">/jsp/customize/hub/feeCharge/card/cardPassword.jsp</result>
+		</action>
+		
+		<!-- 确认银行卡缴费金额页面 -->
+		<action name="toMakeSure" class="feeChargeAction" method="toMakeSure">
+		    <result name="makeSure">/jsp/customize/hub/feeCharge/card/makeSure.jsp</result>
+		</action>
+		
+		<!-- 扣款之前增加银联卡缴费日志 -->
+		<action name="addChargeLog" class="feeChargeAction" method="addChargeLog">
+		</action>
+		
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="feeChargeAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 话费充值银行卡缴费提交 -->
+		<action name="cardChargeCommit" class="feeChargeAction" method="cardChargeCommit">
+			<!--modify begin by wWX191797 at 20140403 for [OR_HUB_201401_880] 自助终端发票打印（bug转需求） -->
+		   	<!-- 在card目录下新建一个文件 finish.jsp与花费投币充值区分 -->
+		    <!-- <result name="success">/jsp/customize/hub/feeCharge/finish.jsp</result>  -->
+		    <result name="success">/jsp/customize/hub/feeCharge/card/finish.jsp</result>
+		    <!--modify end by wWX191797 at 20140403 for [OR_HUB_201401_880] 自助终端发票打印（bug转需求） -->
+		    <result name="error">/jsp/customize/hub/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费异常处理 -->
+		<action name="goCardError" class="feeChargeAction" method="goCardError">
+			<result name="cardErrorPage">/jsp/customize/hub/feeCharge/card/cardErrorPage.jsp</result>
+		</action>
+		
+		<!-- 取消银行卡缴费 -->
+		<action name="cancelCardCharge" class="feeChargeAction" method="cancelCardCharge">
+		    <result name="cancelCardCharge">/jsp/customize/hub/feeCharge/prompt.jsp</result>
+		</action>	
+		
+		<!-- 湖北打印发票需要随机密码验证 -->
+		<action name="validateByRandomPwd" class="feeChargeAction" method="validateByRandomPwd">
+			<result name="success">/jsp/customize/hub/feeCharge/randomPwd.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 随机密码验证通过后打印发票 -->
+		<action name="printInvoice" class="feeChargeAction" method="printInvoiceWithPwd">
+			<result name="success">/jsp/customize/hub/feeCharge/printInvoice.jsp</result>
+		    <result name="error">/jsp/customize/hub/feeCharge/randomPwd.jsp</result>
+		</action>		
+		
+		<!-- 无需进行随机密码验证，直接打印发票 -->
+		<action name="printInvoiceWithoutPwd" class="feeChargeAction" method="printInvoiceWithoutPwd">
+			<result name="print">/jsp/customize/hub/feeCharge/printInvoice.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="feeChargeAction" method="insertInvoiceLog">
+		</action>
+			<!--电子渠道-抽奖平台-抽奖接口改造  -->
+		<action name="mianFeiChouJiang" class="feeChargeAction" method="mianFeiChouJiang">
+		</action>
+		<!-- add begin by yKF73963 2013-10-15 自助终端-积分专区     -->
+		<action name="mianFeiChouJiangNew" class="feeChargeAction" method="mianFeiChouJiangNew">
+		</action>
+		<!-- add end by yKF73963 2013-10-15 自助终端-积分专区     -->
+	</package>	
+</struts>

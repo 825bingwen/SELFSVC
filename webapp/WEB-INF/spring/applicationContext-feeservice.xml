@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 登录 -->
+	<bean id="feeServiceAction" parent="baseAction" class="com.gmcc.boss.selfsvc.feeservice.action.FeeServiceAction" scope="prototype"></bean>
+	
+	<!-- 详单查询 -->
+	<bean id="cdrDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.feeservice.dao.DetailedRecordsDaoImpl" autowire="byName" />
+	
+	<bean id="cdrServiceImpl" class="com.gmcc.boss.selfsvc.feeservice.service.DetailedRecordsServiceImpl" autowire="byName" >
+		<property name="detailedRecordsDaoImpl">
+			<ref bean="cdrDaoImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="cdrService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="cdrServiceImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="detailedRecordsBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.DetailedRecordsBean"/>
+	<bean id="detailedRecordsAction" parent="baseAction" class="com.gmcc.boss.selfsvc.feeservice.action.DetailedRecordsAction" scope="prototype">
+		<property name="detailedRecordsBean">
+			<ref bean="detailedRecordsBean" />
+		</property>
+		<property name="detailedRecordsService">
+			<ref bean="cdrService" />
+		</property>
+	</bean>
+	
+	<!-- 月初扣款查询 -->
+	
+	<!-- bean -->
+	<bean id="monthDeductBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.MonthDeductBean"/>
+	
+	<!-- action -->
+	<bean id="monthDeductAction" parent="baseAction" class="com.gmcc.boss.selfsvc.feeservice.action.MonthDeductAction" scope="prototype">
+		<property name="monthDeductBean"><ref bean="monthDeductBean"/></property>
+	</bean>
+	
+	<!-- 缴费历史查询 -->
+	<bean id="chargeHistoryBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.ChargeHistoryBean"/>
+	<bean id="chargeHistoryAction" parent="baseAction" class="com.gmcc.boss.selfsvc.feeservice.action.ChargeHistoryAction" scope="prototype">
+		<property name="chargeHistoryBean"><ref bean="chargeHistoryBean"/></property>
+	</bean>
+	
+	<!--add begin g00140516 2013/02/22 R003C13L02n01 OR_NX_201302_600-->
+	<bean id="currBillFeeBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.CurrBillFeeBean"/>
+	<bean id="currBillFeeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.feeservice.action.CurrBillFeeAction" scope="prototype">
+		<property name="currBillFeeBean"><ref bean="currBillFeeBean"/></property>
+	</bean>
+	<!--add end g00140516 2013/02/22 R003C13L02n01 OR_NX_201302_600-->	
+</beans>

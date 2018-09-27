@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <!-- 产品查询受理Action -->
+    <bean id="prodOrderAction" parent="baseAction" class="com.customize.cq.selfsvc.prodOrder.action.ProdOrderAction" scope="prototype">
+        <property name="prodOrderBean" ref="prodOrderBean"></property>
+        <property name="receptionBean" ref="receptionBean"></property>
+        <property name="prodOrderService" ref="prodOrderService"></property>
+    </bean>
+    
+    <!-- 查询可受理的产品 -->
+    <bean id="prodOrderService" parent="baseTransactionProxy">
+    	<property name="target">
+			<ref local="prodOrderServiceImpl"/>
+		</property>
+    </bean>
+    
+    <!-- 产品受理serviceImpl -->
+    <bean id="prodOrderServiceImpl" class="com.customize.cq.selfsvc.prodOrder.service.ProdOrderServiceImpl" >
+		<property name="prodOrderDaoImpl" ref="prodOrderDaoImpl" />
+	</bean>
+	
+	<!-- 产品受理daoImpl -->
+	<bean id="prodOrderDaoImpl" parent="baseDao" class="com.customize.cq.selfsvc.prodOrder.dao.ProdOrderDaoImpl"></bean>
+	
+    <!-- 产品查询受理Bean -->
+    <bean id="prodOrderBean" parent="baseBeanCQ" class="com.customize.cq.selfsvc.bean.ProdOrderBean"></bean>
+    
+</beans>

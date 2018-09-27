@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 湖北账户余额查询 -->
+	<bean id="feeBalanceAction" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.FeeBalanceAction" scope="prototype">
+	    <property name="feeBalanceBean"><ref bean="feeBalanceBean"/></property>
+	</bean>
+
+	<bean id="feeBalanceBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.FeeBalanceBean" ></bean>
+	
+	<!-- 湖北账单分析 -->
+	<bean id="billAnalysisAction" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.BillAnalysisAction" scope="prototype">
+		 <property name="billAnalysisBean"><ref bean="billAnalysisBean"/></property>
+	</bean>
+	<bean id="billAnalysisBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.BillAnalysisBean" ></bean>
+	
+	<!-- 湖北资费推荐 -->
+	<bean id="chargeGuideAction" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.ChargeGuideAction" scope="prototype">
+		 <property name="chargeGuideBean"><ref bean="chargeGuideBean"/></property>
+	</bean>
+	<bean id="chargeGuideBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.ChargeGuideBean" ></bean>
+	
+	
+	<!-- 湖北月账单查询 -->
+	<bean id="monthBillAction" parent="baseAction" class="com.customize.hub.selfsvc.monthBill.action.MonthBillAction" scope="prototype">
+	   <property name="monthBillBean" ref="monthBillBean"></property>
+	</bean>
+	
+	<bean id="monthBillBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.MonthBillBean"></bean>
+	
+	<!-- 湖北欠费历史查询 -->
+	<bean id="qryArrearAction" parent="baseAction" class="com.customize.hub.selfsvc.query.action.QryArrearAction" scope="prototype">
+		<property name="queryBean" ref="queryBean"></property>
+	</bean>
+	<!-- 本机网龄Action -->
+	<bean id="qryCurrentStatusAction1" parent="baseAction" class="com.customize.hub.selfsvc.query.action.CurrentStatusAction" scope="prototype">
+	    <property name="currentStatusBean" ref="currentStatusBean"></property>
+	</bean>
+	<bean id="queryBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.QueryBean"></bean>
+	
+	<!-- 分月返还到账情况查询 Add by LiFeng [XQ[2011]_06_020]电子渠道分月返还到账情况查询需求【重点需求】 20110913 Begin -->
+	<bean id="monthlyReturnAction" parent="baseAction" class="com.customize.hub.selfsvc.query.action.MonthlyReturnAction" scope="prototype">
+		<property name="queryBean" ref="queryBean"></property>
+	</bean>
+	<!-- 分月返还到账情况查询 Add by LiFeng [XQ[2011]_06_020]电子渠道分月返还到账情况查询需求【重点需求】 20110913 End -->
+	
+	<!-- 新版账单查询add by xkf57421 begin  -->
+	<bean id="billQueryHubBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.BillQueryHubBean" ></bean>
+	<bean id="billQueryHubAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.BillQueryHubAction">
+		 <property name="billQueryHubBean"><ref bean="billQueryHubBean"/></property>
+	</bean>
+	<bean id="billBarImgAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.BillBarImgAction">
+	</bean>
+	<bean id="billPieImgAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.BillPieImgAction">
+	</bean>
+	<bean id="hisBillQryHubAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.feeservice.action.HisBillQryHubAction">
+		 <property name="hisBillQryHubBean"><ref bean="billQueryHubBean"/></property>
+	</bean>
+	
+	<!-- 新版账单查询add by xkf57421 end -->
+	
+	<!-- 余额明细查询 add begin wWX217192 2016-04-01 OR_HUB_201602_493 -->
+	<bean id="balanceDetailAction" scope="prototype" parent="baseAction" class="com.customize.hub.selfsvc.balanceDetail.action.BalanceDetailAction">
+		<property name="balanceDetailBean" ref="balanceDetailBean"></property>
+	</bean>
+	
+	<bean id="balanceDetailBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.BalanceDetailBean">
+	</bean>
+	<!-- 余额明细查询 add end wWX217192 2016-04-01 OR_HUB_201602_493-->
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="prodInstall">
+	<!-- 开户模板对象 -->
+	<typeAlias alias="tpltVO" type="com.customize.hub.selfsvc.prodInstall.model.ShTpltTempletVO" />
+	
+	<!-- 开户受理日志对象 -->
+	<typeAlias alias="ilVO" type="com.customize.hub.selfsvc.prodInstall.model.InstallLogVO" />
+	
+	<!-- 数据字典对象 -->
+	<typeAlias alias="dictVO" type="com.customize.hub.selfsvc.prodInstall.model.ShDictItemVO" />
+	
+	<!-- 选号共享单位查询 -->
+    <select id="qryShDictItem" resultClass="dictVO" parameterClass="dictVO">
+		SELECT dictid,dictname,groupid,status from sh_dict_item M
+	 	 where 1=1 and status=1  
+ 		<isNotNull prepend="AND" property="groupid"> 
+				M.groupid=#groupid#  
+		</isNotNull>
+		<isNotNull prepend="AND" property="dictid"> 
+				M.dictid=#dictid# 
+		</isNotNull>
+	</select>
+	
+	<!-- 开户模板查询 -->
+    <select id="qryTpltTemplate" resultClass="tpltVO" parameterClass="tpltVO">
+		SELECT M.TEMPLETID,M.TEMPLETNAME,M.MAINPRODID,M.MAINPRODNAME,M.BRAND,M.MONTHFEE,M.DESCRIPTION,
+				M.REGION,M.ORGID,to_char(M.CREATEDATE,'yyyy-mm-dd hh24:mi:ss') CREATEDATE,
+				to_char(M.STATUSDATE,'yyyy-mm-dd hh24:mi:ss') STATUSDATE,M.STATUS,M.SORTORDER,
+				M.MINFEE,M.OPERID,M.NOTES
+	 		 FROM SH_TPLT_TEMPLET M where 1=1
+ 		<isNotNull prepend="AND" property="region"> 
+				M.REGION=#region# 
+		</isNotNull>
+		<isNotNull prepend="AND" property="status"> 
+				M.status=#status#
+		</isNotNull>
+		<isNotNull prepend="AND" property="templetid"> 
+				M.TEMPLETID=#templetid#
+		</isNotNull>
+		     Order by SORTORDER
+	</select>
+	
+	<!-- 开户受理日志新增 -->
+	<insert id="insertInstallLog"  parameterClass="ilVO">
+		<selectKey resultClass="java.lang.String" keyProperty="oid">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		insert into sh_log_install
+		(oid,termid,chargeid,region,servnumber,hlrid,groupid,mainprodiid,prodtempletid,chargetype,recfee,tofee,custname,certid,linkaddr,sex,blankcard,imsi,linkphone,productlist,submailaddr,createdate,status,statusdate,recstatus,formnum,subsid,notes)
+		values
+		(#oid#,#termid#,#chargeid#,#region#,#servnumber#,#hlrid#,#groupid#,
+		 #mainprodiid#,#prodtempletid#,#chargetype#,#recfee#,#tofee#,#custname#,
+		 #certid#,#linkaddr#,#sex#,#blankcard#,#imsi#,#linkphone#,#productlist#,
+		 #submailaddr#,to_date(#createdate#, 'yyyymmddhh24miss'),#status#,
+		 to_date(#statusdate#, 'yyyymmddhh24miss'),#recstatus#,#formnum#,#subsid#,#notes#)
+	</insert>
+</sqlMap>

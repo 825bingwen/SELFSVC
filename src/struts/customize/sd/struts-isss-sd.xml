@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<!-- create by sWX219697 2014-9-18 OR_SD_201409_556_自助终端营销功能优化 -->
+	<package name="ISSS" extends="struts-common" namespace="/ISSS">		
+		
+		<!-- 设置ISSS对应的session，用于向智能营销平台反馈办理结果 -->
+		<action name="setISSSSession" class="iSSSAction" method="setISSSSession">
+		</action>
+		
+		<!-- 向智能营销平台反馈办理结果 -->
+		<action name="feedbackByStatus" class="iSSSAction" method="feedbackByStatus">
+		</action>
+		
+		<!-- 查询智能营销平台推荐列表 -->
+		<action name="qryOfferInfoList" class="iSSSAction" method="qryOfferInfoList">
+		</action>
+		
+		<!-- 考虑一下 -->
+		<action name="consider" class="iSSSAction" method="consider">
+		</action>
+		
+	</package>	
+</struts>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 自选套餐Action -->
+	<bean id="telProdDiyAction" parent="baseAction" class="com.customize.hub.selfsvc.telProdDiy.action.TelProdDiyAction" scope="prototype">
+		    <property name="telProdDiyService" ref="telProdDiyService"></property>
+		    <property name="telProdDiyBean" ref="telProdDiyBean"></property>
+	</bean>
+	
+	<!-- 自选套餐Bean -->
+	<bean id="telProdDiyBean" parent="baseBeanHub" class="com.customize.hub.selfsvc.bean.TelProdDiyBean"></bean>
+
+	<!-- 自选套餐service -->
+	<bean id="telProdDiyService" parent="baseTransactionProxy">
+	    <property name="target" ref="telProdDiyServiceImpl"></property>
+	</bean>
+	
+	<!-- 自选套餐serviceImpl -->
+	<bean id="telProdDiyServiceImpl" class="com.customize.hub.selfsvc.telProdDiy.service.TelProdDiyServiceImpl">
+	    <property name="telProdDiyDaoImpl" ref="telProdDiyDaoImpl"></property>
+	</bean>
+	
+	<!-- 自选套餐DaoImpl -->
+	<bean id="telProdDiyDaoImpl" parent="baseDao" class="com.customize.hub.selfsvc.telProdDiy.dao.TelProdDiyDaoImpl"></bean>
+	
+</beans>

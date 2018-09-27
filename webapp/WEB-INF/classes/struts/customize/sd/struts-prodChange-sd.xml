@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="prodChange" extends="struts-common" namespace="/prodChange">     
+                
+        <!-- 查询可转换的主体产品列表,列出用户信息 -->
+        <action name="qryMainProdChangeInfoList" class="prodChangeAction" method="qryMainProdChangeInfoList">
+            <result name="qryProdChangeInfoList">/jsp/customize/sd/prodChange/mainProdList.jsp</result>
+            <result name="error">/commonError.jsp</result>
+            <!-- modify begin wWX217192 2014-10-20 OR_SD_201407_1310 ISSS:ISSS平台营销活动产品配置功能扩展 -->
+            <result name="mainProdTemplate" type="redirectAction">
+            	<param name="actionName">/prodChange/mainProdTemplateList.action</param>
+            	<param name="newProdId">${newProdId}</param>
+            	<param name="curMenuid">${curMenuid}</param>
+            </result>
+            <!-- modify end wWX217192 2014-10-20 OR_SD_201407_1310 ISSS:ISSS平台营销活动产品配置功能扩展 -->
+        </action>
+        
+        <!-- 选择主体产品模板 -->
+        <action name="mainProdTemplateList" class="prodChangeAction" method="mainProdTemplateList">
+            <result name="mainProdTemplate">/jsp/customize/sd/prodChange/mainProdTempList.jsp</result>
+            <result name="error">/commonError.jsp</result>      
+        </action>
+        
+        <!-- 产品变更确认信息 -->
+        <action name="prodChangeValidateInfo" class="prodChangeAction" method="prodChangeValidateInfo">
+            <result name="prodChangeValidateInfo">/jsp/customize/sd/prodChange/prodValidateInfo.jsp</result>
+            <result name="error">/commonError.jsp</result>      
+        </action>
+        
+        <!-- 执行产品变更 -->
+        <action name="mainProdChangeSubmit" class="prodChangeAction" method="mainProdChangeSubmit">
+            <result name="mainProdChangeSubmit">/jsp/customize/sd/prodChange/mainProdChangeFinish.jsp</result>
+            <result name="error">/commonError.jsp</result>      
+        </action>
+        
+        <!-- 主体产品下组内档次转换 -->
+        <action name="chgLevelInGroup" class="prodChangeAction" method="chgLevelInGroup">
+            <result name="chgLevelInGroup">/jsp/customize/sd/prodChange/mainProdChangeFinish.jsp</result>
+            <result name="error">/commonError.jsp</result>      
+        </action>
+                
+    </package>  
+</struts>

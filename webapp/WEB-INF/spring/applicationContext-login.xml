@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	<!-- 登录 -->
+	
+	<!-- terminalLoginAction -->
+	<!--add begin cKF48754 2011/11/01 R003C11L11n01 OR_huawei_201111_149 -->
+	<bean id="terminalLoginAction" parent="baseAction" class="com.gmcc.boss.selfsvc.login.action.TerminalLoginAction" scope="prototype">
+		<property name="loginService">
+			<ref bean="loginService" />
+		</property>
+	</bean>
+	<!--add end cKF48754 2011/11/01 R003C11L11n01 OR_huawei_201111_149 -->
+	
+	<!-- 用户身份认证 -->
+	<bean id="loginDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.login.dao.LoginDaoImpl" autowire="byName" />
+	
+	<bean id="loginServiceImpl" class="com.gmcc.boss.selfsvc.login.service.LoginServiceImpl" autowire="byName" >
+		<property name="loginDaoImpl">
+			<ref bean="loginDaoImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="loginService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="loginServiceImpl"/>
+		</property>
+	</bean>	
+	
+	<bean id="userLoginBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.UserLoginBean"/>
+	<bean id="userLoginAction" parent="baseAction" class="com.gmcc.boss.selfsvc.login.action.UserLoginAction" scope="prototype">
+		<property name="userLoginBean">
+			<ref bean="userLoginBean" />
+		</property>
+		<property name="loginService">
+			<ref bean="loginService" />
+		</property>
+	</bean>
+	
+	<!-- UserLoginAction -->
+	<!--add begin cKF48754 2011/10/27 R003C11L10n01 添加parent="baseAction" -->
+	<bean id="terminalForwardAction" parent="baseAction" class="com.gmcc.boss.selfsvc.login.action.TerminalForwardAction" scope="prototype"></bean>
+	<!--add end cKF48754 2011/10/27 R003C11L10n01 添加parent="baseAction" -->
+	
+	
+	<!-- 终端开关机信息 -->
+	<!--add begin lWX5316086 2013-9-3 终端监控平台 -->
+	<bean id="terminalOnOffDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.login.dao.TerminalOnOffDaoImpl" autowire="byName" />
+
+	<bean id="terminalOnOffServiceImpl" class="com.gmcc.boss.selfsvc.login.service.TerminalOnOffServiceImpl" autowire="byName" >
+		<property name="terminalOnOffDaoImpl">
+			<ref bean="terminalOnOffDaoImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="terminalOnOffService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="terminalOnOffServiceImpl"/>
+		</property>
+	</bean>	
+	
+	<bean id="terminalOnOffAction" parent="baseAction" class="com.gmcc.boss.selfsvc.login.action.TerminalOnOffAction" scope="prototype">
+		<property name="terminalOnOffService">
+			<ref bean="terminalOnOffServiceImpl"/>
+		</property>
+	</bean>
+	<!--add end lWX5316086 2013-9-3 终端监控平台 -->
+</beans>

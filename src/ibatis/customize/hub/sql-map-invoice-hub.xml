@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="invoiceHub">	
+	<typeAlias alias="invoicePrintPO" type="com.customize.hub.selfsvc.invoice.model.InvoicePrintPO"/>
+	<insert id="insertInvoiceLog" parameterClass="invoicePrintPO">
+		INSERT INTO SH_LOG_PRINTINVOICE(SERVNUMBER, RECDATE, TERMID,FORMNUM)
+        VALUES (#servNumber#,SYSDATE, #termID#,#formnum#)
+	</insert>
+	
+</sqlMap>

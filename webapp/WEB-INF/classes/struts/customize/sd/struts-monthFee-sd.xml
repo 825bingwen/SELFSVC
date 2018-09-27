@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 山东月账单查询 -->
+	<package name="monthFee" extends="struts-common" namespace="/monthFee">
+	    
+		<!-- 查询月份 -->
+		<action name="currMonthFee" class="monthFeeAction" method="qryCurrentMonthBill">
+			<result name="qryCurrentMonthBill">/jsp/customize/sd/monthfee/currMonthBill.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 查询账期 -->
+		<action name="qryBillCycle" class="monthFeeAction" method="qryBillCycle">
+			<result name="selectCycle">/jsp/customize/sd/monthfee/selectCycle.jsp</result>
+			<result name="qryMonthBill">/jsp/customize/sd/monthfee/monthBill.jsp</result>
+			<result name="qryMonthBill_new">/jsp/customize/sd/monthfee/MonthBill_new.jsp</result>
+			<result name="qryMonthBill_real_new">/jsp/customize/sd/monthfee/MonthBill_real_new.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 月账单查询(老版&新版) -->
+		<action name="isNewOrOld" class="monthFeeAction" method="isNewOrOld">
+			<result name="qryMonthBill">/jsp/customize/sd/monthfee/monthBill.jsp</result>
+			<result name="qryMonthBill_new">/jsp/customize/sd/monthfee/MonthBill_new.jsp</result>
+			<result name="qryMonthBill_real_new">/jsp/customize/sd/monthfee/MonthBill_real_new.jsp</result>
+			<result name="selectCycle">/jsp/customize/sd/monthfee/selectCycle.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 当月费用结构图 -->
+		<action name="billfixedPieChart_new" class="monthFeeAction" method="billfixedPieChart_new"></action>
+		
+		<!-- 当月费用结构图 -->
+		<action name="billfixedBarChart_new" class="monthFeeAction" method="billfixedBarChart_new"></action>
+		
+		<!-- 月账单查询(老版) -->
+		<action name="monthFee" class="monthFeeAction" method="qryMonthBill">
+			<result name="qryMonthBill">/jsp/customize/sd/monthfee/monthBill.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!-- 
+		<action name="monthFee_new" class="monthFeeAction" method="qryMonthBill_new">
+			<result name="qryMonthBill_new">/jsp/customize/sd/monthfee/MonthBill_new.jsp</result>
+			<result name="selectCycle">/jsp/customize/sd/monthfee/selectCycle.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		 -->
+		
+		<!-- 账单寄送 -->
+		<action name="sendmail" class="monthFeeAction" method="sendmail"></action>
+		
+		<!-- 账单寄送(新版) -->
+		<action name="sendmail_new" class="monthFeeAction" method="sendmail_new"></action>
+		
+		<!-- 开通139手机邮箱 -->
+		<action name="provideMailService" class="monthFeeAction" method="provideMailService"></action>
+		
+		<!-- 消费分析图 -->
+		<action name="billPieChart" class="monthFeeAction" method="billPieChart"></action>
+		
+
+		
+	</package>
+</struts>

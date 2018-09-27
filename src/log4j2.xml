@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>    
+<configuration status="OFF">  
+
+  <!-- appender -->  
+  <appenders>    
+  	<!-- 输出到控制台 -->
+    <Console name="Console" target="SYSTEM_OUT">
+    	<!-- 输出格式 -->    
+		<PatternLayout pattern="%-5p[%d{yyyy-MM-dd HH:mm:ss SSSS}] - %m%n" />
+    </Console>
+    
+    <!-- 输出到文件 -->
+    <RollingFile name="RollingFile" fileName="./logs/SelfSvc.log" filePattern="./logs/SelfSvc.log_%d{yyyyMMdd}">
+    	 <!-- 输出格式 -->
+         <PatternLayout pattern="%-5p[%d{yyyy-MM-dd HH:mm:ss SSSS}] - %m%n" />
+         <!-- 策略:按日期进行存储 -->
+         <Policies>
+         	<TimeBasedTriggeringPolicy modulate="true"/>
+         </Policies>
+    </RollingFile>
+  </appenders>    
+  
+  <!-- logger-->
+  <loggers>
+    <root level="INFO">
+      <appender-ref ref="RollingFile"/>
+      <appender-ref ref="Console"/>
+    </root>
+  </loggers>
+</configuration>   
+
+

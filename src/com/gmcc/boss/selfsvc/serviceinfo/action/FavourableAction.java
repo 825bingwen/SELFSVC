@@ -1,0 +1,265 @@
+package com.gmcc.boss.selfsvc.serviceinfo.action;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.selfsvc.bean.FavourableBean;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.BusinessIdConstants;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * 本机品牌资费及已开通功能
+ * 
+ * @author xkf29026
+ * 
+ */
+public class FavourableAction extends BaseAction
+{
+    
+    private static Log logger = LogFactory.getLog(FavourableAction.class);
+    
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * 当前菜单id
+     */
+    private String curMenuId = "";
+    
+    // 错误信息
+    private String errormessage;
+    
+    // 结果列表标题
+    private String[] servicetitle;
+    
+    // 查询结果
+    private List result;
+    
+    // 调用接口bean
+    private FavourableBean favourableBean;
+
+    /**
+     * 查询本机品牌资费及已开通功能
+     * 
+     * @param request
+     * @return
+     */
+    public String qryFavourable()
+    {
+        logger.debug("queryFavourable Starting...");
+        
+        String forward = "error";
+        
+        // 获取session
+        HttpSession session = getRequest().getSession(true);
+        
+        // 获取终端机信息
+        TerminalInfoPO terminalInfoPO = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+        
+        // 获取客户信息
+        NserCustomerSimp customer = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);
+        
+        // 客户手机号
+        String servnumber = customer.getServNumber();
+        
+        session.setAttribute("servnumber", servnumber);
+        
+        // 查询类型 1：品牌资费 2：已开通服务、优惠
+        String queryType = "2";
+        
+        // 查询本机品牌资费及已开通功能
+        Map result = favourableBean.qryFavourable(terminalInfoPO, customer, curMenuId, queryType);
+        
+        if (result.get("returnObj") != null && result.size() > 0)
+        {
+            Vector vec = (Vector)(result.get("returnObj"));
+            
+            // 返回的字符串为已开通业务=资费描述=启用日期=结束日期
+            String servicetitle = (String)vec.get(0);
+            
+            // 对标题字符串进行分解后放入数组返回页面
+            if (servicetitle != null && !"".equals(servicetitle))
+            {
+                String[] titles = servicetitle.split("=");
+                
+                // 设置结果标题
+                setServicetitle(titles);
+            }
+            
+            Vector servicecont = new Vector();
+            CRSet cr = (CRSet)vec.get(1);
+            // 拼装数据
+            
+            for (int i = 0; i < cr.GetRowCount(); i++)
+            {  
+                //modify begin fwx439896 2017-04-19 OR_huawei_201703_629_【山东移动接口迁移专题】-自助终端已有接口1
+            	
+            	String feeInfo =null;
+            	//走能开   能开时间格式和UAP格式不同
+                if(CommonUtil.isInvokeOpenEbus(BusinessIdConstants.CLI_QRY_ZFINFO))
+            	{   
+                	//如果返回的 开始时间或者结束时间为null  转换成空格
+                	String crFour=StringUtils.isBlank(cr.GetValue(i, 4))? "  ":cr.GetValue(i, 4);
+                	String crThree=StringUtils.isBlank(cr.GetValue(i, 3))? "  ":cr.GetValue(i, 3);
+                	feeInfo= cr.GetValue(i, 1) + "=" + cr.GetValue(i, 2) + "=" + crThree
+                	+ "=" +crFour ;
+            	}
+                else
+                {
+                	feeInfo= cr.GetValue(i, 1) + "=" + cr.GetValue(i, 2) + "=" + CommonUtil.formatTime(cr.GetValue(i, 3))
+                	+ "=" + CommonUtil.formatTime(cr.GetValue(i, 4));
+                }
+                //modify end fwx439896 2017-04-19 OR_huawei_201703_629_【山东移动接口迁移专题】-自助终端已有接口1	  
+                servicecont.add(feeInfo);
+            }
+            
+            getRequest().setAttribute("servicecont", servicecont);
+            Map dataM = new HashMap();
+            dataM.put("serviceTitle", servicetitle);
+            dataM.put("favourableResult", servicecont);
+            
+            // 对数据进行分页查询
+            Vector Pageresult = getQueryPageData(getRequest(), dataM, "favourableResult");
+            
+            List listOuter = new ArrayList();
+            
+            // 对分页查询后的数据进行分解后返回页面
+            for (int i = 0; Pageresult != null && Pageresult.size() != 0 && i < Pageresult.size(); i++)
+            {
+                List listInner = new ArrayList();
+                
+                String[] content = Pageresult.get(i).toString().split("=");
+                for (int j = 0; j < content.length; j++)
+                {
+                    listInner.add(content[j]);
+                }
+                listOuter.add(listInner);
+            }
+            
+            // 设置结果
+            setResult(listOuter);
+            
+            forward = "qryFavourable";
+            
+            // 创建成功日志
+            this.createRecLog(Constants.BUSITYPE_SUBSQRYFAVOURABLE, "0", "0", "0", "业务信息查询:已开通优惠查询成功!");
+        }
+        else if (result.get("returnObj") == null)
+        {
+            // modify begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            String resultMsg = getConvertMsg((String) result.get("returnMsg"), "zz_04_15_000003", null, null);
+            
+            this.getRequest().setAttribute("errormessage", resultMsg);
+            
+            // 创建错误日志
+            this.createRecLog(Constants.BUSITYPE_SUBSQRYFAVOURABLE, "0", "0", "1", resultMsg);
+            // modify end g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+        }
+        
+        logger.debug("queryFavourable End!");
+        return forward;
+    }
+    
+    /**
+     * 获取查询单页数据
+     * 
+     * @param request
+     * @param dataM
+     * @param listType
+     * @return
+     */
+    public Vector getQueryPageData(HttpServletRequest request, Map dataM, String listType)
+    {
+        
+        Vector dataV = (Vector)dataM.get(listType);
+        request.setAttribute("total", String.valueOf(dataV.size()));
+        //request.setAttribute("pageSize", String.valueOf(Constants.DEFAULT_PAGE_SIZE));
+        return dataV;
+//        Vector result = new Vector();
+//        if (dataV != null && dataV.size() > 0)
+//        {
+//            String page = request.getParameter("pageNo");
+//            if (page == null || page.trim().length() < 1)
+//            {
+//                page = "1";
+//            }
+//            int iPage = Integer.parseInt(page);
+//            int maxSize = iPage * Constants.DEFAULT_PAGE_SIZE;
+//            maxSize = maxSize <= dataV.size() ? maxSize : dataV.size();
+//            for (int i = (iPage - 1) * Constants.DEFAULT_PAGE_SIZE; i < maxSize; i++)
+//            {
+//                result.add(dataV.get(i));
+//            }
+//            
+//            // String pageSize = (String)request.getAttribute("pageSize");
+//            request.setAttribute("total", String.valueOf(dataV.size()));
+//            request.setAttribute("pageSize", String.valueOf(Constants.DEFAULT_PAGE_SIZE));
+//        }
+//        return result;
+    }
+    
+    public FavourableBean getFavourableBean()
+    {
+        return favourableBean;
+    }
+    
+    public void setFavourableBean(FavourableBean favourableBean)
+    {
+        this.favourableBean = favourableBean;
+    }
+    
+    public String getCurMenuId() {
+		return curMenuId;
+	}
+
+	public void setCurMenuId(String curMenuId) {
+		this.curMenuId = curMenuId;
+	}
+
+	public String[] getServicetitle()
+    {
+        return servicetitle;
+    }
+    
+    public void setServicetitle(String[] servicetitle)
+    {
+        this.servicetitle = servicetitle;
+    }
+
+    public List getResult()
+    {
+        return result;
+    }
+
+    public void setResult(List result)
+    {
+        this.result = result;
+    }
+
+    public String getErrormessage()
+    {
+        return errormessage;
+    }
+
+    public void setErrormessage(String errormessage)
+    {
+        this.errormessage = errormessage;
+    }
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="privilege" extends="struts-common" namespace="/privilege">		
+		<!-- 移动业务办理 -->
+		<action name="privilege" class="privilegeAction" method="selectOperationType">
+			<result name="operationType">/jsp/privilege/operationType.jsp</result>
+			<!--add begin g00140516 2011/11/23 R003C11L11n01 OR_huawei_201111_150 -->
+			<result name="newOperationType">/jsp/privilege/newOperationType.jsp</result>
+			<!--add end g00140516 2011/11/23 R003C11L11n01 OR_huawei_201111_150 -->
+			<result name="newOperationType2">/jsp/privilege/newOperationType2.jsp</result>
+			<!-- add begin hWX5316476 2015-6-12 OR_SD_201503_945-->
+			<result name="qryCustNcodeInfo">/jsp/privilege/groupNcode/privilegeGroup.jsp</result>
+			<!-- add end hWX5316476 2015-6-12 OR_SD_201503_945-->
+		</action>
+		
+		<action name="feeMessage" class="privilegeAction" method="qryFeeMessage">
+		</action>
+		
+		<action name="commitReception" class="privilegeAction" method="commitReception">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<!--add begin g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+		<action name="privilegeGroup" class="privilegeGroupAction" method="qryPrivilegeGroup">
+			<result name="qrySuccess">/jsp/privilege/group/privilegeGroup.jsp</result>
+		</action>
+		
+		<action name="confirmPrivilege" class="privilegeGroupAction" method="confirmPrivilege">
+			<result name="confirmPage">/jsp/privilege/group/confirmPrivilege.jsp</result>
+		</action>
+		
+		<action name="commitPrivilege" class="privilegeGroupAction" method="commitPrivilege">			
+		</action>
+		<!--add end g00140516 2012/07/10 R003C12L07n01 OR_NX_201205_649 -->
+		
+		<!-- add begin wWX217192 2015-04-07 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求 -->
+		<action name="jumpToSPRec" class="privilegeAction" method="jumpToSPRec">
+			<result name="success">/jsp/privilege/operationType.jsp</result>
+		</action>
+		
+		<!-- 山东梦网订购业务办理 -->
+		<action name="orderSP" class="privilegeAction" method="orderSP">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		<!-- add end wWX217192 2015-04-07 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求 -->
+		
+		<!-- add begin hWX5316476 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+		<action name="confirmPrivInfo" class="privilegeAction" method="confirmPrivInfo">
+			<result name="success">/jsp/privilege/groupNcode/confirmPrivInfo.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<action name="commitPrivNcode" class="privilegeAction" method="commitPrivNcode">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+			<result name="error">/commonError.jsp</result>			
+		</action>
+		<!-- add end hWX5316476 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购 -->
+	</package>	
+</struts>

@@ -1,0 +1,162 @@
+<%@ page contentType="text/html; charset=GBK"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>移动自助终端</title>
+<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<link href="${sessionScope.basePath }css/reset.css?ver=${jsVersion }" type="text/css" rel="stylesheet" />
+<link href="${sessionScope.basePath }css/style.css?ver=${jsVersion }" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="${sessionScope.basePath }js/public.js?ver=${jsVersion }"></script>
+<script	type="text/javascript" src="${sessionScope.basePath }js/script.js?ver=${jsVersion }"></script>
+<script type="text/javascript" src="${sessionScope.basePath }js/dialyzer.js?ver=${jsVersion }"></script>
+<script>
+var submitFlag = 0;
+
+document.onkeydown = pwdKeyboardDown;
+document.onkeyup = pwdKeyboardUp;
+function pwdKeyboardDown(e)
+{
+	var key = GetKeyCode(e);
+	//更正
+	if (key == 77) 
+	{
+		preventEvent(e);
+	}
+	
+	if (!KeyIsNumber(key))
+	{
+		return false;//这句话最关键
+	}
+}
+
+function KeyIsNumber(KeyCode) 
+{
+	//只允许输入0-9
+	if (KeyCode >= 48 && KeyCode <= 57)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+
+function pwdKeyboardUp(e)
+{
+	var key = GetKeyCode(e);
+	if (key == 82 || key == 220)
+	{
+		goback("<s:property value='#request.curMenuId' />");
+		return;
+	}
+}
+
+function goback(menuid)
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		
+		document.getElementById("curMenuId").value = menuid;
+		document.forms[0].target = "_self";
+		document.forms[0].action = "${sessionScope.basePath }login/backForward.action";
+		document.forms[0].submit();
+	}
+}
+
+function view(cycle,startdate,enddate,acctid,unionacct)
+{
+	if (submitFlag == 0)
+	{
+		submitFlag = 1;
+		
+		document.getElementById("cycle").value = cycle;
+		document.getElementById("startdate").value = startdate;
+		document.getElementById("enddate").value = enddate;
+		document.getElementById("acctid").value = acctid;
+		document.getElementById("unionacct").value = unionacct;
+
+		<%-- add begin hWX5316476 2015-6-24 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+		openRecWaitLoading();
+		<%-- add end hWX5316476 2015-6-24 OR_SD_201506_330  自助终端“详单查询”等页面增加‘正在努力查询，请稍后…’的等待画面--%>
+
+		// 提交
+		document.forms[0].target = "_self";
+		//document.forms[0].action = "${sessionScope.basePath }monthFee/monthFee_new.action";
+		document.forms[0].action = "${sessionScope.basePath }monthFee/isNewOrOld.action";
+		document.forms[0].submit();
+	}
+}
+</script>
+</head>
+	<body scroll="no">
+	<form name="actform" method="post">
+	
+		<!-- 月份 -->
+		<input type="hidden" id="month" name="month" value="<s:property value="#request.month" />"/>
+	
+		<!-- 客户信息 -->
+		
+		<!-- 客户名称 -->
+		<input type="hidden" id="custname" name="custname" value="<s:property value="#request.custname" />"/>
+		<!-- 品牌 -->
+		<input type="hidden" id="brandnm" name="brandnm" value="<s:property value="#request.brandnm" />"/>
+		<%--add by lKF60882 2016-10-10 OR_SD_201604_913_山东_关于在各账单查询功能界面中增加星级展示的需求--%>
+		<!-- 客户星级 -->
+		<input type="hidden" id="subsCreditName" name="subsCreditName" value="<s:property value="#request.subsCreditName" />"/>
+		<!-- 主体产品 -->
+		<input type="hidden" id="productnm" name="productnm" value="<s:property value="#request.productnm" />"/>
+		<!-- 用户ID -->
+		<input type="hidden" id="subsid" name="subsid" value="<s:property value="#request.subsid" />"/>
+		<!-- 令牌 -->
+		<input type="hidden" id="token" name="token" value="<s:property value="#request.token" />"/>
+		
+	    <!-- 账期信息 -->
+	    
+		<!-- 账期 -->
+		<input type="hidden" id="cycle" name="cycle" value=""/>
+		<!-- 开始时间 -->
+		<input type="hidden" id="startdate" name="startdate" value=""/>
+		<!-- 结束时间 -->
+		<input type="hidden" id="enddate" name="enddate" value=""/>
+		<!-- 主账号 -->
+		<input type="hidden" id="acctid" name="acctid" value=""/>		
+		<!-- 是否合户用户 -->
+		<input type="hidden" id="unionacct" name="unionacct" value=""/>		
+		
+		<%@ include file="/titleinc.jsp"%>
+
+			
+			<div class="main" id="main">
+				<%@ include file="/customer.jsp"%>
+				
+				<a href="#" class="bt10 fr mr43" onmousedown="this.className='bt10on fr mr43'" onmouseup="this.className='bt10 fr mr43';topGo('qryBill', 'serviceinfo/serviceInfoFunc.action'); return false;" style="display:inline">返回账单详单查询</a>
+				
+				<div class="blank30"></div>
+		          
+		        <p class="fs18 p20 ml50">请选择查询账期：</p>
+		          
+		        <div class="blank15"></div>
+		        
+		        <div class="pl160">
+		        	<ul>
+		        		<s:iterator value="cycleList" id="list" status="st">
+		        			<li class="cycle">
+			        				<a href="#" onmousedown="this.className='hover tc'" onmouseup="this.className='tc'" onclick="view('<s:property value="#list.cycle" />', '<s:property value="#list.startdate" />','<s:property value="#list.enddate" />','<s:property value="#list.acctid" />','<s:property value="#list.unionacct" />')">
+			        					<s:property value="#list.startdate" /> - <s:property value="#list.enddate" />
+			        				</a>
+		        			</li>
+		        		</s:iterator>
+		        	</ul>
+		        </div>		         			
+			</div>
+			
+			<%@ include file="/backinc.jsp"%>		
+	</form>
+</body>
+</html>

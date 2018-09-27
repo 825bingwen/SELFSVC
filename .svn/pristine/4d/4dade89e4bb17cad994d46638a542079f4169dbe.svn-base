@@ -1,0 +1,386 @@
+/*
+ * 文 件 名:  NonlocalChargeAction.java
+ * 版    权:  Huawei Technologies Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
+ * 描    述:  <山东异地缴费>
+ * 修 改 人:  jWX216858
+ * 修改时间:  Apr 27, 2015
+ * 跟踪单号:  <跟踪单号>
+ * 修改单号:  <修改单号>
+ * 修改内容:  <修改内容>
+ */
+package com.customize.sd.selfsvc.charge.action;
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.customize.sd.selfsvc.charge.service.FeeChargeService;
+import com.customize.sd.selfsvc.charge.service.INonlocalChargeService;
+import com.customize.sd.selfsvc.common.service.IFeeServiceSD;
+import com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * <异地缴费Action>
+ * <功能详细描述>
+ * 
+ * @author  jWX216858
+ * @version  [版本号, Apr 27, 2015]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本 OR_SD_201503_949_自助终端新增跨省缴费功能的支撑]
+ */
+@Controller
+@Scope("prototype")
+public class NonlocalChargeAction extends BaseAction
+{
+	/**
+	 *  序列化
+	 */
+	private static final long serialVersionUID = 3959283345948321551L;
+	
+	/**
+     * 日志
+     */
+    private static Log logger = LogFactory.getLog(NonlocalChargeAction.class);
+	
+    /**
+     * 错误信息
+     */ 
+    private String errormessage;
+    
+    /**
+     * 省外异地缴费service
+     */
+    @Autowired
+	private transient INonlocalChargeService nonlocalChargeService;
+	
+	/**
+	 * 缴费service
+	 */
+    @Autowired
+    @Qualifier("feeChargeServiceImpl")
+    private transient FeeChargeService feeChargeService;
+    
+    /**
+     * 山东缴费日志
+     */
+    @Autowired
+    private transient IFeeServiceSD feeServiceSDImpl;
+	
+	/**
+	 * 缴费信息
+	 */
+	private transient CardChargeLogVO chargeLogVO;
+	
+	/**
+	 * 手机号码
+	 */
+	private String servNumber;
+	
+	/**
+	 * 现金缴费金额明细
+	 */
+	private String cashDetail;
+	
+	/**
+	 * 银联返回错误码，银联卡扣款失败时用到
+	 */
+	private String unionRetCode = "";
+	
+	/**
+	 * 银联打印信息，银联卡缴费，打印小票时用到
+	 */
+	private String printcontext;
+	
+	/**
+	 * 是否可以打印小票标志，1-否，0-是
+	 */
+	private String canNotPrint;
+	
+	/**
+     * 手机号输入页面
+     * 
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+	public String inputNumber()
+	{
+		return SUCCESS;
+	}
+
+	/**
+     * 客户应缴费用总额查询
+     * 
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+	public String qryfeeChargeAccount()
+	{
+		logger.debug("qryfeeChargeAccount start");
+		String forward = "qryfeeChargeAccount";
+		
+		try
+		{
+			// 获取用户信息
+			chargeLogVO = nonlocalChargeService.qryfeeChargeAccount(servNumber, getCurMenuId());
+		}
+		catch (ReceptionException e)
+		{
+			// 设置错误信息
+			setErrormessage(e.getMessage());
+			logger.error(e.getMessage(), e);
+			forward = "error";
+		}
+		
+		logger.debug("qryfeeChargeAccount end");
+		return forward;
+	}
+	
+	/**
+     * 转向投币页面
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String cashCharge()
+    {
+    	// 屏蔽超时返回首页的功能
+        getRequest().setAttribute("sdCashFlag", "1");
+        
+        // 投币前记录缴费日志
+        chargeLogVO = feeServiceSDImpl.addChargeLog(
+        		chargeLogVO, 
+        		feeChargeService.getChargeLogOID(),
+        		"nonlocalPhone",
+        		Constants.PROVINCE_REGION_999);
+        return "cashCharge";
+    }
+    
+    /**
+     * 现金缴费提交处理
+     * @return String
+     */
+    public String cashChargeCommit()
+    {
+        logger.debug("cashChargeCommit start");
+        
+        logger.info("用户" + servNumber + "投币面额为：" + cashDetail + "；总投币金额为：" + chargeLogVO.gettMoney() + "；流水：" + chargeLogVO.getTerminalSeq());
+        
+        // 防止用户不投币，直接从浏览器中模拟交费请求
+        String referer = getRequest().getHeader("Referer");
+        if (null == referer)       
+        {
+            setErrormessage("无效请求");
+            return this.chargeError();
+        }    
+     
+        // 缴费提交
+        return this.chargeCommit();
+    }
+    
+    /**
+     * 缴费成功提交
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String chargeCommit()
+    {
+    	logger.debug("chargeCommit start");
+    	
+        try
+        {
+        	// 银联卡返回的tMoney单位为分
+        	if (Constants.PAYBYUNIONCARD.equals(chargeLogVO.getPayType()))
+        	{
+        		chargeLogVO.settMoney(CommonUtil.fenToYuan(chargeLogVO.gettMoney()));        
+        	}
+        	
+        	chargeLogVO = nonlocalChargeService.chargeCommit(chargeLogVO, getCurMenuId(), unionRetCode);
+        }
+        catch(ReceptionException e)
+        {
+			// 设置错误信息
+			setErrormessage(e.getMessage());
+        	logger.error(e.getMessage(), e);
+        	return "chargeError";
+        }
+    	logger.debug("chargeCommit end");
+    	return "chargeCommit";
+    }
+    
+    /**
+     * 转向银行卡缴费金额选择页面
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String cardCharge()
+    {
+		return "otherFee";
+    }
+    
+    /**
+     * 手工输入缴费金额
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String toInputMoney()
+    {
+    	return "toInputMoney";
+    }
+    
+    /**
+     * 转向银行卡缴费免责声明页面
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String dutyInfo()
+    {
+        return "dutyInfo";
+    }
+    
+    /**
+     * 银联卡缴费跳转到读取银联卡页面
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String toReadCard()
+    {
+    	 // 投币前记录缴费日志
+        chargeLogVO = feeServiceSDImpl.addChargeLog(
+        		chargeLogVO, 
+        		feeChargeService.getChargeLogOID(),
+        		"nonlocalPhone",
+        		Constants.PROVINCE_REGION_999);
+    	
+    	return "toReadCard";
+    }
+    
+    /**
+     * 扣款成功之后，更新交费日志
+     * 
+     * @throws Exception
+     * @see
+     */
+    public void updateCardChargeLog()
+    {
+    	try 
+    	{
+    		feeServiceSDImpl.updateCardChargeLog(chargeLogVO);
+    		writeXmlMsg(Constants.RECSTATUS_SUCCESS);
+		}
+    	catch (Exception e) 
+    	{
+    		logger.error(e.getMessage(), e);
+    		writeXmlMsg(Constants.RECSTATUS_FALID);
+    	}
+    }
+    
+    /**
+     * 缴费异常处理
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String chargeError()
+    {
+    	// 银联卡返回的金额单位是分，转换为元
+        if (Constants.PAYBYUNIONCARD.equals(chargeLogVO.getPayType()))
+        {
+            chargeLogVO.settMoney(CommonUtil.fenToYuan(chargeLogVO.gettMoney()));
+        }
+        
+    	feeServiceSDImpl.updateChargeLog(chargeLogVO, errormessage, unionRetCode, null);
+    	return "chargeError";
+    }
+    
+    /**
+     * <充值交费单笔充值最高金额>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String getMaxMoney()
+    {
+        return CommonUtil.getParamValue(Constants.NONLOCAL_CHARGE_MAX, "2000");
+    }
+
+    /**
+     * <充值交费单笔充值最低金额>
+     * <功能详细描述>
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public String getMinMoney()
+    {
+        return CommonUtil.getParamValue(Constants.NONLOCAL_CHARGE_MIN, "10");
+    }
+    
+	public CardChargeLogVO getChargeLogVO() {
+		return chargeLogVO;
+	}
+
+	public void setChargeLogVO(CardChargeLogVO chargeLogVO) {
+		this.chargeLogVO = chargeLogVO;
+	}
+
+	public String getErrormessage() {
+		return errormessage;
+	}
+
+	public void setErrormessage(String errormessage) {
+		this.errormessage = errormessage;
+	}
+
+	public String getServNumber() {
+		return servNumber;
+	}
+
+	public void setServNumber(String servNumber) {
+		this.servNumber = servNumber;
+	}
+
+	public String getCashDetail() {
+		return cashDetail;
+	}
+
+	public void setCashDetail(String cashDetail) {
+		this.cashDetail = cashDetail;
+	}
+
+	public String getUnionRetCode() {
+		return unionRetCode;
+	}
+
+	public void setUnionRetCode(String unionRetCode) {
+		this.unionRetCode = unionRetCode;
+	}
+
+	public String getPrintcontext() {
+		return printcontext;
+	}
+
+	public void setPrintcontext(String printcontext) {
+		this.printcontext = printcontext;
+	}
+
+	public String getCanNotPrint() {
+		return canNotPrint;
+	}
+
+	public void setCanNotPrint(String canNotPrint) {
+		this.canNotPrint = canNotPrint;
+	}
+	
+}

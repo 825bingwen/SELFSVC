@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 优惠办理Action -->
+	<bean id="privAcceptAction" parent="baseAction" class="com.customize.cq.selfsvc.privAccept.action.PrivAcceptCQAction" scope="prototype">
+	    <property name="privAcceptBean" ref="privAcceptBean"></property>
+	    <property name="feeChargeBean" ref="feeChargeBean"></property>
+	    <property name="feeChargeService" ref="feeChargeService"></property>
+	    <property name="privAcceptCQServiver" ref="privAcceptCQServiver"></property>
+	</bean>
+	
+	<!-- 优惠办理service -->
+	<bean id="privAcceptCQServiver" parent="baseTransactionProxy">
+	    <property name="target" ref="privAcceptServiceCQImpl"></property>
+	</bean>
+	
+	<!-- 优惠办理serviceImpl -->
+	<bean id="privAcceptServiceCQImpl" class="com.customize.cq.selfsvc.privAccept.service.PrivAcceptServiceCQImpl">
+	    <property name="privAcceptDaoCQImpl" ref="privAcceptDaoCQImpl"></property>
+	</bean>
+	
+	<!-- 优惠办理DaoImpl -->
+	<bean id="privAcceptDaoCQImpl" parent="baseDao" class="com.customize.cq.selfsvc.privAccept.dao.PrivAcceptDaoCQImpl"></bean>
+	
+ 
+	<!-- 优惠办理Bean -->
+	<bean id="privAcceptBean" parent="baseBeanCQ" class="com.customize.cq.selfsvc.bean.PrivAcceptCQBean"></bean>
+
+</beans>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="nxfeeservice" extends="struts-common" namespace="/nxfeeservice">		
+				
+		<!-- 宁夏账户余额查询 -->
+		<action name="qryAccBalance" class="feeBalanceAction" method="qryAccBalance">
+		    <result name="qryBalance">/jsp/customize/nx/feeservice/feeBalance/qrybalance.jsp</result> 
+		    <result name="error">/commonError.jsp</result> 
+		</action>
+		
+		<!-- 月账单查询 -->
+		<action name="monthBill" class="monthBillAction" method="selectBillMonth">
+		    <result name="selectBillMonth">/jsp/customize/nx/feeservice/monthBill/selectBillMonth.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 查询账期 -->
+		<action name="qryBillCycle" class="monthBillAction" method="qryBillCycle">
+			<result name="selectCycle">/jsp/customize/nx/feeservice/monthBill/selectCycle.jsp</result>
+			<result name="selectBillMonth">/jsp/customize/nx/feeservice/monthBill/selectBillMonth.jsp</result>
+			<result name="qryMonthBill_new">/jsp/customize/nx/feeservice/monthBill/MonthBill_new.jsp</result>
+			<result name="qryMonthBill_real_new">/jsp/customize/nx/feeservice/monthBill/MonthBill_real_new.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 月账单查询(老版&新版) -->
+		<action name="isNewOrOld" class="monthBillAction" method="isNewOrOld">
+			<result name="selectBillMonth">/jsp/customize/nx/feeservice/monthBill/selectBillMonth.jsp</result>
+			<result name="qryMonthBill_new">/jsp/customize/nx/feeservice/monthBill/MonthBill_new.jsp</result>
+			<result name="qryMonthBill_real_new">/jsp/customize/nx/feeservice/monthBill/MonthBill_real_new.jsp</result>
+			<result name="selectCycle">/jsp/customize/nx/feeservice/monthBill/selectCycle.jsp</result>
+			<result name="monthBillDetail">/jsp/customize/nx/feeservice/monthBill/monthBillDetail.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<action name="queryMonthBill" class="monthBillAction" method="queryMonthBill">
+		    <result name="monthBillDetail">/jsp/customize/nx/feeservice/monthBill/monthBillDetail.jsp</result>
+		</action>
+		
+		<!-- 当月费用结构图 -->
+		<action name="billfixedPieChart_new" class="monthBillAction" method="billfixedPieChart_new"></action>
+		
+		<!-- 当月费用结构图 -->
+		<action name="billfixedBarChart_new" class="monthBillAction" method="billfixedBarChart_new"></action>
+		
+		<!--  add begin m00227318 2012/08/29 V200R003C12L08n01 OR_NX_201207_1179 -->	
+		<!-- 在月账单查询页面中实现超链接 -->
+		<action name ="monthBillUrl" class="monthBillAction" method="montnBillUrl">
+		    <result name="qrymonthBillUrl">/jsp/customize/nx/feeservice/monthBill/MonthBill_Url.jsp</result>
+		</action>
+		<!--  add end m00227318 2012/08/29 V200R003C12L08n01 OR_NX_201207_1179 -->
+		
+	</package>	
+</struts>

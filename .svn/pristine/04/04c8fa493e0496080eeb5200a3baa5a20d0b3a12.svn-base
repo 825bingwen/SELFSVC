@@ -1,0 +1,1001 @@
+package com.gmcc.boss.selfsvc.common;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.struts2.ServletActionContext;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+
+import com.customize.sd.selfsvc.bean.ProdChangeBean;
+import com.customize.sd.selfsvc.prodChange.model.ProdChangePO;
+import com.gmcc.boss.selfsvc.bean.UserLoginBean;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.common.model.OfferInfoVO;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+import com.opensymphony.xwork2.ActionContext;
+
+
+/**
+ * 
+ * <山东自助终端对接智能营销平台(ISSS)>
+ * <功能详细描述>
+ * 
+ * @author  sWX219697
+ * @version  [版本号, Sep 12, 2014]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ * @remark create by sWX219697 2014-9-12 OR_SD_201409_556_自助终端营销功能优化
+ */
+public class ISSSInvokeUtil 
+{
+	private static Log logger = LogFactory.getLog(ISSSInvokeUtil.class);
+
+    /**
+     * 自助终端对接ISSS事件触发成功返回码
+     */
+    private static final String SUCCESS_CODE = "0";
+    
+    /**
+     * 主体产品变更Bean
+     */
+    private static ProdChangeBean prodChangeBean;
+    
+    /**
+     * 获取用户登录信息的Bean
+     */
+    private transient static UserLoginBean userLoginBean = null;
+    
+    /**
+     * <webService接口调用>
+     * <功能详细描述>
+     * @param wsUrl 
+     * @param operation
+     * @param reqMsg 请求报文
+     * @return
+     * @throws Exception
+     * @see [类、类#方法、类#成员]
+     */
+    private static String invoke(String wsUrl, String operation ,OMElement reqMsg) throws Exception
+    {
+		//初始化webService客户端并调用
+		return new Axis2Client(wsUrl, operation).invokeWebService(reqMsg);
+    }
+    
+    /**
+     * <营销事件调用>
+     * <功能详细描述>
+     * @param telnum 手机号码
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public static List<OfferInfoVO> eventInvoke(String telnum)
+    {
+    	//营销业务list
+		List<OfferInfoVO> offerList = new ArrayList<OfferInfoVO>();
+		
+		try 
+		{
+			//开关，1：功能开启，否则关闭
+	        if (!"1".equals(CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_SWITCH)))
+	        {
+	        	return offerList;
+	        }
+	        
+			// 根据事件类型获取配置的事件编码
+			String eventCode =  CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_EVENTCODE);
+			
+			// wsUrl
+			String wsUrl = CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_WSURL);
+			
+			// 调用方法
+			String operation = CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_OPERATION);
+			
+			//命名空间
+			String serNs = CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_SERNS);
+			
+			//命名空间
+			String xsdNs = CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_XSDNS);
+			
+			//用户信息session
+			NserCustomerSimp customer = (NserCustomerSimp)getSession(Constants.USER_INFO);
+			
+			//若用户登录，则传用户登录的手机号，否则传充值的手机号码
+			String msisdn = (null == customer ? telnum : customer.getServNumber());
+			
+			//组装请求报文
+			OMElement reqMsg = createEventMsg(eventCode,msisdn,serNs,xsdNs);
+			
+			// true:生产, false测试
+			if (true)
+			{
+				//调用webService接口并解析返回值
+				offerList = parseEventResponse(invoke(wsUrl, operation , reqMsg), msisdn);
+				
+				// add begin jWX216858 2015-4-30 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				Collections.sort(offerList);
+				// add end jWX216858 2015-4-30 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+			}
+			
+			//测试环境
+			else
+			{
+				//返回报文，分页展示
+				String responseMsg = "<RecommednationResult xmlns=\"http://service.prp.campaign.huawei.com\">"
+					+"<return>"
+					+"<resultCode>0</resultCode>"
+					+"<resultMessage>success!</resultMessage>"
+					+"<offerList>" 
+					//+"<desc>国际长途业务介绍</desc>"   introduceInfo
+					+"<offerName>国际长途</offerName>"
+					+"<offerAttrMap><key>offerCode</key><value>pp.gt.tp</value></offerAttrMap>"
+					+"<offerAttrMap><key>treatment_id</key><value>test11</value></offerAttrMap>"
+					+"<offerAttrMap><key>introduceInfo</key><value>国际长途业务介绍</value></offerAttrMap>"
+					+"<offerAttrMap><key>campaignName</key><value>国际长途考虑</value></offerAttrMap>"
+					+"<offerAttrMap><key>activityPriority</key><value>25</value></offerAttrMap>"
+					+"<offerType>4</offerType>"
+					+"<offerId> </offerId>"
+					+"</offerList>"
+					+"<offerList>" 
+					//+"<desc>国际漫游业务介绍</desc>" 
+					+"<offerName>国际漫游</offerName>"
+					+"<offerAttrMap><key>activity_name</key><value>中高端客户推荐办理家庭网</value></offerAttrMap>"
+					+"<offerAttrMap><key>offerCode</key><value>test22</value></offerAttrMap>"
+					+"<offerAttrMap><key>treatment_id</key><value>test222</value></offerAttrMap>"
+					+"<offerAttrMap><key>introduceInfo</key><value>国际漫游业务介绍</value></offerAttrMap>"
+					+"<offerAttrMap><key>campaignName</key><value>国际漫游考虑</value></offerAttrMap>"
+					+"<offerAttrMap><key>activityPriority</key><value>75</value></offerAttrMap>"
+					+"<offerType>1</offerType>"
+					+"<offerId></offerId>"
+					+"</offerList>"
+					+"<offerList>" 
+					//+"<desc>主体产品变更</desc>" 
+					+"<offerName>资费套餐</offerName>"
+					+"<offerAttrMap><key>activity_name</key><value>资费套餐</value></offerAttrMap>"
+					+"<offerAttrMap><key>offerCode</key><value>pp.gt.tp</value></offerAttrMap>"
+					+"<offerAttrMap><key>treatment_id</key><value>test222</value></offerAttrMap>"
+					+"<offerAttrMap><key>introduceInfo</key><value>主体产品变更</value></offerAttrMap>"
+					+"<offerAttrMap><key>activityPriority</key><value>100</value></offerAttrMap>"
+					+"<offerType>4</offerType>"
+					+"<offerId>1111</offerId>"
+					+"</offerList>"
+					+"<offerList>" 
+					//+"<desc>主体产品变更</desc>" 
+					+"<offerName>莱芜预付费全球通新88套餐</offerName>"
+					+"<offerAttrMap><key>activity_name</key><value>莱芜预付费全球通新88套餐</value></offerAttrMap>"
+					+"<offerAttrMap><key>offerCode</key><value>pp.gt.88tcy.634</value></offerAttrMap>"
+					+"<offerAttrMap><key>treatment_id</key><value>test222</value></offerAttrMap>"
+					+"<offerAttrMap><key>introduceInfo</key><value>主体产品变更</value></offerAttrMap>"
+					+"<offerAttrMap><key>activityPriority</key><value>100</value></offerAttrMap>"
+					+"<offerType>4</offerType>"
+					+"<offerId></offerId>"
+					+"</offerList>"
+					+"<offerList>" 
+					//+"<desc>主体产品变更</desc>" 
+					+"<offerName>后付费亲情卡轻松打</offerName>"
+					+"<offerAttrMap><key>activity_name</key><value>后付费亲情卡轻松打</value></offerAttrMap>"
+					+"<offerAttrMap><key>offerCode</key><value>pp.gt.88tcy.634</value></offerAttrMap>"
+					+"<offerAttrMap><key>treatment_id</key><value>test222</value></offerAttrMap>"
+					+"<offerAttrMap><key>introduceInfo</key><value>主体产品变更</value></offerAttrMap>"
+					+"<offerAttrMap><key>activityPriority</key><value>25</value></offerAttrMap>"
+					+"<offerType>4</offerType>"
+					+"<offerId></offerId>"
+					+"</offerList>"
+					+"</return>"
+					+"</RecommednationResult>";
+				
+				//发送请求并解析返回报文
+				offerList = parseEventResponse(responseMsg, msisdn);
+
+				// add begin jWX216858 2015-4-30 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				Collections.sort(offerList);
+				// add end jWX216858 2015-4-30 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+			}
+		} 
+		catch (Exception e)
+		{
+			logger.error("充值后调用营销事件接口失败：", e);
+		}
+		
+    	return offerList;
+    }
+    
+    /**
+     * <组装营销事件请求报文>
+     * <功能详细描述>
+     * @param eventCode
+     * @param servNum
+     * @param serNs
+     * @param xsdNs
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+	private static OMElement createEventMsg(String eventCode,String servNum,String serNs,String xsdNs) 
+	{
+		OMFactory fac = OMAbstractFactory.getOMFactory();  
+		
+		//创建命名空间
+        OMNamespace serNameSpace = fac.createOMNamespace(serNs,"");  
+        OMNamespace xsdNameSpace = fac.createOMNamespace(xsdNs, "");
+        
+        //组装请求报文信息
+        OMElement reqMsg = fac.createOMElement("getRecommendedOffer", serNameSpace);  
+        
+        //组装requestHeader信息对象，固定的请求头部
+        OMElement reqHeader = fac.createOMElement("requestHeader", serNameSpace);
+        
+        // 外围渠道ID，各渠道调用时传入一级渠道ID
+        OMElement accessChannel = fac.createOMElement("accessChannel", xsdNameSpace);
+        accessChannel.setText("bsacAtsv");  
+        reqHeader.addChild(accessChannel);  
+        
+        // 固定为101
+        OMElement beId = fac.createOMElement("beId", xsdNameSpace);
+        beId.setText("101");  
+        reqHeader.addChild(beId);  
+        
+        // 固定为2
+        OMElement language = fac.createOMElement("language", xsdNameSpace);
+        language.setText("2");  
+        reqHeader.addChild(language);  
+        
+        // 固定为：Campaign
+        OMElement operator = fac.createOMElement("operator", xsdNameSpace);
+        operator.setText("Campaign");  
+        reqHeader.addChild(operator);  
+        
+        // modify by lKF60882 2016-9-27 OR_SD_201609_165_山东_【营销平台升级】自助终端配合改造需求
+        OMElement password = fac.createOMElement("password", xsdNameSpace);
+        password.setText(CommonUtil.getParamValue(Constants.SH_ISSS_PASSWORD, "q3geiItxj4ljNLkI6OINDA=="));  
+        reqHeader.addChild(password);  
+        
+        // 填空
+        OMElement transactionId = fac.createOMElement("transactionId", xsdNameSpace);
+        transactionId.setText("xxxxx");  
+        reqHeader.addChild(transactionId); 
+        
+        reqMsg.addChild(reqHeader);
+        
+        //组装eventBody信息对象
+        OMElement eBody = fac.createOMElement("eventBody", serNameSpace);
+        
+        // 事件编码
+        OMElement eventCodeElt = fac.createOMElement("eventCode", xsdNameSpace);
+        eventCodeElt.setText(eventCode);  
+        eBody.addChild(eventCodeElt);  
+        
+        // 号码
+        OMElement msisdn = fac.createOMElement("msisdn", xsdNameSpace);
+        msisdn.setText(servNum);  
+        eBody.addChild(msisdn);  
+        
+        reqMsg.addChild(eBody);
+        reqMsg.build();  
+        
+        return reqMsg;
+
+	}
+	
+	/**
+	 * <解析营销事件返回报文>
+	 * <针对ISSS返回的营销推荐业务列表，若某条推荐信息对应的offerid节点不存在，
+	 * 则不再校验offertype。且若offerid节点存在，则offertype也存在>
+	 * @param resMsg
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark modify by sWX219697 2015-2-11 17:47:52 OR_SD_201502_198_ISSS自助终端、便利店支持无产品营销活动推荐
+	 */
+	@SuppressWarnings({ "unchecked", "unchecked" })
+	private static List<OfferInfoVO> parseEventResponse(String resMsg, String telnum)
+	{
+		//营销业务list
+		List<OfferInfoVO> resultList = new ArrayList<OfferInfoVO>();
+		
+		try 
+		{
+			Document body = DocumentHelper.parseText(resMsg);
+			
+			//获取返回报文的return根节点
+			Element root = body.getRootElement().element("return");
+			
+			List<Element> proList = new ArrayList<Element>();
+			
+			//遍历return下所有offerList节点
+			Iterator offerList = root.elementIterator("offerList");
+			
+			//遍历offerList节点下内容
+			while (offerList.hasNext())
+			{
+				Element eChild = (Element)offerList.next();
+				Element elOfferId = eChild.element("offerId");
+				
+				// add begin jWX216858 2015-5-11 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				/*if (!isElementNotNull(elOfferId))
+				{
+					continue;
+				}*/
+				// add end jWX216858 2015-5-11 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				
+				//判断offerType(1、套餐\ 2、营销方案 \3、SP \4：主体产品 ，5： 个人虚拟网产品，6：个人虚拟网优惠)，
+				Element elOfferType = eChild.element("offerType");
+				
+				//主体产品
+				if (isElementNotNull(elOfferId) 
+						&& "4".equals(elOfferType.getText()))
+				{
+					proList.add(eChild);
+					continue;
+				}
+				
+				//自助终端只展示 1套餐 4 主体产品
+				if (isElementNotNull(elOfferId) 
+						&& !"1".equals(elOfferType.getText()))
+				{
+					continue;
+				}
+				
+				OfferInfoVO offerInfo = new OfferInfoVO();
+				
+				//遍历解析业务扩展属性
+				Iterator attrChild = eChild.elementIterator("offerAttrMap");
+				
+				//解析业务扩展属性
+				while (attrChild.hasNext())
+				{
+					Element offerAttrMap = (Element)attrChild.next();
+					
+					String key = offerAttrMap.element("key").getText();
+					
+					// add begin jWX216858 2015-5-21 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+					Element valueObj = offerAttrMap.element("value");
+					
+					String value = "";
+					if (isElementNotNull(valueObj))
+					{
+						value = valueObj.getText();
+					}
+					// add end jWX216858 2015-5-21 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+					
+					//产品code，1、套餐:  产品包;产品; 2、优惠营销案: ;批次;档次 3、SP:;SP企业编码;SP业务编码
+					if ("offerCode".equals(key))
+					{
+						offerInfo.setOfferCode(value);
+					}
+					
+					//反馈时使用
+					if ("treatment_id".equals(key))
+					{
+						offerInfo.setTreatment_id(value);
+					}
+					
+					// add begin hWX5316476 2015-1-15 OR_SD_201412_699_ISSS：事件OFFER推荐接口-推荐话术优化（配套GA版本）
+					// 业务简介 营销话术desc 改用introduceInfo的value
+					if("introduceInfo".equals(key))
+					{
+					    offerInfo.setDesc(value);
+					}
+					// add end hWX5316476 2015-1-15 OR_SD_201412_699_ISSS：事件OFFER推荐接口-推荐话术优化（配套GA版本）
+					
+					//若offerId节点为空，直接将其offerAttrMap下campaignName对应的value放到页面上产品名称字段中
+					if("campaignName".equalsIgnoreCase(key) && !isElementNotNull(elOfferId))
+					{
+						//业务名称
+						offerInfo.setOfferName(value);
+					}
+					
+					// add begin jWX216858 2015-5-7 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+					// 活动优先级  低 --25,中 --50,较高 --75,高—100
+					if ("activityPriority".equals(key))
+					{
+						offerInfo.setPriority(value);
+						if ("".equals(value))
+						{
+							offerInfo.setPriority("0");
+						}
+					}
+					// add end jWX216858 2015-5-7 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				}
+				
+				if(isElementNotNull(elOfferId))
+				{
+					//根据offercode查找对应的菜单项（offercode与sh_menu_item表中issscode字段对应）
+					MenuInfoPO menuItem = parseMenuItem(offerInfo.getOfferCode());
+					
+					//若未找到对应的菜单，则该业务不进行展示
+					if (null == menuItem)
+					{
+						continue;
+					}
+					
+					//对应的menuId
+					offerInfo.setMenuId(menuItem.getMenuid());
+					
+					//对应的跳转url
+					offerInfo.setUrl(menuItem.getGuiobj());
+					
+					//业务名称
+					offerInfo.setOfferName(eChild.element("offerName").getText());
+					
+					//业务id，反馈时使用
+					offerInfo.setOfferId(eChild.element("offerId").getText());
+				}
+				else
+				{
+					//offerId为空时，赋值为1,用于反馈
+					offerInfo.setOfferId("1");
+				}
+				
+				resultList.add(offerInfo);
+			}
+			
+			// 将用户可办理的主体产品列表加入到resultList中
+			resultList.addAll(parseMainProductResponse(proList, telnum));
+		} 
+		catch (Exception e) 
+		{
+			logger.error("解析营销事件接口返回报文失败：", e);
+		}
+		
+		return resultList;
+	}
+	
+	/**
+	 * <xml元素节点是否为空>
+	 * <功能详细描述>
+	 * @param eChild
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 */
+	private static boolean isElementNotNull(Element eChild)
+	{
+		boolean isNull = false;
+		
+		if(null != eChild && StringUtils.isNotBlank(eChild.getText()))
+		{
+			isNull = true;
+		}
+		
+		return isNull;
+	}
+	
+	/**
+	 * * <解析营销事件返回报文>
+	 * <解析主体产品变更返回的列表信息>
+	 * @param resMsg
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 * @remark create by wWX217192 2014-10-16 OR_SD_201407_1310 ISSS:ISSS平台营销活动产品配置功能扩展
+	 */
+	@SuppressWarnings("unchecked")
+	private static List<OfferInfoVO> parseMainProductResponse(List<Element> proList, String telnum)
+	{
+		Element eChild = null;
+		
+		//遍历解析业务扩展属性
+		Iterator attrChild = null;
+		
+		//可变更主体产品列表list
+		List<OfferInfoVO> resultList = new ArrayList<OfferInfoVO>();
+		
+		OfferInfoVO offerInfo = null;
+		
+		// 智能营销平台返回的可变更主体产品列表list
+		List<OfferInfoVO> offerList = new ArrayList<OfferInfoVO>();
+		
+		// 查询当前登录用户可变更的主体产品列表list
+		List<ProdChangePO> prodChangeList = new ArrayList<ProdChangePO>();
+		
+		for(int i = 0; i < proList.size(); i++)
+		{
+			eChild = proList.get(i);
+			
+			attrChild = eChild.elementIterator("offerAttrMap");
+			
+			offerInfo = new OfferInfoVO();
+			
+			while (attrChild.hasNext())
+			{
+				Element offerAttrMap = (Element)attrChild.next();
+				
+				String key = offerAttrMap.element("key").getText();
+				
+				// add begin jWX216858 2015-5-21 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				Element valueObj = offerAttrMap.element("value");
+				
+				String value = "";
+				if (isElementNotNull(valueObj))
+				{
+					value = valueObj.getText();
+				}
+				// add end jWX216858 2015-5-21 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				
+				//产品code，1、套餐:  产品包;产品; 2、优惠营销案: ;批次;档次 3、SP:;SP企业编码;SP业务编码
+				if ("offerCode".equals(key))
+				{
+					offerInfo.setOfferCode(value);
+				}
+				
+				//反馈时使用
+				if ("treatment_id".equals(key))
+				{
+					offerInfo.setTreatment_id(value);
+				}
+				
+				// add begin hWX5316476 2015-1-15 OR_SD_201412_699_ISSS：事件OFFER推荐接口-推荐话术优化（配套GA版本）
+                // 业务简介 营销话术desc 改用introduceInfo的value
+                if("introduceInfo".equals(key))
+                {
+                    offerInfo.setDesc(value);
+                }
+                // add end hWX5316476 2015-1-15 OR_SD_201412_699_ISSS：事件OFFER推荐接口-推荐话术优化（配套GA版本）
+                
+                // add begin jWX216858 2015-5-7 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+				// 活动优先级  低 --25,中 --50,较高 --75,高—100
+				if ("activityPriority".equals(key))
+				{
+					offerInfo.setPriority(value);
+					if ("".equals(value))
+					{
+						offerInfo.setPriority("0");
+					}
+				}
+				// add end jWX216858 2015-5-7 OR_SD_201504_452_山东_ISSS自助终端UCD改造
+
+			}
+			
+			// 主体产品变更的MenuId
+			offerInfo.setMenuId("recProductChange");
+			
+			// 主体产品变更跳转的URL
+			offerInfo.setUrl("prodChange/qryMainProdChangeInfoList.action");
+			
+			//业务名称
+			offerInfo.setOfferName(eChild.element("offerName").getText());
+			
+			//业务id，反馈时使用
+			offerInfo.setOfferId(eChild.element("offerId").getText());
+
+			offerList.add(offerInfo);
+		}
+		
+		// 获取终端机信息
+		TerminalInfoPO termInfoPO = (TerminalInfoPO)getSession(Constants.TERMINAL_INFO);
+		
+		//用户信息session
+		NserCustomerSimp customer = (NserCustomerSimp)getSession(Constants.USER_INFO);
+		
+		//若用户登录，则传用户登录的手机号，否则传充值的手机号码
+		String servNum = (null == customer ? telnum : customer.getServNumber());
+		
+		if(null == customer || customer.getRegionID().isEmpty())
+		{
+			Map customerSimpMap = userLoginBean.getUserInfo(servNum, termInfoPO);
+	        
+	        if (customerSimpMap.get("customerSimp") != null)
+	        {
+	        	// 取登录用户信息
+	        	customer = (NserCustomerSimp) customerSimpMap.get("customerSimp");
+	        }
+		}
+		// 调用接口查询可转换主体产品信息
+		prodChangeList = prodChangeBean.qryMainProdInfo(termInfoPO, customer, "recProductChange");
+		
+		// 遍历智能营销平台返回的主体产品信息
+		for(OfferInfoVO offerInfoVo : offerList)
+		{
+			// 遍历客户可转换的主体产品信息
+			for(ProdChangePO prod : prodChangeList)
+			{
+				// 若智能营销平台返回的主体产品编码与客户可转换的主体产品编码相同，则将此主体产品信息展示至前台
+				if(offerInfoVo.getOfferCode().split(";", -1)[1].equals(prod.getNewProdId()))
+				{
+					resultList.add(offerInfoVo);
+					break;
+				}
+			}
+		}
+		
+		return resultList;
+	}
+	
+	/**
+	 * <根据offercode解析出对应的菜单>
+	 * <功能详细描述>
+	 * @return menuItem 菜单项
+	 * @see [类、类#方法、类#成员]
+	 */
+	@SuppressWarnings("unchecked")
+	private static MenuInfoPO parseMenuItem(String offerCode)
+	{
+		MenuInfoPO menuItem = null;
+		
+        // 获取终端机信息
+        TerminalInfoPO terminalInfoPO = (TerminalInfoPO)getSession(Constants.TERMINAL_INFO);
+        
+        //取出该终端机对应的菜单项
+		List<MenuInfoPO> menuItemList = (List<MenuInfoPO>)PublicCache.getInstance()
+			.getCachedData(terminalInfoPO.getTermgrpid());
+		
+	    if (StringUtils.isNotEmpty(offerCode) && null != menuItemList)
+	    {
+	    	for (int i = 0; i < menuItemList.size(); i++)
+	        {
+	    		
+	    		//根据offercode查找对应的菜单项
+	            if (offerCode.equals(menuItemList.get(i).getISSSCode()))
+	            {
+	                menuItem = menuItemList.get(i);
+	                break;
+	            }
+	        }
+	    }
+	    
+	    return menuItem;
+	}
+	
+    /**
+     * <反馈办理结果>
+     * <功能详细描述>
+     * @param servNum 手机号码
+     * @param offerInfo 业务信息类
+     * @see [类、类#方法、类#成员]
+     */
+    public static void feedbackInvoke(String servNum, String menuId, String status)
+    {
+		logger.debug("feedbackInvoke begin...");
+		
+		try 
+		{
+			//若参数为空，则直接返回
+			if(StringUtils.isEmpty(servNum) || StringUtils.isEmpty(menuId) || StringUtils.isEmpty(status))
+			{
+				logger.debug("feedbackInvoke end: the param is null...");
+				return;
+			}
+			
+            String province = CommonUtil.getParamValue(Constants.PROVINCE_ID);
+            
+            //判断省份，只有山东进行反馈
+            if (!Constants.PROOPERORGID_SD.equals(province))
+            {
+            	logger.debug("feedbackInvoke end: the province is not SD...");
+            	return;
+            }
+            
+            //若开关关闭则直接返回 1：开启，0：关闭
+            if (!"1".equals(CommonUtil.getParamValue(Constants.SH_CHARGE_WEBSERVICE_SWITCH)))
+            {
+            	logger.debug("feedbackInvoke end: the switch is not open...");
+            	return;
+            }
+			
+            //获取session中保存的业务信息
+            String sessionKey = getSessionKey(servNum, menuId);
+            
+            OfferInfoVO offerInfo = (OfferInfoVO)getSession(sessionKey);
+            
+            //没有相关的业务订购信息，直接返回
+			if (null == offerInfo)
+			{
+				logger.debug("feedbackInvoke end: there is no session about offerInfo...");
+				return;
+			}
+			
+			//订购状态
+			offerInfo.setStatus(status);
+			
+			//调用反馈接口
+			doFeedbackInvoke(servNum, offerInfo);
+		    
+		    //反馈后清除session
+		    removeSession(sessionKey);
+		} 
+		catch (Exception e)
+		{
+			logger.error("反馈接口调用失败：", e);
+		}
+		
+		logger.debug("feedbackInvoke end...");
+		
+    }
+    
+    /**
+     * <反馈接口调用>
+     * <功能详细描述>
+     * @param servNum 手机号码
+     * @param offerInfo 推荐信息
+     * @see [类、类#方法、类#成员]
+     * @remark create by sWX219697 2015-2-11 15:31:00 OR_SD_201502_198_ISSS自助终端、便利店支持无产品营销活动推荐
+     */
+    public static void doFeedbackInvoke(String servNum, OfferInfoVO offerInfo) throws Exception
+    {
+		// wsUrl
+		String wsUrl = CommonUtil.getParamValue(Constants.SH_ISSS_FEEDBACK_WSURL);
+		
+		// 调用方法
+		String operation = CommonUtil.getParamValue(Constants.SH_ISSS_FEEDBACK_OPERATION);
+		
+		//命名空间
+		String implNs = CommonUtil.getParamValue(Constants.SH_ISSS_FEEDBACK_IMPLNS);
+		
+		//命名空间1
+		String xsdNs = CommonUtil.getParamValue(Constants.SH_ISSS_FEEDBACK_XSDNS);
+		
+		//命名空间
+		String xsdNs1 = CommonUtil.getParamValue(Constants.SH_ISSS_FEEDBACK_XSDNS1);
+		
+		//组装请求报文
+		OMElement reqMsg = createFeedbackMsg(servNum, implNs, xsdNs, xsdNs1, offerInfo);
+		
+		//调用反馈webService接口
+	    invoke(wsUrl, operation, reqMsg);
+    }
+    
+    /**
+     * <组装反馈接口请求报文>
+     * <功能详细描述>
+     * @param servNum
+     * @param implNs
+     * @param xsdNs
+     * @param xsdNs1
+     * @param offerInfo
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+	private static OMElement createFeedbackMsg(String servNum,String implNs,String xsdNs, 
+			String xsdNs1, OfferInfoVO offerInfo) 
+	{
+		OMFactory fac = OMAbstractFactory.getOMFactory();  
+		
+		//创建命名空间
+        OMNamespace implNameSpace = fac.createOMNamespace(implNs,"");  
+        OMNamespace xsdNameSpace = fac.createOMNamespace(xsdNs, "");
+        OMNamespace xsd1NameSpace = fac.createOMNamespace(xsdNs1, "");
+        
+        //组装请求报文信息
+        OMElement reqMsg = fac.createOMElement("onFeedbackHandle", implNameSpace);  
+        
+        //组装requestParam
+        OMElement requestParam = fac.createOMElement("requestParam", implNameSpace);
+        
+        // contactId
+        OMElement contactId = fac.createOMElement("contactId", xsdNameSpace);
+        contactId.setText("");  
+        requestParam.addChild(contactId);
+        
+        // 电子邮件
+        OMElement email = fac.createOMElement("email", xsdNameSpace);
+        email.setText("");  
+        requestParam.addChild(email);
+        
+        //扩展属性
+        OMElement extAttr = fac.createOMElement("extAttr", xsdNameSpace);
+        
+        //treatment_id key
+        OMElement key = fac.createOMElement("key", xsdNameSpace);
+        key.setText("treatment_id");  
+        extAttr.addChild(key);
+        
+        //treatment_id value
+        OMElement value = fac.createOMElement("value", xsdNameSpace);
+        value.setText(offerInfo.getTreatment_id());  
+        extAttr.addChild(value);
+        
+        requestParam.addChild(extAttr);
+        
+        // 号码
+        OMElement msisdn = fac.createOMElement("msisdn", xsdNameSpace);
+        msisdn.setText(servNum);  
+        requestParam.addChild(msisdn); 
+        
+        //订购业务的属性
+        OMElement orderInfos = fac.createOMElement("orderInfos", xsdNameSpace);
+        
+        //业务id
+        OMElement offerId = fac.createOMElement("offerId", xsdNameSpace);
+        offerId.setText(offerInfo.getOfferId());  
+        orderInfos.addChild(offerId);
+        
+        //订购时间
+        OMElement orderTime = fac.createOMElement("orderTime", xsdNameSpace);
+        orderTime.setText(CommonUtil.dateToString(new Date(), "yyyyMMdd HH:mm:ss"));  
+        orderInfos.addChild(orderTime);
+        
+        //订购状态
+        OMElement orderStatus = fac.createOMElement("orderStatus", xsdNameSpace);
+        orderStatus.setText(offerInfo.getStatus());  
+        orderInfos.addChild(orderStatus);
+        requestParam.addChild(orderInfos);
+        
+        //组装requestHeader信息对象，固定的请求头部
+        OMElement requestHeader = fac.createOMElement("requestHeader", xsdNameSpace);
+        
+        // 外围渠道ID，各渠道调用时传入一级渠道ID
+        OMElement accessChannel = fac.createOMElement("accessChannel", xsd1NameSpace);
+        accessChannel.setText("bsacAtsv");  
+        requestHeader.addChild(accessChannel);  
+        
+        // 固定为101
+        OMElement beId = fac.createOMElement("beId", xsd1NameSpace);
+        beId.setText("101");  
+        requestHeader.addChild(beId);  
+        
+        // 固定为2
+        OMElement language = fac.createOMElement("language", xsd1NameSpace);
+        language.setText("2");  
+        requestHeader.addChild(language);  
+        
+        // 固定为：feedbackuser
+        OMElement operator = fac.createOMElement("operator", xsd1NameSpace);
+        operator.setText("feedbackuser");  
+        requestHeader.addChild(operator);  
+        
+        // modify by lKF60882 2016-9-27 OR_SD_201609_165_山东_【营销平台升级】自助终端配合改造需求
+        OMElement password = fac.createOMElement("password", xsd1NameSpace);
+        password.setText(CommonUtil.getParamValue(Constants.SH_ISSS_PASSWORD, "q3geiItxj4ljNLkI6OINDA=="));  
+        requestHeader.addChild(password);  
+        
+        // 填空
+        OMElement transactionId = fac.createOMElement("transactionId", xsd1NameSpace);
+        transactionId.setText("xxxxx");  
+        requestHeader.addChild(transactionId); 
+        
+        requestParam.addChild(requestHeader);
+        
+        //组装subscriberId信息对象
+        OMElement subscriberId = fac.createOMElement("subscriberId", xsdNameSpace);
+        subscriberId.setText("");
+        requestParam.addChild(subscriberId);
+        
+        reqMsg.addChild(requestParam);
+        reqMsg.build();  
+        
+        return reqMsg;
+
+	}
+	
+	/**
+	 * <设置ISSS返回的业务信息>
+	 * <功能详细描述>
+	 * @param telnum
+	 * @param menuId
+	 * @param offerId
+	 * @param treatment_id
+	 * @see [类、类#方法、类#成员]
+	 */
+	public static void setISSSSession(String telnum, String menuId, String offerId, String treatment_id, String offerCode)
+	{
+    	//智能营销平台返回的产品信息
+    	OfferInfoVO offerInfo = new OfferInfoVO();
+    	
+    	//战役id，反馈时使用
+    	offerInfo.setTreatment_id(treatment_id);
+    	
+    	//产品id，反馈时使用
+    	offerInfo.setOfferId(offerId);
+    	
+    	// 主体产品编码，若办理业务为主体产品变更时使用
+    	offerInfo.setOfferCode(offerCode);
+    	
+		//用户信息session
+		NserCustomerSimp customer = (NserCustomerSimp)getSession(Constants.USER_INFO);
+		
+		//若用户登录，则传用户登录的手机号，否则传充值的手机号码
+		String msisdn = (null == customer ? telnum : customer.getServNumber());
+        
+		String sessionKey = getSessionKey(msisdn, menuId);
+		
+		setSession(sessionKey, offerInfo);
+		
+	}
+    /**
+     * <设置session>
+     * <功能详细描述>
+     * @param key
+     * @param offerId 产品id，反馈时使用
+     * @param treatment_id 战役id，反馈时使用
+     * @see [类、类#方法、类#成员]
+     */
+	public static void setSession(String sessionKey, Object obj)
+	{
+        //先清除session
+    	removeSession(sessionKey);
+    	
+    	getRequest().getSession().setAttribute(sessionKey, obj);
+	}
+	
+	/**
+	 * <获取保存的session>
+	 * <功能详细描述>
+	 * @param key
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 */
+	private static Object getSession(String key)
+	{
+		//获取session
+        return getRequest().getSession().getAttribute(key);
+	}
+	
+	/**
+	 * <清除session>
+	 * <功能详细描述>
+	 * @param key
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 */
+	private static void removeSession(String key)
+	{
+		//获取session
+        HttpSession session = getRequest().getSession();
+        
+        //清除session
+        if(null != session.getAttribute(key))
+        {
+        	session.removeAttribute(key);
+        }
+        
+	}
+	
+	/**
+	 * <根据手机号码和menuId生成session key>
+	 * <功能详细描述>
+	 * @param telnum 手机号码
+	 * @param menuId 菜单id
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 */
+	private static String getSessionKey(String telnum , String menuId)
+	{
+		return "ISSS_"+telnum + "_" + menuId;
+	}
+	
+	/**
+	 * <获取request请求>
+	 * <功能详细描述>
+	 * @return
+	 * @see [类、类#方法、类#成员]
+	 */
+	private static HttpServletRequest getRequest()
+	{
+        ActionContext ctx = ActionContext.getContext();
+        HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST); 
+        
+        return request;
+	}
+
+	public ProdChangeBean getProdChangeBean() {
+		return prodChangeBean;
+	}
+
+	public void setProdChangeBean(ProdChangeBean prodChangeBean) {
+		this.prodChangeBean = prodChangeBean;
+	}
+
+	public UserLoginBean getUserLoginBean() {
+		return userLoginBean;
+	}
+
+	public void setUserLoginBean(UserLoginBean userLoginBean) {
+		this.userLoginBean = userLoginBean;
+	}
+	
+}

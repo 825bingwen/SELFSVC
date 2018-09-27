@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="rectelInfo" extends="struts-common" namespace="/rectelInfo">
+	    
+		<action name="inputMgtPwd" class="rectelInfoAction" method="inputMgtPwd">
+		    <result name="input">/jsp/customize/nx/rectelInfo/mgtpwdPage.jsp</result>
+		</action>
+		
+		<action name="checkMgtpwd" class="rectelInfoAction" method="checkMgtpwd">
+			<result name="registerPage">/jsp/customize/nx/rectelInfo/rectelPage.jsp</result>
+			<result name="logoutPage">/jsp/customize/nx/rectelInfo/logoutPage.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+		
+		<action name="logout" class="rectelInfoAction" method="logout">
+		</action>
+		
+		<action name="registerRectel" class="rectelInfoAction" method="registerRectel">
+		</action>
+	</package>
+</struts>

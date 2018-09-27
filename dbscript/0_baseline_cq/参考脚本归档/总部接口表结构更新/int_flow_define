@@ -1,0 +1,22 @@
+-- Create table
+create table INT_FLOW_DEFINE
+(
+  FLOWID      VARCHAR2(64) not null,
+  SORTORDER   NUMBER(2) not null,
+  FLOWSEGMENT VARCHAR2(4000) not null,
+  FLOWTYPE    NUMBER(2) default 0
+);
+-- Add comments to the table 
+comment on table INT_FLOW_DEFINE
+  is '流程脚本定义';
+-- Add comments to the columns 
+comment on column INT_FLOW_DEFINE.FLOWID
+  is '流程脚本ID';
+comment on column INT_FLOW_DEFINE.SORTORDER
+  is '流程脚本片段的排列序号';
+comment on column INT_FLOW_DEFINE.FLOWSEGMENT
+  is '流程脚本片段';
+comment on column INT_FLOW_DEFINE.FLOWTYPE
+  is '流程类型，0:客户端流程 1：服务端流程  2:opcode 虚拟用例';
+-- Create/Recreate indexes 
+create unique index INX_INT_FLOW_DEFINE on INT_FLOW_DEFINE (FLOWID, SORTORDER);

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="cardbusi/cardInstall" extends="struts-common" namespace="/cardInstall">		
+	
+		<!-- 全局错误页面 -->
+		<global-results>
+		    <result name="installError">/jsp/customize/sd/cardbusi/cardInstall/installError.jsp</result>
+		</global-results>
+
+		<!-- 异常页面 -->
+		<action name="installError" class="cardInstallAction" method="installError">
+		</action>
+		
+		<!-- 缴费时异常页面 -->
+		<action name="installFeeError" class="cardInstallAction" method="installFeeError"></action>
+		
+		<!-- 入网协议 -->
+		<action name="agreement" class="cardInstallAction" method="agreement">
+		    <result name="agreement">/jsp/customize/sd/cardbusi/cardInstall/agreement.jsp</result>
+		</action>
+		
+		<!-- 读取身份证 -->
+		<action name="readCert" class="cardInstallAction" method="readCert">
+		    <result name="readCert">/jsp/customize/sd/cardbusi/cardInstall/readCert.jsp</result>
+		</action>
+		
+		<!-- 身份证展现 -->
+		<action name="certShow" class="cardInstallAction" method="certShow">
+		    <result name="certShow">/jsp/customize/sd/cardbusi/cardInstall/certShow.jsp</result>
+		</action>
+		
+		<!-- 产品选择 -->
+		<action name="selectProd" class="cardInstallAction" method="selectProd">
+		    <result name="selectProd">/jsp/customize/sd/cardbusi/cardInstall/selectProd.jsp</result>
+		</action>
+		
+		<!-- 选号规则 -->
+		<action name="selectRule" class="cardInstallAction" method="selectRule">
+		    <result name="selectRule">/jsp/customize/sd/cardbusi/cardInstall/selectRule.jsp</result>
+		</action>
+		
+		<!-- 号码前缀后缀输入页面 -->
+		<action name="inputTelnumByRule" class="cardInstallAction" method="inputTelnumByRule">
+		    <result name="inputTelnumByRule">/jsp/customize/sd/cardbusi/cardInstall/inputTelnumByRule.jsp</result>
+		    <result name="bookedTelnum">/jsp/customize/sd/cardbusi/cardInstall/bookedTelnum.jsp</result>
+		</action>
+		
+		<!-- 手机号码查询列表 -->
+		<action name="telnumResult" class="cardInstallAction" method="telnumResult">
+		    <result name="telnumResult">/jsp/customize/sd/cardbusi/cardInstall/telnumResult.jsp</result>
+		</action>
+        
+        <!-- 号码资源暂选 -->
+        <action name="telnumTmpPick" class="cardInstallAction" method="telnumTmpPick"></action>
+        
+		<!-- 校验空白卡信息 -->
+		<action name="chkBlankCardInfo" class="cardInstallAction" method="chkBlankCardInfo"></action>
+		
+        <!-- 设置服务密码 -->
+        <action name="setPasswd" class="cardInstallAction" method="setPasswd">
+            <result name="setPasswd">/jsp/customize/sd/cardbusi/cardInstall/setPasswd.jsp</result>
+        </action>
+		
+		<!-- 记录写卡日志 -->
+		<action name="makeErrLog" class="cardInstallAction" method="makeErrLog">
+		</action>
+		
+		<!-- 费用确认页面 -->
+		<action name="feeConfirm" class="cardInstallAction" method="feeConfirm">
+		    <result name="feeConfirm">/jsp/customize/sd/cardbusi/cardInstall/feeConfirm.jsp</result>
+		</action>
+		
+		<!-- 校验当前时间银联卡缴费是否可用 -->
+		<action name="checkTime" class="cardInstallAction" method="checkTime">
+        </action>
+        
+		<!-- 选择缴费类型 -->
+		<action name="selectPayType" class="cardInstallAction" method="selectPayType">
+		    <result name="selectPayType">/jsp/customize/sd/cardbusi/cardInstall/selectPayType.jsp</result>
+		</action>
+		
+		<!-- 转向投币页面 -->
+		<action name="cashChargeInstall" class="cardInstallAction" method="cashChargeInstall">
+		    <result name="cashCharge">/jsp/customize/sd/cardbusi/cardInstall/cashCharge.jsp</result>
+		</action>
+		
+		<!-- 现金缴费开户 -->
+		<action name="cashCommitInstall" class="cardInstallAction" method="cashCommitInstall">
+		    <result name="success">/jsp/customize/sd/cardbusi/cardInstall/installCommit.jsp</result>
+		</action>
+		
+		<!-- 转向读银行卡页面 -->
+		<action name="toReadCard" class="cardInstallAction" method="toReadCard">
+		    <result name="toReadCard">/jsp/customize/sd/cardbusi/cardInstall/toReadCard.jsp</result>
+		</action>
+		
+		<!-- 银联卡缴费开户 -->
+		<action name="installCardCommit" class="cardInstallAction" method="installCardCommit">
+		    <result name="success">/jsp/customize/sd/cardbusi/cardInstall/installCommit.jsp</result>
+		</action>
+
+		<!-- 扣款成功之后，更新日志 -->
+		<action name="updateCardChargeLog" class="cardInstallAction" method="updateCardChargeLog">			
+		</action>
+		
+		<!-- 异步获取加密信息 -->
+		<action name="asynGetEncryptedData" class="cardInstallAction" method="asynGetEncryptedData">			
+		</action>
+		
+		<!-- 调用写卡失败作废卡信息接口-->
+		<action name="asynUpdateWriteCardResult" class="cardInstallAction" method="asynUpdateWriteCardResult">
+		</action>
+	</package>
+	
+	<!-- 补卡action -->
+	<package name="cardbusi/reissueCard" extends="struts-common" namespace="/reissueCard">		
+		
+		<!-- 全局错误页面 -->
+		<global-results>
+		    <result name="error">/jsp/customize/sd/cardbusi/reissueCard/reissueError.jsp</result>
+		</global-results>
+		
+		<!-- 输入手机号码 -->
+		<action name="inputTelnum" class="reissueCardAction" method="inputTelnum">
+		    <result name="inputTelnum">/jsp/customize/sd/cardbusi/reissueCard/inputTelnum.jsp</result>
+		</action>
+		
+		<!-- 读取身份证 -->
+		<action name="readCert" class="reissueCardAction" method="readCert">
+		    <result name="readCert">/jsp/customize/sd/cardbusi/reissueCard/readCert.jsp</result>
+		    <result name="error">/jsp/customize/sd/cardbusi/reissueCard/inputTelnum.jsp</result>
+		</action>
+		
+		<!-- 显示身份证信息 -->
+		<action name="certShow" class="reissueCardAction" method="certShow">
+		    <result name="certShow">/jsp/customize/sd/cardbusi/reissueCard/certShow.jsp</result>
+		</action>
+		
+		<!-- 检验身份证信息和用户补卡次数 -->
+		<action name="checkIdCardAndReissueNum" class="reissueCardAction" method="checkIdCardAndReissueNum">
+		</action>
+		
+		<!-- 检查空白卡资源 -->
+		<action name="authBlankCard" class="reissueCardAction" method="authBlankCard">
+		</action>
+
+		<!-- 费用确认 -->
+		<action name="feeConfirm" class="reissueCardAction" method="feeConfirm">
+			<result name="feeConfirm">/jsp/customize/sd/cardbusi/reissueCard/feeConfirm.jsp</result>
+		</action>
+		
+		<!-- 选择支付方式 -->
+		<action name="selectPayType" class="reissueCardAction" method="selectPayType">
+			<result name="selectType">/jsp/customize/sd/cardbusi/reissueCard/selectType.jsp</result>
+		</action>
+		
+		<!-- 现金缴费 -->
+		<action name="cashPay" class="reissueCardAction" method="cashPay">
+			<result name="cashPay">/jsp/customize/sd/cardbusi/reissueCard/cashChargePage.jsp</result>
+		</action>
+		
+		<!-- 校验当前时间银联卡缴费是否可用 -->
+		<action name="checkTime" class="cardInstallAction" method="checkTime">
+        </action>
+		
+		<!-- 银联卡缴费 -->
+		<action name="unionCardPay" class="reissueCardAction" method="unionCardPay">
+			<result name="readCard">/jsp/customize/sd/cardbusi/reissueCard/readCard.jsp</result>
+		</action>
+		
+		<!-- 记录现金/银联缴费异常日志，并跳转至错误页面-->
+		<action name="goChargeError" class="reissueCardAction" method="goChargeError">
+		</action>
+		
+		<!-- 补卡提交 -->
+		<action name="reissueCommit" class="reissueCardAction" method="reissueCommit">
+			<result name="success">/jsp/customize/sd/cardbusi/reissueCard/finish.jsp</result>
+		</action>
+		
+		<!-- 记录sh_rec_log日志 -->
+		<action name="addRecLog" class="reissueCardAction" method="addRecLog">
+		</action>
+		
+	</package>	
+	
+</struts>

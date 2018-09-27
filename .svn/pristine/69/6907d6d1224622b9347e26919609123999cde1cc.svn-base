@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="packageservice">
+	
+	<typeAlias alias="privServPackPO" type="com.customize.sd.selfsvc.packageService.model.PrivServPackPO" />
+	
+	<!-- 查询特惠业务包信息 -->
+    <select id="qryPrivServPackList"  resultClass="privServPackPO" parameterClass="privServPackPO">
+		SELECT T.NCODE,T.PRIVNAME,TO_CHAR(T.PRIVFEE/100,'999999.99') AS PRIVFEE,TO_CHAR(T.EFFDATE,'YYYY-MM-DD') AS EFFDATE,
+				TO_CHAR(T.ENDDATE,'YYYY-MM-DD') AS ENDDATE,T.PRIVDESC,T.BRAND,T.REGION
+		FROM  SH_PRIV_INFO T 
+		WHERE  
+			( T.BRAND = #brand# or t.brand = 'ALL')
+			 AND (T.REGION = #region# OR T.REGION = '999')
+			 AND (T.ENDDATE IS NULL  OR <![CDATA[T.ENDDATE > SYSDATE]]>)
+			 AND T.STATUS = '1'
+    </select>
+    
+    <!-- 根据ncode和地区查询特惠业务包详情 -->
+    <select id="qryPrivServPackDetail"  resultClass="privServPackPO" parameterClass="privServPackPO">
+		SELECT T.NCODE,T.PRIVNAME,TO_CHAR(T.PRIVFEE/100,'999999.99') AS PRIVFEE,TO_CHAR(T.EFFDATE,'YYYY-MM-DD') AS EFFDATE,
+			   TO_CHAR(T.ENDDATE,'YYYY-MM-DD') AS ENDDATE,T.PRIVDESC,T.BRAND,T.REGION
+		FROM  SH_PRIV_INFO T 
+		WHERE  T.NCODE = #ncode# AND T.STATUS = '1' AND T.REGION = #region# 
+    </select>
+</sqlMap>
+    

@@ -1,0 +1,874 @@
+package com.gmcc.boss.selfsvc.privilege.action;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.common.cbo.global.cbo.common.CTagSet;
+import com.gmcc.boss.selfsvc.bean.ReceptionBean;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.login.model.NserCustomerSimp;
+import com.gmcc.boss.selfsvc.privilege.model.CustNcodeInfoPO;
+import com.gmcc.boss.selfsvc.privilege.model.GroupNcodePO;
+import com.gmcc.boss.selfsvc.privilege.service.PrivilegeService;
+import com.gmcc.boss.selfsvc.resdata.model.MenuInfoPO;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+import com.gmcc.boss.selfsvc.util.CommonUtil;
+
+/**
+ * 业务处理模板
+ * 
+ * @author yKF28472
+ * @version [版本号, Apr 23, 2011]
+ * @see [相关类/方法]
+ * @since [产品/模块版本]
+ */
+public class PrivilegeAction extends BaseAction
+{
+    private static final long serialVersionUID = -3950351941316700610L;
+    
+    private static Log logger = LogFactory.getLog(PrivilegeAction.class);
+    
+    private String curMenuId = "";
+    
+    // 业务类型编码
+    private String nCode = "";
+    
+    // 提示信息
+    private String feeMessage = "";
+    
+    // 操作类型 1:开通 0:取消
+    private String operType = "";
+    
+    // 操作类型名称
+    private String operTypeName = "";
+    
+    // 菜单名称
+    private String menuName = "";
+    
+    // 描述信息
+    private String busidetail = "";
+    
+    // 业务办理及资费信息
+    private ReceptionBean receptionBean = null;
+    
+    //add begin g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150
+    /**
+     * 当前使用状态
+     */
+    private String currStatus = "";
+    //add end g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150
+    
+    private String statusDesp = "";
+    
+    /**
+     * 特别提示信息
+     */
+    private String tip = "";
+    
+    /**
+     * 成功提示信息
+     */
+    private String successMessage = "";
+    
+    /**
+     * parentMenuId 父菜单
+     */
+    private String parentMenuId = "";
+    
+    // add begin wWX217192 2015-04-02 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求
+    
+    /**
+     * 梦网订购时的手机号码
+     */
+    private String telnum = "";
+
+    /**
+     * 对象ID
+     */
+    private String spid = "";
+    
+    /**
+     * sp业务编码
+     */
+    private String bizid = "";
+    
+    // add begin hWX5316476 2015-4-28 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+    /**
+     * 组ID
+     */
+    private String groupid;
+    
+    /**
+     * 生效方式：1立即 3：下月
+     */
+    private String effectType;
+    
+    /**
+     * 客户办理同组业务信息
+     */
+    private CustNcodeInfoPO custNcodeInfo;
+    
+    /**
+     * 同组业务列表
+     */
+    private GroupNcodePO groupNcodePO;
+
+    // add end hWX5316476 2015-4-28 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购  
+    
+    /**
+     * 调用Service
+     */
+    private PrivilegeService privilegeService;
+    
+    private String spReceptionFlag = "";
+    
+	/**
+     * 调用后台接口，查询该业务对应的资费信息
+     * 
+     * @return
+     * @throws IOException
+     * @see
+     */
+    public String qryFeeMessage() throws IOException
+    {
+        logger.debug("qryFeeMessage Starting ...");
+        
+        this.getRequest().setCharacterEncoding("GBK");
+        this.getResponse().setContentType("text/html;charset=GBK");
+        
+        HttpSession session = this.getRequest().getSession();
+        
+        NserCustomerSimp customerSimp = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);
+        
+        TerminalInfoPO termInfo = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+        
+        String province = (String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID);
+        if (Constants.PROOPERORGID_NX.equals(province))
+        {
+            // 宁夏目前没有此接口，所以跳过此步
+            feeMessage = "";
+        }
+        else
+        {
+            feeMessage = receptionBean.qryFeeMessage(customerSimp, termInfo, nCode, curMenuId);
+        }
+        
+        logger.info("办理业务" + nCode + "时，自后台获取的提示信息为：" + feeMessage);
+        
+        if (feeMessage == null || feeMessage.trim().length() == 0)
+        {
+            feeMessage = "。";
+        }
+        else
+        {
+            feeMessage = "，" + feeMessage.trim() + "。";
+        }
+        
+        logger.debug("qryFeeMessage End");
+        
+        // 处理操作类型名称
+        if (Constants.SERVICE_APPLY.equals(operType))
+        {
+            operTypeName = "开通";
+        }
+        else if (Constants.SERVICE_CANCEL.equals(operType))
+        {
+            operTypeName = "退订";
+        }
+        
+        // 处理菜单名称
+        List totalMenus = (List)PublicCache.getInstance().getCachedData(termInfo.getTermgrpid());
+        
+        MenuInfoPO menu = null;
+        for (int i = 0; i < totalMenus.size(); i++)
+        {
+            menu = (MenuInfoPO)totalMenus.get(i);
+            if (this.curMenuId.equals(menu.getMenuid()))
+            {
+                break;
+            }
+            else
+            {
+                menu = null;
+            }
+        }
+        
+        if (menu != null)
+        {
+            busidetail = menu.getBusidetail();
+            menuName = menu.getMenuname();
+        }
+        PrintWriter out = this.getResponse().getWriter();
+        out.write(operTypeName + "," + menuName + "," + feeMessage);
+        out.flush();
+        
+        return null;
+    }
+    
+    /**
+     * 业务受理
+     * 
+     * @return
+     * @see
+     */
+    public String commitReception()
+    {
+        logger.debug("commitReception Starting ...");
+        
+        String forward = "failed";
+        
+        // add begin g00140516 2012/05/26 R003C12L05n01 OR_huawei_201201_94 出错时返回上一页面
+        this.getRequest().setAttribute("backStep", "-1");
+        // add end g00140516 2012/05/26 R003C12L05n01 OR_huawei_201201_94 出错时返回上一页面
+        
+        HttpSession session = this.getRequest().getSession();
+        
+        NserCustomerSimp customerSimp = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);
+        
+        TerminalInfoPO termInfo = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+        
+        String sOperType = "";
+        if (Constants.SERVICE_APPLY.equals(operType))
+        {
+        	operTypeName = "开通";
+        	sOperType = Constants.SERVICE_APPLY_STR;
+        }
+        else if (Constants.SERVICE_CANCEL.equals(operType))
+        {
+        	operTypeName = "退订";
+        	
+        	//若为国际漫游业务，则sOperType为ADD，否则为DEL
+        	sOperType = "recInternationalRoaming".equalsIgnoreCase(curMenuId) ? 
+        			Constants.SERVICE_APPLY_STR : Constants.SERVICE_CANCEL_STR;
+        }
+        
+        // 获取业务名称
+        menuName = CommonUtil.getMenuName(curMenuId);
+        
+        ReturnWrap result = receptionBean.recCommonServ(customerSimp, termInfo, nCode, sOperType, "", "", curMenuId);
+        // begin zKF66389 2015-09-15 9月份findbugs修改
+        //if (result != null && result.getStatus() == SSReturnCode.SUCCESS)
+        if (result.getStatus() == SSReturnCode.SUCCESS)
+        {
+            forward = "success";
+            
+            // modify begin cKF76106 2012/09/11 OR_NX_201209_258
+            CTagSet tagSet = (CTagSet) result.getReturnObject();
+            // 业务受理流水号
+            String recFormnum = "0";
+            
+            if(null != tagSet && null != tagSet.get("formnum"))
+            {
+                recFormnum = (String)tagSet.get("formnum");
+            }
+            
+            this.createRecLog(curMenuId, recFormnum, "0", "0", "业务受理成功");
+            // modify end cKF76106 2012/09/11 OR_NX_201209_258
+            
+            successMessage = menuName + operTypeName + "成功";
+            
+            logger.info("业务(" + nCode + ")受理成功");
+        }
+        else
+        {
+            // modify begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            String resultMsg = menuName + operTypeName + "失败";
+            
+            // modify begin yKF28472 宁夏取CRM返回的错误信息
+            String province = (String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID);
+            if (Constants.PROOPERORGID_NX.equals(province))
+            {
+            	// begin zKF66389 2015-09-15 9月份findbugs修改
+                //if (result != null && result.getReturnMsg() != null && !"".equals(result.getReturnMsg()))
+                if (result.getReturnMsg() != null && !"".equals(result.getReturnMsg()))
+                {
+                    resultMsg = result.getReturnMsg();
+                }
+            }
+            // modify end yKF28472 宁夏取CRM返回的错误信息
+            
+            resultMsg = getConvertMsg(resultMsg, "zz_04_20_000001", String.valueOf(result.getErrcode()), 
+                    formatParams(sOperType, curMenuId));          
+            
+            this.createRecLog(curMenuId, "0", "0", "1", resultMsg);
+            
+            this.getRequest().setAttribute("errormessage", resultMsg);
+            // modify begin g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+            
+            logger.error("业务(" + nCode + ")受理失败");
+        }
+        
+        logger.debug("commitReception End");
+        
+        return forward;
+    }
+    
+    public String selectOperationType()
+    {
+        //modify begin g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150
+        HttpSession session = this.getRequest().getSession();
+        
+        NserCustomerSimp customerSimp = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);        
+        
+        TerminalInfoPO termInfo = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+        
+        // 处理描述信息
+        List totalMenus = (List)PublicCache.getInstance().getCachedData(termInfo.getTermgrpid());
+        
+        MenuInfoPO menuInfo = null;
+        if (totalMenus != null && totalMenus.size() > 0)
+        {
+            for (int i = 0; i < totalMenus.size(); i++)
+            {
+                menuInfo = (MenuInfoPO)totalMenus.get(i);
+                if (this.curMenuId.equals(menuInfo.getMenuid()))
+                {
+                    busidetail = menuInfo.getBusidetail();
+                    
+                    // 父菜单
+                    parentMenuId = menuInfo.getParentid();
+                    
+                    //this.getRequest().
+                    break;
+                }
+            }
+        }
+        
+        // add begin hWX5316476 2015-4-28 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+        // 配置同组业务组ID，则进行查询同组业务订购信息，进行同组业务办理菜单
+        if(StringUtils.isNotBlank(groupid))
+        {
+           // 查询用户订购信息
+            return qryCustNcodeInfo();
+        }
+        // add end hWX5316476 2015-4-28 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+
+        if("privNewBusRec".equals(parentMenuId))
+        {
+        	return "operationType";
+        }
+        
+        // add begin g00140516 2012/09/17 R003C12L09n01 OR_HUB_201207_1089
+        String tipFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_PRODTIPS_FLAG);
+        if ("1".equals(tipFlag))
+        {
+            tip = receptionBean.qryNcodeTips(customerSimp, termInfo, nCode, "PCOpRec", "PCTIPNORMAL", curMenuId);
+        }
+        // add end g00140516 2012/09/17 R003C12L09n01 OR_HUB_201207_1089
+        
+        String province = (String)PublicCache.getInstance().getCachedData(Constants.PROVINCE_ID);
+        if (Constants.PROOPERORGID_HUB.equals(province))
+        {
+            String hotspotBz = (String)this.getRequest().getSession().getAttribute(termInfo.getTermid()+"_recHotspot");
+            
+            if ("1".equals(hotspotBz) )
+            {
+                
+                ReturnWrap result = receptionBean.qryRecStatusHub(customerSimp, termInfo, nCode, "QRY", "", "", curMenuId);
+                
+                this.parseResult(result);
+                
+                logger.info("用户" + customerSimp.getServNumber() + "的业务(" + nCode + ")的当前状态：" + statusDesp);
+                
+                return "newOperationType"; 
+            }
+        }
+		
+        String newFlowFlag = (String) PublicCache.getInstance().getCachedData("SH_REC_NEWFLOW");
+        if ("1".equals(newFlowFlag))
+		{
+        	// 湖北的查询使用单独的接口
+            if (Constants.PROOPERORGID_HUB.equals(province))
+            {
+            	ReturnWrap result = receptionBean.qryRecStatusHub(customerSimp, termInfo, nCode, "QRY", "", "", curMenuId);
+                
+                this.parseResult(result);
+            }
+            else
+            {
+            	ReturnWrap result = receptionBean.recCommonServ(customerSimp, termInfo, nCode, "QRY", "", "", curMenuId);
+            	
+            	//modify begin jWX216858 2014/08/08 V200R003C10LG0801 OR_huawei_201408_93   圈复杂度_自助终端（二阶段）
+            	this.parseResultByRecCommServ(result);
+            	//modify end jWX216858 2014/08/08 V200R003C10LG0801 OR_huawei_201408_93   圈复杂度_自助终端（二阶段）
+            }
+
+            logger.info("用户" + customerSimp.getServNumber() + "的业务(" + nCode + ")的当前状态：" + statusDesp);
+            
+            return "newOperationType2";
+        }        
+        //modify end g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150        
+        
+        return "operationType";
+    }
+    
+    /**
+     * <查询同组业务列表和用户已办理业务信息>
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-5-27 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    private String qryCustNcodeInfo()
+    {
+        try
+        {
+            // 查询同组业务列表和用户已办理业务信息
+            custNcodeInfo = privilegeService.qryCustNcodeInfo(groupid, curMenuId);
+        }
+        catch (ReceptionException e)
+        {
+            // 设置错误信息
+            getRequest().setAttribute("errormessage", e.getMessage()); 
+            return ERROR;
+        }
+        
+        return "qryCustNcodeInfo";
+    }
+    /**
+     * 确认选择业务信息
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-5-27 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public String confirmPrivInfo()
+    {
+        try
+        {
+            // 确认
+            groupNcodePO = privilegeService.qryGroupNcodeInfo(groupid,custNcodeInfo.getNextNcode());
+        }
+        catch (ReceptionException e)
+        {
+            // 设置错误信息
+            getRequest().setAttribute("errormessage", e.getMessage()); 
+            return ERROR;
+        }
+        
+        return SUCCESS;
+    }
+    
+    /**
+     * <提交办理同组业务>
+     * @return
+     * @see [类、类#方法、类#成员]
+     * @remark create by hWX5316476 2015-5-29 OR_SD_201503_945_山东_自助终端支撑‘同组’(即：切替)产品的订购
+     */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public String commitPrivNcode()
+    {
+        try
+        {
+            // 办理所选优惠业务
+            successMessage = privilegeService.commitPrivNcode(custNcodeInfo,groupNcodePO, operType, effectType, curMenuId);
+        }
+        catch (ReceptionException e)
+        {
+            // 设置错误信息
+            getRequest().setAttribute("errormessage", e.getMessage()); 
+            return ERROR;
+        }
+        
+        return SUCCESS;
+    }
+
+    /**
+     * 解析调用业务受理接口返回的内容
+     * @param result
+     * @remark create by jWX216858 2014/08/08 V200R003C10LG0801 OR_huawei_201408_93   圈复杂度_自助终端（二阶段）
+     */
+	private void parseResultByRecCommServ(ReturnWrap result)
+	{
+		// 正常
+		if (result != null && ((result.getStatus() == SSReturnCode.SUCCESS)
+		        || (result.getErrcode() >= 104 && result.getErrcode() <= 107)))
+		{
+		    CTagSet tagSet = (CTagSet) result.getReturnObject();
+		    
+		    String currNCode = "";                
+		    String nextNCode = "";
+		    
+		    if (tagSet != null)
+		    {
+		    	currNCode = tagSet.GetValue("curncode");
+		    	nextNCode = tagSet.GetValue("nextncode");
+		    }
+		    
+		    // 本月、下月均已开通
+		    if (StringUtils.isNotEmpty(currNCode) && StringUtils.isNotEmpty(nextNCode))
+		    {
+		        statusDesp = "已开通";
+		        
+		        currStatus = "1";
+		    }
+		    // 本月、下月均未开通
+		    else if (StringUtils.isEmpty(currNCode) && StringUtils.isEmpty(nextNCode))
+		    {
+		        statusDesp = "未开通";
+		        
+		        currStatus = "0";
+		    }
+		    // 本月已开通、下月失效
+		    else if (StringUtils.isNotEmpty(currNCode) && StringUtils.isEmpty(nextNCode))
+		    {
+		        statusDesp = "本月已开通，下月失效";
+		        
+		        currStatus = "0";
+		    }
+		    // 本月未开通、下月开通
+		    else if (StringUtils.isEmpty(currNCode) && StringUtils.isNotEmpty(nextNCode))
+		    {
+		        statusDesp = "本月未开通，下月开通";
+		        
+		        currStatus = "1";
+		    }                                      
+		}
+		 // 异常，按照未开通处理
+        else
+        {
+            statusDesp = "未开通";
+            
+            currStatus = "0";
+        }
+	}
+
+    /**
+     * 解析调用的返回的内容
+     * @param result
+     * @remark create by jWX216858 2014/08/08 V200R003C10LG0801 OR_huawei_201408_93   圈复杂度_自助终端（二阶段）
+     */
+	public void parseResult(ReturnWrap result)
+	{
+		// 正常
+		if (result != null && result.getStatus() == SSReturnCode.SUCCESS)
+		{
+			CRSet crset = (CRSet) result.getReturnObject();
+		    
+			// 有返回值
+			if (null != crset && 0 < crset.GetRowCount())
+			{
+				currStatus = crset.GetValue(0, 1);
+				
+				// 1，已开通
+				if ("1".equals(currStatus))
+				{
+					statusDesp = "已开通";
+				}
+				// 否则，未开通
+				else
+				{
+					statusDesp = "未开通";
+				}
+			}
+			// 无返回值，按照未开通进行处理
+			else
+			{
+				statusDesp = "未开通";
+		        
+		        currStatus = "0";
+			}                                      
+		}
+		// 异常，按照未开通处理
+		else
+		{
+		    statusDesp = "未开通";
+		    
+		    currStatus = "0";
+		}
+	}
+    
+    /**
+     * 提示信息改造，格式化参数
+     * 
+     * @param operType 操作类型
+     * @param menuID 业务ID
+     * @return
+     * @see 
+     * @remark create g00140516 2012/08/07 R003C12L08n01 湖北电子渠道二期提示信息改造
+     */
+    private String[] formatParams(String operType, String menuID)
+    {
+        String[] params = new String[]{"", ""};
+        
+        if (Constants.SERVICE_APPLY_STR.equalsIgnoreCase(operType))
+        {
+            params[0] = "开通";
+        }
+        else if (Constants.SERVICE_CANCEL_STR.equalsIgnoreCase(operType))
+        {
+            params[0] = "取消";
+        }
+        
+        params[1] = CommonUtil.getMenuName(menuID);
+        
+        return params;
+    }
+    
+    public String jumpToSPRec()
+    {
+    	spReceptionFlag = (String) PublicCache.getInstance().getCachedData(Constants.SH_SPRECEPTION_FLAG);
+    	
+    	return SUCCESS;
+    }
+    
+    /**
+     * 山东梦网订购业务
+     * @return
+     * @remark create by wWX217192 2015-03-30 OR_SD_201502_373_山东_关于自助终端承载和娱乐包新业务的支撑需求
+     */
+    public String orderSP()
+    {
+    	logger.debug("orderSP Start...");
+    	
+    	HttpSession session = this.getRequest().getSession();
+        
+        NserCustomerSimp customer = (NserCustomerSimp)session.getAttribute(Constants.USER_INFO);        
+        
+        TerminalInfoPO termInfo = (TerminalInfoPO)session.getAttribute(Constants.TERMINAL_INFO);
+    	
+    	
+        String forward = "error";
+        try
+        {
+    	// 调用山东梦网业务订购接口
+    	String flag = privilegeService.addSPReception(termInfo, customer, curMenuId, telnum, spid, bizid);
+    	
+    	if(SSReturnCode.SUCCESS == Integer.valueOf(flag))
+    	{
+    		setSuccessMessage("业务办理成功！");
+    		
+    		forward = "success";
+    	}
+        }
+        catch(ReceptionException re)
+        {
+        	// 设置错误信息
+            getRequest().setAttribute("errormessage", re.getMessage()); 
+        }
+    	
+    	logger.debug("orderSP End...");
+    	
+    	return forward;
+    }
+    
+    public String getCurMenuId() {
+		return curMenuId;
+	}
+
+	public void setCurMenuId(String curMenuId) {
+		this.curMenuId = curMenuId;
+	}
+
+	public String getNCode()
+    {
+        return nCode;
+    }
+    
+    public void setNCode(String code)
+    {
+        nCode = code;
+    }
+    
+    public String getFeeMessage()
+    {
+        return feeMessage;
+    }
+    
+    public String getGroupid()
+    {
+        return groupid;
+    }
+
+    public void setGroupid(String groupid)
+    {
+        this.groupid = groupid;
+    }
+
+    public CustNcodeInfoPO getCustNcodeInfo()
+    {
+        return custNcodeInfo;
+    }
+
+    public void setCustNcodeInfo(CustNcodeInfoPO custNcodeInfo)
+    {
+        this.custNcodeInfo = custNcodeInfo;
+    }
+
+    public void setFeeMessage(String feeMessage)
+    {
+        this.feeMessage = feeMessage;
+    }
+    
+    public String getOperType()
+    {
+        return operType;
+    }
+    
+    public void setOperType(String operType)
+    {
+        this.operType = operType;
+    }
+    
+    public ReceptionBean getReceptionBean()
+    {
+        return receptionBean;
+    }
+    
+    public void setReceptionBean(ReceptionBean receptionBean)
+    {
+        this.receptionBean = receptionBean;
+    }
+    
+    public String getOperTypeName()
+    {
+        return operTypeName;
+    }
+    
+    public void setOperTypeName(String operTypeName)
+    {
+        this.operTypeName = operTypeName;
+    }
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public String getMenuName()
+    {
+        return menuName;
+    }
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public void setMenuName(String menuName)
+    {
+        this.menuName = menuName;
+    }
+
+    //add begin g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150
+    public String getCurrStatus()
+    {
+        return currStatus;
+    }
+
+    public void setCurrStatus(String currStatus)
+    {
+        this.currStatus = currStatus;
+    }
+    //add end g00140516 2011/11/08 R003C11L11n01 OR_huawei_201111_150
+    
+    public String getBusidetail()
+    {
+        return busidetail;
+    }
+    
+    public void setBusidetail(String busidetail)
+    {
+        this.busidetail = busidetail;
+    }
+
+    public String getStatusDesp()
+    {
+        return statusDesp;
+    }
+
+    public void setStatusDesp(String statusDesp)
+    {
+        this.statusDesp = statusDesp;
+    }
+
+    public String getTip()
+    {
+        return tip;
+    }
+
+    public void setTip(String tip)
+    {
+        this.tip = tip;
+    }
+        
+    public String getSuccessMessage()
+    {
+		return successMessage;
+	}
+
+	public void setSuccessMessage(String successMessage)
+	{
+		this.successMessage = successMessage;
+	}
+
+	public String getParentMenuId() {
+		return parentMenuId;
+	}
+
+	public void setParentMenuId(String parentMenuId) {
+		this.parentMenuId = parentMenuId;
+	}
+
+	public String getTelnum() {
+		return telnum;
+	}
+
+	public void setTelnum(String telnum) {
+		this.telnum = telnum;
+	}
+
+	public String getSpid() {
+		return spid;
+	}
+
+	public void setSpid(String spid) {
+		this.spid = spid;
+	}
+
+	public String getBizid() {
+		return bizid;
+	}
+
+	public void setBizid(String bizid) {
+		this.bizid = bizid;
+	}
+
+	public PrivilegeService getPrivilegeService() {
+		return privilegeService;
+	}
+
+	public void setPrivilegeService(PrivilegeService privilegeService) {
+		this.privilegeService = privilegeService;
+	}
+
+	public String getSpReceptionFlag() {
+		return spReceptionFlag;
+	}
+
+	public void setSpReceptionFlag(String spReceptionFlag) {
+		this.spReceptionFlag = spReceptionFlag;
+	}
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public String getEffectType()
+    {
+        return effectType;
+    }
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"NM_CONFUSING","EC_UNRELATED_TYPES"})
+    public void setEffectType(String effectType)
+    {
+        this.effectType = effectType;
+    }
+
+    public GroupNcodePO getGroupNcodePO()
+    {
+        return groupNcodePO;
+    }
+
+    public void setGroupNcodePO(GroupNcodePO groupNcodePO)
+    {
+        this.groupNcodePO = groupNcodePO;
+    }
+}

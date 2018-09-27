@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- 充值卡充值Bean -->
+	<bean id="cardPayBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.CardPayBean"></bean>
+	
+	<!-- 充值卡充值Action -->
+	<bean id="cardPayAction" parent="baseAction" class="com.gmcc.boss.selfsvc.charge.action.CardPayAction" scope="prototype">
+	    <property name="cardPayBean" ref="cardPayBean"></property>
+	</bean>
+	
+	<!-- 手机支付主账户充值 -->
+	<bean id="cmpayDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.charge.dao.CmpayDaoImpl" autowire="byName" />
+	
+	<bean id="cmpayServiceImpl" class="com.gmcc.boss.selfsvc.charge.service.CmpayServiceImpl" autowire="byName" >
+		<property name="cmpayDaoImpl">
+			<ref bean="cmpayDaoImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="cmpayService" parent="baseTransactionProxy">
+		<property name="target">
+			<ref local="cmpayServiceImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="cmpayBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.CmpayBean" scope="prototype"></bean>
+	<bean id="cmpayAction" parent="baseAction" class="com.gmcc.boss.selfsvc.charge.action.CmpayAction" scope="prototype">
+		<property name="cmpayBean">
+			<ref local="cmpayBean" />
+		</property>
+		<property name="cmpayService">
+			<ref local="cmpayService" />
+		</property>
+	</bean>
+	
+	<!-- 充值通用action，用于记录日志 -->
+	<bean id="chargeAction" parent="baseAction" class="com.gmcc.boss.selfsvc.charge.action.ChargeAction" scope="prototype">
+	    <property name="chargeService" ref="chargeService"/>
+	</bean>
+	
+	<bean id="chargeService" parent="baseTransactionProxy">
+	    <property name="target" ref="chargeServiceImpl"/>
+	</bean>
+	
+	<bean id="chargeServiceImpl" class="com.gmcc.boss.selfsvc.charge.service.ChargeServiceImpl">
+	    <property name="chargeDaoImpl" ref="chargeDaoImpl"/>
+	</bean>
+	
+	<bean id="chargeDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.charge.dao.ChargeDaoImpl"></bean>
+	
+	<!-- 跨省异地缴费bean  -->
+	<bean id="nonlocalChargeBean" parent="baseBean" class="com.gmcc.boss.selfsvc.bean.NonlocalChargeBean"></bean>
+</beans>

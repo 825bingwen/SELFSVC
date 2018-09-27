@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="privAccept">
+	<!-- 优惠受理添加日志 -->
+	
+	<typeAlias alias="privLogVO" type="com.customize.hub.selfsvc.privAccept.model.PrivLogVO" />
+	
+	<!-- 添加受理优惠日志记录 -->
+	<insert id="insertPrivLog" parameterClass="privLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="privLogOID">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		    INSERT INTO SH_LOG_PRIV(PRIVLOGOID,CHARGEID,REGION,SERVNUMBER,PRIVID,PRIVNCODE,
+		    			RECDATE, PRIVFEE,TOFEE,CHARGEFEE,CHARGETYPE, RECSTAUTS, RECSTAUTSDESC,RECTYPE)
+	        VALUES(
+	             #privLogOID#, #chargeID#,#region#,#servnumber#,#privId#,#privNcode#,to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'),
+		         #privFee#,#toFee#,#chargeFee#,#chargeType#,#recStatus#, #recStatusDesc#, #recType#)
+	</insert>
+</sqlMap>

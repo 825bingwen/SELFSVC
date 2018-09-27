@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="freecharge" extends="struts-common" namespace="/freecharge">		
+
+		<!-- 转到充值卡充值页面-->
+		<action name="cardPay" class="cardPayAction" method="inputNumber">
+		    <result name="inputNumber">/jsp/charge/cardPay/inputNumber.jsp</result>
+		</action>
+		
+		<!-- 充值卡充值 -->
+		<action name="cardPayCommit" class="cardPayAction" method="cardPayCommit">
+		    <result name="success">/commonSuccess.jsp</result>
+		    <result name="error">/commonError.jsp</result>
+		</action>
+	</package>	
+</struts>

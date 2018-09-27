@@ -1,0 +1,493 @@
+package com.customize.hub.selfsvc.bean;
+
+import com.customize.hub.selfsvc.bean.impl.BaseBeanHubImpl;
+import com.customize.hub.selfsvc.chooseTel.model.ServerNumPO;
+import com.gmcc.boss.common.base.ReturnWrap;
+import com.gmcc.boss.common.cbo.global.cbo.common.CRSet;
+import com.gmcc.boss.selfsvc.cache.PublicCache;
+import com.gmcc.boss.selfsvc.common.Constants;
+import com.gmcc.boss.selfsvc.common.SSReturnCode;
+import com.gmcc.boss.selfsvc.terminfo.model.TerminalInfoPO;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 预约选号
+ * <一句话功能简述>
+ * <功能详细描述>
+ * 
+ * @author  yKF28472
+ * @version  [版本号, Apr 19, 2011]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class ChooseTelBean extends BaseBeanHubImpl
+{
+    /**
+     * 查询可预约号码列表
+     * 
+     * @param terminalInfoPO 终端信息
+     * @param curMenuId 当前菜单
+     * @param model 号码模式
+     * @param pur 号码用途(默认传"rsupSal")
+     * @param pageflag 号码页数
+     * @return 可预约号码列表
+     * @see 
+     */
+    public List<ServerNumPO> phoneNumQuery(TerminalInfoPO terminalInfoPO,String curMenuId,String model,String pur,String pageflag)
+    {
+        // 如果是新版自助选号功能，选号费用默认参数表中配置的值
+        String telFee = (String) PublicCache.getInstance().getCachedData(Constants.SH_TEL_FEE);
+        if (null == telFee)
+        {
+        	telFee = "5000";
+        }
+        
+        String newVersion = (String) PublicCache.getInstance().getCachedData(Constants.SH_SELECTTEL_NEW);
+        
+        String maxCount = (String) PublicCache.getInstance().getCachedData(Constants.SH_SELECTTEL_MAXCOUNT);
+        if (null == maxCount)
+        {
+        	maxCount = "2000";
+        }
+        
+        List<ServerNumPO> telnums = new ArrayList<ServerNumPO>();
+        
+        Map<String, String> paramMap = new HashMap<String, String>();
+        
+        // 新版标识
+        paramMap.put("newVersion", newVersion);
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //区域
+        paramMap.put("region", terminalInfoPO.getRegion());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        //号码模式
+        paramMap.put("model", model);
+        
+        // 号码用途(默认传"rsupSal")
+        paramMap.put("pur", pur);
+        
+        // 号码页数
+        paramMap.put("pageIndex", pageflag);
+        
+        // 特殊号码预付金上限
+        paramMap.put("maxPrice", "");
+
+        // 特殊号码预付金下限
+        paramMap.put("minPrice", "");
+        
+        // 产品品牌
+        paramMap.put("prodType", "");
+        
+        // 号码类型
+        paramMap.put("telType", "rsclTgsm");
+        
+        // 返回记录最大的数量
+        paramMap.put("maxcount", maxCount);
+        
+        // 按地市查询
+        paramMap.put("iscountry", "0");
+        
+        paramMap.put("telnum", "");
+        
+        paramMap.put("orgid", "");
+
+        ReturnWrap rw = super.getSelfSvcCallHub().phoneNumQuery(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            CRSet crset = (CRSet) rw.getReturnObject();
+            
+            if (crset != null)
+            {
+                ServerNumPO serverNumPO = null;
+                String fee = "";
+                
+                for (int i = 0; i < crset.GetRowCount(); i++)
+                {
+                    serverNumPO = new ServerNumPO();
+                    
+                    serverNumPO.setTelnum(crset.GetValue(i, 0));// 手机号码
+                    
+                    // 新版：CRM有返回费用时，使用CRM返回的费用；CRM未返回费用时，使用默认费用
+                    if ("1".equals(newVersion))
+                    {
+                        fee = crset.GetValue(i, 1);
+                        
+                        if (null == fee || "".equals(fee.trim()))
+                        {
+                            serverNumPO.setSeltel_prepayfee(telFee);// 预存费用
+                        }
+                        else
+                        {
+                            serverNumPO.setSeltel_prepayfee(fee);// 预存费用
+                        }
+                    }
+                    else
+                    {
+                        serverNumPO.setSeltel_prepayfee(crset.GetValue(i, 1));// 预存费用
+                    }
+                    // add begin liutao 2016-07-30 OR_HUB_201603_1191  自助终端显示内容优化需求（张德伟）
+                    serverNumPO.setMinimumCharge(crset.GetValue(i, 2));// 最低消费金额
+                    telnums.add(serverNumPO);
+                }
+            }
+        }
+        
+        return telnums;
+    }
+    
+    /**
+     * 预定号码
+     * <功能详细描述>
+     * @param terminalInfoPO 终端信息
+     * @param curMenuId 当前菜单
+     * @param telnum 被预定号码
+     * @param seltelprepay 预存费
+     * @param channelid 受理渠道, 默认："bsacAtsv"
+     * @param CredentFlag 凭证类型(0 验证码；1 身份证；2 无凭证)
+     * @param certtype 证件类型,默认：IdCard，没有为空
+     * @param certid 证件号码,没有为空
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public Map bespeakPhone(TerminalInfoPO terminalInfoPO,String curMenuId,String telnum,String seltelprepay,String channelid,String credentFlag,String certtype,String certid)
+    {
+        Map paramMap = new HashMap();
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //区域
+        paramMap.put("region", terminalInfoPO.getRegion());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        // 被预定号码
+        paramMap.put("telnum", telnum);
+        
+        // 预存费
+        paramMap.put("seltelprepay", seltelprepay);
+        
+        // 受理渠道, 默认："bsacAtsv"
+        paramMap.put("channelid", channelid);
+        
+        // 凭证类型(0 验证码；1 身份证；2 无凭证)
+        paramMap.put("credentFlag", credentFlag);
+        
+        // 证件类型,默认：IdCard，没有为空
+        paramMap.put("certtype", certtype);
+        
+        // 证件号码,没有为空
+        paramMap.put("certid", certid);
+        
+        ReturnWrap rw = super.getSelfSvcCallHub().bespeakPhone(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            //设置返回结果
+            map.put("returnObj", rw.getReturnObject());
+            
+            //设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+        
+    }
+    
+    /**
+     * 查网号列表(如：135、136)
+     * <功能详细描述>
+     * @param terminalInfoPO 终端信息
+     * @param curMenuId 当前菜单
+     * @param netType 网络类型(默认传"GSM")
+     * @param pur 号码用途(默认传"rsupSal")
+     * @param orgid 地区
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public Map netNbrQuery(TerminalInfoPO terminalInfoPO,String curMenuId,String netType,String pur)
+    {
+        Map paramMap = new HashMap();
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //区域
+        paramMap.put("region", terminalInfoPO.getRegion());
+        
+        //设置终端机OrgId
+        paramMap.put("orgId", terminalInfoPO.getOrgid());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        //网号
+        paramMap.put("netType", netType);
+        
+        // 号码用途(默认传"rsupSal")
+        paramMap.put("pur", pur);
+        
+        ReturnWrap rw = super.getSelfSvcCallHub().netNbrQuery(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            //设置返回结果
+            map.put("returnObj", rw.getReturnObject());
+            
+            //设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    
+    /**
+     * 查网段列表(如：0531、0532)
+     * <功能详细描述>
+     * @param terminalInfoPO 终端信息
+     * @param curMenuId 当前菜单
+     * @param netnbr 网号
+     * @param nettype 网络类型(默认传"GSM")
+     * @param pur 号码用途(默认传"rsupSal")
+     * @param pageIndex 页数
+     * @param orgid 地区
+     * @return
+     * @see [类、类#方法、类#成员]
+     */
+    public Map netValueQuery(TerminalInfoPO terminalInfoPO,String curMenuId,String netnbr,String nettype,String pur)
+    {
+        Map paramMap = new HashMap();
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        //区域
+        paramMap.put("region", terminalInfoPO.getRegion());
+        
+        //设置终端机OrgId
+        paramMap.put("orgId", terminalInfoPO.getOrgid());
+        
+        // 网号
+        paramMap.put("netnbr", netnbr);
+        
+        // 网络类型(默认传"GSM")
+        paramMap.put("nettype", nettype);
+        
+        // 号码用途(默认传"rsupSal")
+        paramMap.put("pur", pur);
+        
+        ReturnWrap rw = super.getSelfSvcCallHub().netValueQuery(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            String returnMsg = rw.getReturnMsg();
+            Map map = new HashMap();
+            
+            //设置返回结果
+            map.put("returnObj", rw.getReturnObject());
+            
+            //设置返回信息
+            map.put("returnMsg", returnMsg);
+            
+            return map;
+        }
+        return null;
+    }
+    
+    /**
+     * 查询符合指定模式的号码列表
+     * 
+     * @param terminalInfoPO
+     * @param curMenuId
+     * @param model
+     * @param pattern
+     * @return
+     * @see 
+     */
+    public List<ServerNumPO> querySpecifiedPatternNums(TerminalInfoPO terminalInfoPO,
+            String curMenuId, String model, String pattern)
+    {
+        String telFee = (String) PublicCache.getInstance().getCachedData(Constants.SH_TEL_FEE);
+        if (null == telFee)
+        {
+        	telFee = "5000";
+        }
+        
+        String maxCount = (String) PublicCache.getInstance().getCachedData(Constants.SH_SELECTTEL_MAXCOUNT);
+        if (null == maxCount)
+        {
+        	maxCount = "2000";
+        }
+        
+        List<ServerNumPO> telnums = new ArrayList<ServerNumPO>();
+        
+        Map<String, String> paramMap = new HashMap<String, String>();
+        
+        // 新版标识
+        paramMap.put("newVersion", "1");
+        
+        //设置操作员id
+        paramMap.put("curOper", terminalInfoPO.getOperid());
+        
+        //设置终端机id
+        paramMap.put("atsvNum", terminalInfoPO.getTermid());
+        
+        //区域
+        paramMap.put("region", terminalInfoPO.getRegion());
+        
+        //设置当前菜单
+        paramMap.put("curMenuId", curMenuId);
+        
+        //号码模式
+        paramMap.put("model", model);
+        
+        // 特殊号码预付金上限
+        paramMap.put("maxPrice", "");
+
+        // 特殊号码预付金下限
+        paramMap.put("minPrice", "");
+        
+        // 产品品牌
+        paramMap.put("prodType", "");
+        
+        // 号码类型
+        paramMap.put("telType", "rsclTgsm");
+        
+        // 返回记录最大的数量
+        paramMap.put("maxcount", maxCount);
+        
+        // 按地市查询
+        paramMap.put("iscountry", "0");
+        
+        paramMap.put("telnum", "");
+        
+        paramMap.put("orgid", "");
+
+        ReturnWrap rw = super.getSelfSvcCallHub().phoneNumQuery(paramMap);
+        if (rw != null && rw.getStatus() == SSReturnCode.SUCCESS)
+        {
+            // 所有可预约的号码列表
+            CRSet crset = (CRSet) rw.getReturnObject();
+            
+            if (crset != null)
+            {
+                ServerNumPO serverNumPO = null;
+                String telnum = "";
+                String fee = "";
+                
+                for (int i = 0; i < crset.GetRowCount(); i++)
+                {
+                    telnum = crset.GetValue(i, 0);
+                    fee = crset.GetValue(i, 1);
+                    
+                    // 判断是否符合指定模式
+                    if (isEligibleNum(telnum, pattern))
+                    {
+                        serverNumPO = new ServerNumPO();
+                        
+                        serverNumPO.setTelnum(crset.GetValue(i, 0));
+                        
+                        // CRM有返回费用时，使用CRM返回的费用；CRM未返回费用时，使用默认费用
+                        if (null == fee || "".equals(fee.trim()))
+                        {
+                            serverNumPO.setSeltel_prepayfee(telFee);// 预存费用
+                        }
+                        else
+                        {
+                            serverNumPO.setSeltel_prepayfee(fee);// 预存费用
+                        }
+                        // add begin liutao 2016-07-30 OR_HUB_201603_1191  自助终端显示内容优化需求（张德伟）
+                        serverNumPO.setMinimumCharge(crset.GetValue(i, 2));// 最低消费金额
+                        telnums.add(serverNumPO);
+                    }                    
+                }
+            }
+        }
+        
+        return telnums;
+    }
+    
+    /**
+     * 判断号码是否符合指定的模式
+     * 
+     * @param telnum 手机号码
+     * @param pattern 模式
+     * @return true，符合指定模式；false，不符合指定模式
+     * @see 
+     */
+    private boolean isEligibleNum(String telnum, String pattern)
+    {
+        // 非11位的字符串
+        if (null == telnum || "".equals(telnum.trim()) || telnum.length() != 11)
+        {
+            return false;
+        }
+        
+        if ("ABAB".equalsIgnoreCase(pattern))
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                if (telnum.charAt(i) != telnum.charAt(i + 1) && telnum.substring(i, i + 2).equals(telnum.substring(i + 2, i + 4)))
+                {
+                    return true;
+                }
+            }
+        }
+        else if ("AABB".equalsIgnoreCase(pattern))
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                if (telnum.charAt(i) == telnum.charAt(i + 1) && telnum.charAt(i + 2) == telnum.charAt(i + 3)
+                        && telnum.charAt(i) != telnum.charAt(i + 2))
+                {
+                    return true;
+                }
+            }
+        }
+        else if ("ABBB".equalsIgnoreCase(pattern))
+        {
+            // 从第一位开始比较
+            for (int i = 1; i < 9; i++)
+            {
+                if (telnum.charAt(i - 1) != telnum.charAt(i) && telnum.charAt(i) == telnum.charAt(i + 1) 
+                        && telnum.charAt(i) == telnum.charAt(i + 2))
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+}

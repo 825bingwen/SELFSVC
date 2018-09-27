@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 产品查询受理 -->
+	<package name="prodOrder" extends="struts-common" namespace="/prodOrder">
+	
+		<!-- 产品查询类型选择 -->
+		<action name="showType" class="prodOrderAction" method="showType">
+			<result name="success">/jsp/customize/cq/prodOrder/selType.jsp</result>
+		</action>
+		
+		<!-- 产品查询订购或退订页面 -->
+		<action name="queryProdList" class="prodOrderAction" method="queryProdList">
+		    <result name="prodOrdered">/jsp/customize/cq/prodOrder/recProdOrdered.jsp</result>
+		    <result name="prodOrdering">/jsp/customize/cq/prodOrder/recProdOrdering.jsp</result>
+		</action>
+		
+		<!-- 增值产品订购 -->
+		<action name="orderProd" class="prodOrderAction" method="orderProd">
+		    <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>
+	</package>
+</struts>

@@ -1,0 +1,15 @@
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('YCKFCX_Atsv', 4, null, '100=0', '', '', '返回值转换', null);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('YCKFCX_Atsv', 1, null, '', 'OPCODE', 'YCKFCX', '月初扣费查询', null);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('YCKFCX_Atsv', 2, 0, 'TELNUM=MSISDN&OPERID=OPERID', '', '', '输入参数转换', null);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('YCKFCX_Atsv', 3, 4, '', '', '', '输出参数转换', 1);
+
+insert into int_command_param (COMMANDID, PARAMTYPE, TRANSTYPE, PARAMFMT, PARAMNAME, PARAMVALUE, PARAMDESC, BEGINROW)
+values ('YCKFCX_Atsv', 3, 0, 'SUM_FUNCFEE=SUM_FUNCFEE&SUM_PACKAGEFEE=SUM_PACKAGEFEE&SUM_BASEFEE=SUM_BASEFEE', '', '', '输出参数转换', null);
+

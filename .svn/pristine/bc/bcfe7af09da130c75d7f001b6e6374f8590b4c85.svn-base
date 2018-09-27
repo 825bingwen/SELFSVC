@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="broadBandAppoint" extends="struts-common" namespace="/broadBandAppoint">
+	
+		<!-- 宽带预约 -->
+		
+		<!-- 宽带预约——实名制验证初始化 -->
+		<action name="initRealName" class="broadBandAppointAction" method="initRealName">
+			<result name="qryArea">/jsp/customize/hub/broadBandAppoint/selectArea.jsp</result>
+		</action>
+
+		<!-- 宽带预约——宽带预约介绍 -->
+		<action name="qryAppointMsg" class="broadBandAppointAction" method="qryAppointMsg">
+		    <result name="qryAppointMsg">/jsp/customize/hub/broadBandAppoint/qryAppointMsg.jsp</result>
+		</action>
+		
+		<!-- 宽带预约——预约提交 -->
+		<action name="broadBandAppoint" class="broadBandAppointAction" method="broadBandAppoint">
+			<result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+		</action>
+		
+	</package>	
+</struts>

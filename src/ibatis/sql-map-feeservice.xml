@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="feeservice">
+	<typeAlias alias="timesPO" type="com.gmcc.boss.selfsvc.feeservice.model.DetailedRecordsTimesPO" />
+
+	<!--modify begin g00140516 2013/02/02 R003C13L01n01 每年的12个月，每月详单均只能打印一次 -->
+	<select id="getPrintTimes" parameterClass="timesPO" resultClass="timesPO">
+	SELECT TELNUM AS servNumber, CYCLE AS month, PRINTNUM AS times, TO_CHAR(LASTPRINTDATE, 'YYYY-MM-DD') printDate, LISTTYPE AS listtype 
+	  FROM SH_LOG_PRINTBILLNUM
+	 WHERE TELNUM=#servNumber# AND CYCLE=#month# AND LISTTYPE=#listtype#
+	 ORDER BY printDate DESC
+	</select>
+	<!--modify end g00140516 2013/02/02 R003C13L01n01 每年的12个月，每月详单均只能打印一次 -->
+	
+	<insert id="addPrintTimes" parameterClass="com.gmcc.boss.selfsvc.feeservice.model.DetailedRecordsTimesPO">
+		INSERT INTO SH_LOG_PRINTBILLNUM(TELNUM, CYCLE,PRINTNUM,LASTPRINTDATE,LISTTYPE)
+		VALUES(#servNumber#,#month#,#times#,SYSDATE,#listtype#)
+	</insert>
+	
+	<update id="updatePrintTimes" parameterClass="com.gmcc.boss.selfsvc.feeservice.model.DetailedRecordsTimesPO">
+		UPDATE SH_LOG_PRINTBILLNUM 
+		SET PRINTNUM=#times#, LASTPRINTDATE=SYSDATE
+		WHERE TELNUM=#servNumber# AND CYCLE=#month# AND LISTTYPE=#listtype#
+	</update>
+	
+	<!-- yKF28472 begin 20111126 增加湖北打印全部详单次数限制 -->
+	<select id="getPrintTimesHUB" parameterClass="timesPO" resultClass="timesPO">
+	SELECT TELNUM AS servNumber, CYCLE AS month, PRINTNUM AS times, LISTTYPE AS listtype 
+	  FROM SH_LOG_PRINTBILLNUM
+	 WHERE TELNUM=#servNumber# AND CYCLE=#month#
+	</select>
+	<insert id="addPrintTimesHUB" parameterClass="com.gmcc.boss.selfsvc.feeservice.model.DetailedRecordsTimesPO">
+		INSERT INTO SH_LOG_PRINTBILLNUM(TELNUM, CYCLE,PRINTNUM,LASTPRINTDATE,LISTTYPE)
+		VALUES(#servNumber#,#month#,#times#,SYSDATE,'')
+	</insert>
+	<update id="updatePrintTimesHUB" parameterClass="com.gmcc.boss.selfsvc.feeservice.model.DetailedRecordsTimesPO">
+		UPDATE SH_LOG_PRINTBILLNUM 
+		SET PRINTNUM=#times#, LASTPRINTDATE=SYSDATE
+		WHERE TELNUM=#servNumber# AND CYCLE=#month#
+	</update>
+	<!-- yKF28472 end 20111126 增加湖北打印全部详单次数限制 -->
+	
+	<!-- add begin sWX219697 2014-6-3 15:34:58 OR_huawei_201405_877 -->
+	<select id="authDetailPrintPwd" parameterClass="com.customize.sd.selfsvc.feeService.model.DetailPrintPwdPo" resultClass="java.lang.Integer">
+		SELECT COUNT(A.TERMID) 
+		FROM SH_DETAIL_PRINT_PWD A 
+		WHERE A.TERMID = #termId# AND A.PASSWORD = #detailPwd#
+	</select>
+	<!-- add end sWX219697 2014-6-3 15:34:58 OR_huawei_201405_877 -->
+		
+</sqlMap>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <!-- 基础服务办理 -->
+	<package name="billSend" extends="struts-common" namespace="/billSend">
+
+        <!-- 转到账单寄送页面 -->
+        <action name="billSendPage" class="billSendAction" method="billSendPage">
+                <result name="selectBillSendType">/jsp/customize/hub/billSend/selectBillSendType.jsp</result>
+        </action>
+        
+        <!-- 账单寄送 -->
+        <action name="billSendCommit" class="billSendAction" method="billSendCommit">
+                <result name="success">/jsp/reception/common/receptionSuccess.jsp</result>
+        </action>
+         <!-- 返还信息-->
+          <action name="QueryAllBackInfo" class="backInfoAction" method="QueryAllBackInfo">
+                <result name="QueryAll">/jsp/customize/hub/backInfo/backInfoList.jsp</result>
+        </action>
+         <action name="backInfoDateInput" class="backInfoAction" method="backInfoDateInput">
+                <result name="backInfoDateInput">/jsp/customize/hub/backInfo/dateInput.jsp</result>
+        </action>
+           <action name="QueryAllBackInfoByDate" class="backInfoAction" method="QueryAllBackInfoByDate">
+                <result name="QueryAllByDate">/jsp/customize/hub/backInfo/backInfoList.jsp</result>
+        </action>
+          <!-- 返还中止和作废信息-->
+            <action name="QueryAbortBackInfo" class="backInfoAction" method="QueryAbortBackInfo">
+                <result name="QueryAbort">/jsp/customize/hub/backInfo/backAbortInfoList.jsp</result>
+        </action>
+          <action name="QueryAbortBackInfoByDate" class="backInfoAction" method="QueryAbortBackInfoByDate">
+                <result name="QueryAbortByDate">/jsp/customize/hub/backInfo/backAbortInfoList.jsp</result>
+        </action>
+         <!-- 电子券返还信息查询 add begin by yKF73963 20130317  OR_HUB_201301_780 关于BOSS触发手机支付电子券的分月赠送的需-->
+         
+          <action name="ecashReturnInfoQuery" class="ecashReturnInfoQueryAction" method="ecashReturnInfoQuery">
+                <result name="ecashReturnInfoList">/jsp/customize/hub/backInfo/ecashReturnInfoList.jsp</result>
+                <result name="ecashDateInput">/jsp/customize/hub/backInfo/dateInput.jsp</result>
+        </action>
+          <!-- 电子券返还信息查询 add end by yKF73963 20130317  OR_HUB_201301_780 关于BOSS触发手机支付电子券的分月赠送的需-->
+	</package>	
+</struts>

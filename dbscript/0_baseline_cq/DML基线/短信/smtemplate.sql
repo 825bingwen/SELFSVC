@@ -1,0 +1,3 @@
+insert into smtemplate (TEMPLATE_NO, TEMPLATE_TYPE, DESCRIPTION, SMS_PORT, DISP_FROM, REPORT, VALID_TIME, CONTENT, INTIME, DO_VALID_TIME, BEGINDATE, ENDDATE, PRIORITY, WORKTIME, FEETYPE, FEECODE, LONGSMSTYPE, OVERTIME, AUDITSTATUS, DELAYTIME, ENCPARA)
+values ('Atsv0001', 'REC00100', '×ÔÖú¶ÌÐÅ·¢ËÍ', '10086', '10086', '0', 7200, '%1', to_date('06-02-2007 14:54:02', 'dd-mm-yyyy hh24:mi:ss'), 86400, to_date('01-01-1999', 'dd-mm-yyyy'), to_date('01-01-2099', 'dd-mm-yyyy'), 1, '', '01', '000000', 0, 0, 1, 0, ' ');
+

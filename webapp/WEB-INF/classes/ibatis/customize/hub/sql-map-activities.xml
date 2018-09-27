@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="activities">
+
+	<!-- 促销活动 -->
+	<typeAlias alias="activityVO" type="com.customize.hub.selfsvc.activitiesrec.model.ActivityVO" />
+	<!-- 活动受理日志 -->
+	<typeAlias alias="privLogVO" type="com.customize.hub.selfsvc.privAccept.model.PrivLogVO" />
+	<!-- 缴费日志 -->
+	<typeAlias alias="cardChargeLog" type="com.gmcc.boss.selfsvc.charge.model.CardChargeLogVO"/>
+	
+	<!-- 查询促销活动组 -->
+	<select id="getActivitieGroups" resultClass="activityVO" parameterClass="activityVO">
+		SELECT DISTINCT GROUPID,GROUPNAME 
+		FROM SH_ACTIVITY_INFO
+		WHERE STATUS = 1 
+		AND GROUPID NOT IN 
+		(
+			SELECT GROUPID 
+			FROM SH_ACTIVITY_INFO
+			WHERE STATUS = 1 
+			<isNotEmpty prepend="AND" property="region"> 
+				AREA in (#region#, 999)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dangciIds"> 
+				DANGCIID in ($dangciIds$)
+			</isNotEmpty>
+		)
+		<isNotEmpty prepend="AND" property="region"> 
+				AREA in (#region#, 999)
+		</isNotEmpty>
+	</select>
+	
+	<!-- 根据组查询档次 -->
+	<select id="getDangciByGroupId" resultClass="activityVO" parameterClass="activityVO">
+		SELECT AREA REGION,ACTIVITYID,DANGCIID,DANGCINAME,PREPAYFEE,PRESENTVALUE,GROUPID,GROUPNAME,STATUSDATE,STATUS 
+		FROM SH_ACTIVITY_INFO
+		WHERE STATUS = 1 
+		<isNotEmpty prepend="AND" property="groupId"> 
+			GROUPID = #groupId#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 根据活动编码和档次编码查询档次 -->
+	<select id="getDangciById" resultClass="activityVO" parameterClass="activityVO">
+		SELECT ACTIVITYID,DANGCIID,DANGCINAME,ACTIVITYDESC
+		FROM SH_ACTIVITY_INFO
+		WHERE ACTIVITYID = #activityId# AND DANGCIID = #dangciId#
+	</select>
+	
+	<!-- 添加受理优惠日志记录 -->
+	<insert id="insertPrivLog" parameterClass="privLogVO">
+		<selectKey resultClass="java.lang.String" keyProperty="privLogOID">  
+            SELECT SEQ_SH_RECOID.NEXTVAL FROM DUAL   
+        </selectKey>
+		    INSERT INTO SH_LOG_PRIV(PRIVLOGOID,CHARGEID,REGION,SERVNUMBER,PRIVID,PRIVNCODE,
+		    			RECDATE, PRIVFEE,TOFEE,CHARGEFEE,CHARGETYPE, RECSTAUTS, RECSTAUTSDESC,RECTYPE)
+	        VALUES(
+	             #privLogOID#, #chargeID#,#region#,#servnumber#,#privId#,#privNcode#,to_date(#recDate#, 'yyyy-mm-dd hh24:mi:ss'),
+		         #privFee#,#toFee#,#chargeFee#,#chargeType#,#recStatus#, #recStatusDesc#, #recType#)
+	</insert>
+	
+	<!-- 根据ID查询chargeLog对象 -->
+	<select id="getChargeLogById" resultClass="cardChargeLog" parameterClass="cardChargeLog">
+		SELECT CHARGELOGOID,REGION,TERMID,OPERID,SERVNUMBER,PAYTYPE,FEE,UNIONPAYUSER,UNIONPAYCODE,BUSITYPE,CARDNUMBER,BATCHNUM,AUTHORIZATIONCODE,BUSINESSREFERENCENUM,
+  		 	UNIONPAYTIME,VOUCHERNUM,UNIONPAYFEE,TERMINALSEQ,RECDATE,STATUS,DESCRIPTION,DEALNUM,ACCEPTTYPE,SERVREGION,CHECKFLAG,ORGID,POSNUM,BATCHNUMBEFOREKOUKUAN,
+  		 	CHECKRESULT,RECTYPE,REPAIRDATE,BANKNO,UNIONRETCODE,RECHARGESTATUS,RECHARGEOPERID
+		FROM SH_CHARGE_LOG 
+		WHERE CHARGELOGOID = #chargeLogOID#
+	</select>
+	
+</sqlMap>

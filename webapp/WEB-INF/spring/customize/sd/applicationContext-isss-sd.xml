@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- create by sWX219697 2014-9-18 OR_SD_201409_556_自助终端营销功能优化 -->
+	<!-- 智能营销平台Action -->
+	<bean id="iSSSAction" parent="baseAction" class="com.gmcc.boss.selfsvc.common.ISSSAction" scope="prototype">
+	</bean>
+	
+	<!-- Add begin wWX217192 2014-10-16 OR_SD_201407_1310_ISSS:ISSS平台营销活动产品配置功能扩展 -->
+	<!-- 智能营销平台工具类 -->
+	<bean id="iSSSInvokeUtil" class="com.gmcc.boss.selfsvc.common.ISSSInvokeUtil">
+		<property name="prodChangeBean" ref="prodChangeBean"></property>
+		<property name="userLoginBean" ref="userLoginBean"></property>
+	</bean>
+	<!-- Add end wWX217192 2014-10-16 OR_SD_201407_1310 ISSS:ISSS平台营销活动产品配置功能扩展 -->
+	
+</beans>

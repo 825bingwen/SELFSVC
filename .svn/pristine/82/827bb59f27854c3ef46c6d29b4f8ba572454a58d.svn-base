@@ -1,0 +1,116 @@
+/*
+ * 文 件 名:  USIMAction.java
+ * 版    权:  Huawei Technologies Co., Ltd. Copyright YYYY-YYYY,  All rights reserved
+ * 描    述:  <描述>
+ * 修 改 人:  qWX279398
+ * 修改时间:  2015-5-14
+ * 跟踪单号:  <跟踪单号>
+ * 修改单号:  <修改单号>
+ * 修改内容:  <修改内容>
+ */
+package com.customize.sd.selfsvc.usim.action;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.customize.sd.selfsvc.usim.service.CheckUSIMService;
+import com.gmcc.boss.selfsvc.common.BaseAction;
+import com.gmcc.boss.selfsvc.common.ReceptionException;
+
+/**
+ * 提示换USIM卡
+ * <功能详细描述>
+ * 
+ * @author  qWX279398
+ * @version  [版本号, 2015-5-14]
+ * @see  [相关类/方法]
+ * @since  [产品/模块版本]
+ */
+public class USIMAction extends BaseAction {
+	
+	// 日志
+	private static Log logger = LogFactory.getLog(USIMAction.class);
+	
+	// 序列化
+	private static final long serialVersionUID = 1L;
+	
+	// 菜单id
+	private String curMenuId = "";
+	
+	// 手机号码
+	private String servnumber = "";
+	
+	private CheckUSIMService checkUSIMService;
+
+	
+	/**
+	 * USIM卡是否更换 
+	 */
+	public void checkUSIM()
+	{
+		logger.debug("checkUSIM Starting ...");
+		
+		String message = "";
+		
+		try 
+		{
+			this.checkUSIMService.changeUSIMCard(curMenuId, servnumber);
+			message = "unChange";
+		}
+		
+		// 已更换USIM卡
+		catch (ReceptionException e) 
+		{
+			message = "change";
+		}
+		
+		// 发生异常，调用不成功
+		catch (Exception e) 
+		{
+			message = "failed";
+		}
+		
+		// AJAX调用返回消息
+		this.writeXmlMsg(message);
+		
+		this.getRequest().getSession().setAttribute("usimFlag", "0");
+		
+		logger.debug("checkUSIM End");
+	}
+	
+	/**
+	 * @return the checkUSIMService
+	 */
+	public CheckUSIMService getCheckUSIMService() {
+		return checkUSIMService;
+	}
+
+	/**
+	 * @param checkUSIMService the checkUSIMService to set
+	 */
+	public void setCheckUSIMService(CheckUSIMService checkUSIMService) {
+		this.checkUSIMService = checkUSIMService;
+	}
+
+	public String getCurMenuId() {
+		return curMenuId;
+	}
+
+	public void setCurMenuId(String curMenuId) {
+		this.curMenuId = curMenuId;
+	}
+
+	/**
+	 * @return the servnumber
+	 */
+	public String getServnumber() {
+		return servnumber;
+	}
+
+	/**
+	 * @param servnumber the servnumber to set
+	 */
+	public void setServnumber(String servnumber) {
+		this.servnumber = servnumber;
+	}
+}

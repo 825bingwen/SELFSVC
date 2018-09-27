@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="login" extends="struts-common">
+	
+		<!-- 框架页面  -->
+		<action name="login" class="terminalLoginAction" method="login">
+			<result name="frame">/frame.jsp</result>
+		</action>
+		
+		<!-- 主页面 -->
+		<action name="index" class="terminalLoginAction" method="index">
+			<result name="index">/index.jsp</result>
+		</action>
+		
+		<action name="goHomePage" class="terminalLoginAction" method="goHomePage">
+			<result name="home">/index2.jsp</result>
+			 <!-- add begin YKF70747 2012/04/08 R003C12L04n01 OR_SD_201203_818 --> 
+			<result name="keyHome">/index2Keyboard.jsp</result>
+			 <!-- add end YKF70747 2012/04/08 R003C12L04n01 OR_SD_201203_818 -->
+			 <!-- add begin hWX5316476 2014-12-9 OR_HUB_201408_628_湖北_新增自助终端上线提醒页面 -->
+			 <result name="sysUpdateTipPage">/sysUpdateTipPage.jsp</result>
+		</action>
+		
+		<action name="clearSession" class="terminalLoginAction" method="clearSession">
+		</action>
+
+		<!-- 使用服务密码进行身份认证 -->
+		<action name="userLoginWithPwd" class="userLoginAction" method="loginWithPwd">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/servicepassword.jsp</result>
+			<result name="randomcode_editPwd">/jsp/login/randomcode_editPwd.jsp</result>
+		    <result name="continue">/jsp/customize/hub/recommendProduct/continue.jsp</result>
+		    <result name="goCheckPassword">/jsp/customize/hub/recommendProduct/checkPassword.jsp</result>
+		    <result name="failed_hub">/jsp/login/servicepassword_hub.jsp</result>
+		    <!-- add begin cKF76106 2012/12/14 V200R003C12L12 OR_NX_201211_746  -->
+		    <result name="initPwdLogin">/jsp/login/initPwdLogin_nx.jsp</result>
+		    <!-- add end cKF76106 2012/12/14 V200R003C12L12 OR_NX_201211_746  -->
+		</action>
+		
+		<!-- 山东登录密码为初始密码时需进行"随机密码认证"后修改密码 -->
+		<action name="editPasswordByRandomPwd" class="userLoginAction" method="editPasswordByRandomPwd">
+			<result name="success">/jsp/login/editPassword.jsp</result>
+			<result name="failed">/jsp/login/randomcode_editPwd.jsp</result>
+		</action>
+		
+		<!-- 修改密码 -->
+		<action name="editPassword" class="userLoginAction" method="editPassword">
+			<result name="success">/jsp/login/alert.jsp</result>
+			<result name="failed">/jsp/login/alert.jsp</result>
+		</action>
+		
+		<!-- 从服务密码认证页面转向随机密码认证登录页面 -->
+		<action name="randomcode_cq" class="userLoginAction" method="randomcode_cq">
+			<result name="success">/jsp/login/randomcode_cq.jsp</result>
+			<result name="failed">/jsp/login/servicepassword.jsp</result>
+		</action>
+		
+		<!-- 重庆随机密码进行登录 -->
+		<action name="loginWithRandom_cq" class="userLoginAction" method="loginWithRandom_cq">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/randomcode_cq.jsp</result>
+		</action>
+				
+		<!-- 向用户发送随机密码短信 -->
+		<action name="randomPwd" class="userLoginAction" method="sendRandomPwd">
+			<result name="success">/jsp/login/randomcode.jsp</result>
+			<result name="failed">/commonError.jsp</result>
+		</action>
+				
+		<!-- 使用随机密码进行身份认证 -->
+		<action name="userLoginWithRandomPwd" class="userLoginAction" method="loginWithRandomPwd">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/randomcode.jsp</result>
+		</action>		
+		
+		<!-- 使用身份证进行认证 -->
+		<action name="userLoginWithID" class="userLoginAction" method="loginWithID">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/id.jsp</result>
+		</action>
+		
+		<!-- 删除终端ID对应的登录信息 -->
+		<action name="deleteLoginCheckByTermId" class="userLoginAction" method="deleteLoginCheckByTermId">
+		</action>
+		
+		<!-- 转到父页面 -->
+		<action name="backForward" class="terminalForwardAction" method="backForward">
+			<result name="back">/back.jsp</result>
+			<result name="funclist01">/jsp/reception/common/receptionIndex_hub.jsp</result>
+			<!-- 热门业务推荐_自定义图标 -->
+			<result name="funclist">/jsp/reception/common/recHotspot_hub.jsp</result>
+			<!-- 热门业务推荐_统一图标 -->
+			<result name="funclist_unify">/jsp/reception/common/recHotspotUnify_hub.jsp</result>
+		</action>
+		
+		<!-- 功能列表页面切换 -->
+		<action name="turnPage" class="terminalForwardAction" method="turnPage">
+			<result name="turnPage">/index.jsp</result>
+		</action>
+		
+		<!-- 向用户发送短信验证码(湖北) -->
+		<action name="sendRandomPwd_hub" class="userLoginAction" method="sendRandomPwd_hub">
+		</action>
+		
+		<!-- 跳转到短信验证码登录页面(湖北) -->
+		<action name="goRamdomPage_hub" class="userLoginAction" method="goRamdomPage_hub">
+			<result name="goRamdomPage">/jsp/login/randomcode_hub.jsp</result>
+		</action>
+		
+		<!-- 跳转到服务密码登录页面(湖北) -->
+		<action name="goServicePwdPage_hub" class="userLoginAction" method="goServicePwdPage_hub">
+			<result name="goServicePwdPage">/jsp/login/servicepassword_hub.jsp</result>
+		</action>
+		
+		<!-- 短信验证码登录(湖北) -->
+		<action name="loginWithRandomPwd_hub" class="userLoginAction" method="loginWithRandomPwd_hub">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/randomcode_hub.jsp</result>
+		</action>
+		
+		<!-- add begin cKF76106 2012/12/14 V200R003C12L12 OR_NX_201211_746  -->
+		<!-- 初始密码登录，修改密码 -->
+		<action name="sendRandomCode" class="userLoginAction" method="sendRandomCode">
+			<result name="randomcode_editPwd">/jsp/login/randomcode_editPwd.jsp</result>
+		</action>
+		
+		<!-- 初始密码登录，转向身份证认证页面 -->
+		<action name="goIdCardPage" class="userLoginAction" method="goIdCardPage">
+			<result name="idCardPage">/jsp/login/id.jsp</result>
+		</action>
+		<!-- add end cKF76106 2012/12/14 V200R003C12L12 OR_NX_201211_746  -->
+
+		<!-- add begin m00227318 2013/02/18 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+		<!-- 转向服务密码认证页面 -->
+		<action name="goServicePwdPage" class="userLoginAction" method="goServicePwdPage">
+			<result name="servicePwdPage">/jsp/login/servicepassword.jsp</result>
+		</action>
+		
+		<!-- 转向短信验证码认证页面 -->
+		<action name="goRandomPwdPage" class="userLoginAction" method="goRandomPwdPage">
+			<result name="randomPwdPage">/jsp/login/optionalmode/randomPwd.jsp</result>
+		</action>
+		
+		<!-- 转向身份证认证页面(宁夏) -->
+		<action name="goIDPage" class="userLoginAction" method="goIDPage">
+			<result name="idCardPage">/jsp/login/id.jsp</result>
+		</action>
+		
+		<!-- 短信验证码登录 -->
+		<action name="loginWithRandomPwdNew" class="userLoginAction" method="loginWithRandomPwdNew">
+			<result name="success">/jsp/login/loginSuccess.jsp</result>
+			<result name="failed">/jsp/login/optionalmode/randomPwd.jsp</result>
+		</action>
+		<!-- add end m00227318 2013/02/18 R003C13L01n01 宁夏，修改，增加可选认证方式 -->
+		<!-- add begin zKF77391 2013/03/29  OR_NX_201303_803_宁夏_[宁夏自助终端]_增加黑名单用户不允许查询、办理业务功能-->
+		<!-- 查询手机号是否在黑名单里面 -->
+		<action name="checkBlackList" class="userLoginAction" method="checkBlackList"></action>
+		<!-- add end zKF77391 2013/03/29 OR_NX_201303_803_宁夏_[宁夏自助终端]_增加黑名单用户不允许查询、办理业务功能 -->
+		
+		<!-- 是否实名制信息登记 -->
+		<action name="realNameCheck" class="userLoginAction" method="realNameCheck"></action>
+		
+		<!-- add begin hWX5316476 2014-2-18 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求 -->
+		<!-- 登录时校验是否是弱密码(宁夏) -->
+		<action name="weakPwdCheckLogin" class="userLoginAction" method="weakPwdCheckLogin"></action>
+		<!-- add end hWX5316476 2014-2-18 OR_NX_201402_306 宁夏自助终端优化需求_弱密码改造需求 -->
+		
+		<!--add begin lWX5316086 2013-9-3 终端监控平台 -->
+		<!-- 设备开关机 -->
+		<action name="termOnOff" class="terminalOnOffAction" method="termOnOff">
+		</action>
+		<action name="updateTermHeart" class="terminalOnOffAction" method="updateTermHeart">
+		</action>
+		
+		<!--add end lWX5316086 2013-9-3 终端监控平台 -->
+		
+		<!-- add begin hWX5316476 2014-12-9 OR_HUB_201408_628_湖北_新增自助终端上线提醒页面 -->
+		<!-- 查询是否跳转系统升级提示页面 -->
+		<action name="qrySysUpdateTipPage" class="userLoginAction" method="qrySysUpdateTipPage">
+		</action>
+		
+		<!-- 查询升级开关 -->
+		<action name="qrySysUpdateSwitch" class="userLoginAction" method="qrySysUpdateSwitch">
+		</action>
+		
+		<!-- 跳转系统升级页面 -->
+		<action name="goSysUpdateTipPage" class="userLoginAction" method="goSysUpdateTipPage">
+			<result name="sysUpdateTipPage">/sysUpdateTipPage.jsp</result>
+		</action>
+		<!-- add end hWX5316476 2014-12-9 OR_HUB_201408_628_湖北_新增自助终端上线提醒页面 -->
+	</package>		
+</struts>

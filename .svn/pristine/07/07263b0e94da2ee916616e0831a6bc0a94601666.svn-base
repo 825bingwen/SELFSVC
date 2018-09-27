@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="invoice" extends="struts-common" namespace="/invoice">
+	
+		<!-- 显示最近的6个月 -->
+		<action name="qryCurrentMonth" class="invoicePrintAction" method="qryCurrentMonth">
+			<result name="qryCurrentMonth">/jsp/customize/sd/invoice/currentMonthInvoice.jsp</result>
+		</action>
+		
+		<!-- 读取要打印的记录信息 -->
+		<action name="invoiceList" class="invoicePrintAction" method="invoiceList">
+			<result name="success">/jsp/customize/sd/invoice/invoiceList.jsp</result>
+		</action>
+		
+		<!-- 打印发票 -->
+		<action name="printInvoice" class="invoicePrintAction" method="printInvoice">
+			<result name="success">/jsp/customize/sd/invoice/printInvoice.jsp</result>
+		</action>
+		
+		<!-- 发票打印日志记录 -->
+		<action name="insertInvoiceLog" class="invoicePrintAction" method="insertInvoiceLog">
+		</action>
+	</package>	
+	
+	<!-- 山东月结发票打印 -->
+	<package name="monthInvoicePrint" extends="struts-common" namespace="/monthInvoicePrint">
+		<!-- 显示最近的6个月 -->
+		<action name="qryCurrentMonth" class="invoicePrintAction" method="qryCurrentMonth">
+			<result name="qryCurrentMonth">/jsp/customize/sd/invoice/currentMonthInvoice.jsp</result>
+			<!-- <result name="error">/commonError.jsp</result> -->
+		</action>
+		
+		<!-- 查询账期数据 -->
+		<action name="qryBillCycle" class="invoicePrintAction" method="qryBillCycle">
+			<result name="selectCycle">/jsp/customize/sd/invoice/monthInvoiceResults.jsp</result>
+			<result name="error">/commonError.jsp</result>
+		</action>
+		
+		<!-- 查询月结发票数据 -->
+		<!-- <action name="printMonthInvoice" class="invoicePrintAction" method="printMonthInvoice">
+		</action> -->
+	</package>
+	
+</struts>

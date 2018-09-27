@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"> 
+	
+	<!-- 操作数据库基类 -->
+	
+	<!-- baseDao -->
+	<bean id="baseDao" class="com.gmcc.boss.selfsvc.common.BaseDaoImpl">
+	    <property name="sqlMapClientTemplate" ref="sqlMapClientTemplate"></property>
+	</bean>
+	
+	<!-- intMsgUtil -->
+	<bean id="intMsgUtil" class="com.gmcc.boss.selfsvc.call.IntMsgUtil" scope="prototype"></bean>
+	
+	<!--modify begin g00140516 2011/12/09 R003C11L12n01 详单查询实现socket协议 -->
+	<bean id="socketUtil" class="com.gmcc.boss.selfsvc.call.SocketUtil" scope="prototype"></bean>
+	
+	<!-- selfSvcCall -->
+	<bean id="selfSvcCall" class="com.gmcc.boss.selfsvc.call.SelfSvcCallImpl">
+		<property name="intMsgUtil" ref="intMsgUtil"></property>
+		<property name="socketUtil" ref="socketUtil"></property>
+	</bean>
+	<!--modify end g00140516 2011/12/09 R003C11L12n01 详单查询实现socket协议 -->
+		
+	<!-- 操作接口基类 -->
+	
+	<!-- baseBean -->
+	<bean id="baseBean" class="com.gmcc.boss.selfsvc.common.BaseBeanImpl">	
+	    <property name="selfSvcCall" ref="selfSvcCall"></property>	
+	</bean>
+	
+	
+	<!-- 公共操作类 -->
+	
+	<!-- daoImpl -->
+	<bean id="selfSvcDaoImpl" parent="baseDao" class="com.gmcc.boss.selfsvc.common.dao.SelfSvcDaoImpl"/>
+	
+	<!-- serviceImpl -->
+	<bean id="selfSvcServiceImpl" class="com.gmcc.boss.selfsvc.common.service.SelfSvcServiceImpl">
+		<property name="selfSvcDaoImpl"><ref bean="selfSvcDaoImpl"/></property>
+	</bean>
+	
+	<!-- service -->
+	<bean id="selfSvcService" parent="baseTransactionProxy">
+		<property name="target"><ref local="selfSvcServiceImpl"/></property>
+	</bean>
+	
+	<!-- baseAction -->
+	<bean id="baseAction" class="com.gmcc.boss.selfsvc.common.BaseAction">
+		<property name="selfSvcService"><ref bean="selfSvcService"/></property>
+	</bean>
+	
+	 
+</beans>

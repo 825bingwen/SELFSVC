@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="prodChange">
+    <!-- 主体产品PO -->
+    <typeAlias alias="prodChangePO" type="com.customize.sd.selfsvc.prodChange.model.ProdChangePO"/>
+    <!-- 产品内模板 -->
+    <typeAlias alias="prodTemplatePO" type="com.customize.sd.selfsvc.prodChange.model.ProdTemplatePO"/>
+    
+    <!-- 查询产品内模板列表 -->
+    <select id="qryLevelByProdId" resultClass="prodTemplatePO" parameterClass="prodChangePO">
+        SELECT T.PRODID,#newProdName# AS PRODNAME ,T.NCODE TEMPLATEID,T.LEVELNAME TEMPLATENAME ,T.LEVELDESC TEMPLATEDESCR 
+        FROM SH_GROUPLEVEL_INFO  T
+		WHERE 
+		<![CDATA[T.EFFDATE <= SYSDATE]]>
+        AND <![CDATA[T.ENDDATE >= SYSDATE ]]>
+        AND (T.REGION = 999 OR T.REGION = #region#)
+        AND T.PRODID = #newProdId#
+        AND T.STATUS = 1
+    </select>
+</sqlMap>
